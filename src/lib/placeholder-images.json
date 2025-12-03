@@ -1,3 +1,112 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "map-main",
+      "description": "An aerial view of a city map showing streets and buildings.",
+      "imageUrl": "https://images.unsplash.com/photo-1446776899648-aa78eefe8ed0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjaXR5JTIwbWFwfGVufDB8fHx8MTc2NDc1MDQwNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city map"
+    },
+    {
+      "id": "map-preview",
+      "description": "A small preview of a map location.",
+      "imageUrl": "https://images.unsplash.com/photo-1532154187607-d766ed024aac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtYXAlMjBsb2NhdGlvbnxlbnwwfHx8fDE3NjQ3Mjc1Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "map location"
+    },
+    {
+      "id": "user-avatar-1",
+      "description": "Avatar for a user.",
+      "imageUrl": "https://images.unsplash.com/photo-1640951613773-54706e06851d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0NzQ2Njk3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "user-avatar-2",
+      "description": "Avatar for another user.",
+      "imageUrl": "https://images.unsplash.com/photo-1640951613773-54706e06851d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0NzQ2Njk3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "user-avatar-3",
+      "description": "Avatar for a third user.",
+      "imageUrl": "https://images.unsplash.com/photo-1640952131659-49a06dd90ad2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0NzQ2Njk3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "agro-connect",
+      "description": "Icon for AgroConnect service.",
+      "imageUrl": "https://images.unsplash.com/photo-1568623970736-27bea63b4489?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmYXJtJTIwcHJvZHVjZXxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farm produce"
+    },
+    {
+      "id": "skills-hub",
+      "description": "Icon for SkillsHub service.",
+      "imageUrl": "https://images.unsplash.com/photo-1641428318914-2371f8bcd282?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0b29scyUyMGhhbW1lcnxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tools hammer"
+    },
+    {
+      "id": "laundry-hub",
+      "description": "Icon for LaundryHub service.",
+      "imageUrl": "https://images.unsplash.com/photo-1467043153537-a4fba2cd39ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsYXVuZHJ5JTIwYmFza2V0fGVufDB8fHx8MTc2NDc5NzgxMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "laundry basket"
+    },
+    {
+      "id": "clean-crs",
+      "description": "Icon for CleanCRS service.",
+      "imageUrl": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0cmFzaCUyMGNhbnxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "trash can"
+    },
+    {
+      "id": "transport-guide",
+      "description": "Icon for Transport Guide service.",
+      "imageUrl": "https://images.unsplash.com/photo-1632276536839-84cad7fd03b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxidXN8ZW58MHx8fHwxNzY0NzU4MTQ2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bus"
+    },
+    {
+      "id": "community-safety",
+      "description": "Icon for Community Safety service.",
+      "imageUrl": "https://images.unsplash.com/photo-1761805364358-1a4446ffb0ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzaGllbGQlMjBzZWN1cml0eXxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "shield security"
+    },
+    {
+      "id": "seller-1",
+      "description": "A farmer selling fresh vegetables.",
+      "imageUrl": "https://images.unsplash.com/photo-1552825898-09a497ef3aff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx2ZWdldGFibGUlMjBzdGFsbHxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "vegetable stall"
+    },
+    {
+      "id": "seller-2",
+      "description": "A person selling fresh fruits.",
+      "imageUrl": "https://images.unsplash.com/photo-1587888507982-8f7e5acb0280?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmcnVpdCUyMHN0YW5kfGVufDB8fHx8MTc2NDc3ODg1Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fruit stand"
+    },
+    {
+      "id": "seller-3",
+      "description": "A seller with bags of grains.",
+      "imageUrl": "https://images.unsplash.com/photo-1573870016550-3b9a1b42b3d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxncmFpbiUyMHNhY2tzfGVufDB8fHx8MTc2NDc5NzgxMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "grain sacks"
+    },
+    {
+      "id": "seller-4",
+      "description": "Poultry farmer with chickens.",
+      "imageUrl": "https://images.unsplash.com/photo-1660085693363-5d6b3f459302?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjaGlja2VucyUyMGZhcm18ZW58MHx8fHwxNzY0NzA0Nzk3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "chickens farm"
+    },
+    {
+      "id": "artisan-1",
+      "description": "An electrician working on a circuit board.",
+      "imageUrl": "https://images.unsplash.com/photo-1595856619767-ab739fa7daae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxlbGVjdHJpY2lhbiUyMHdvcmtpbmd8ZW58MHx8fHwxNzY0Nzc1MjYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "electrician working"
+    },
+    {
+      "id": "artisan-2",
+      "description": "A plumber fixing a sink.",
+      "imageUrl": "https://images.unsplash.com/photo-1563197906-c1466d8e2edd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwbHVtYmVyJTIwZml4aW5nfGVufDB8fHx8MTc2NDc5NzgxMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plumber fixing"
+    },
+    {
+      "id": "artisan-3",
+      "description": "A carpenter measuring wood.",
+      "imageUrl": "https://images.unsplash.com/photo-1606462471470-e62753e2cfaf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjYXJwZW50ZXIlMjB3b29kfGVufDB8fHx8MTc2NDc0OTY0MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "carpenter wood"
+    }
+  ]
 }
