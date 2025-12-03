@@ -1,21 +1,30 @@
+
+'use client';
+
+import { usePathname } from 'next/navigation';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { AppMobileNav } from "./app-mobile-nav";
 import { AppHeader } from "./app-header";
+import { cn } from '@/lib/utils';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  // Don't show nav on the landing page
+  const showNav = pathname !== '/';
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-gradient-to-br from-blue-950 via-slate-900 to-violet-950">
-        <AppSidebar />
+        {showNav && <AppSidebar />}
         <div className="flex flex-col flex-1">
-          <AppHeader />
+          {showNav && <AppHeader />}
           <SidebarInset>
-            <main className="flex-1 pb-20 md:pb-0">
+            <main className={cn("flex-1", showNav && "pb-20 md:pb-0")}>
               {children}
             </main>
           </SidebarInset>
-          <AppMobileNav />
+          {showNav && <AppMobileNav />}
         </div>
       </div>
     </SidebarProvider>
