@@ -26,6 +26,7 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarSeparator,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Logo } from '../logo';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -49,8 +50,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar variant="inset" side='left'>
-      <SidebarHeader>
+      <SidebarHeader className="flex items-center justify-between">
         <Logo withText={true} />
+        <SidebarTrigger className="md:hidden" />
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
