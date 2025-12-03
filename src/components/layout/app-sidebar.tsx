@@ -15,6 +15,7 @@ import {
   LogOut,
   HelpCircle,
   LayoutDashboard,
+  Home,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -31,7 +32,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const navItems = [
-  { href: '/', icon: Map, label: 'Home (Map)' },
+  { href: '/', icon: Home, label: 'Home' },
+  { href: '/map', icon: Map, label: 'Map View' },
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/services', icon: GanttChartSquare, label: 'Services' },
   { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
