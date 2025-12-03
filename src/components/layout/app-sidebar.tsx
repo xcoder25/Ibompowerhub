@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -13,6 +14,7 @@ import {
   Settings,
   LogOut,
   HelpCircle,
+  LayoutDashboard,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -30,6 +32,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const navItems = [
   { href: '/', icon: Map, label: 'Home (Map)' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/services', icon: GanttChartSquare, label: 'Services' },
   { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
