@@ -52,7 +52,7 @@ export function AppSidebar() {
     <Sidebar variant="inset" side='left'>
       <SidebarHeader className="flex items-center justify-between">
         <Logo withText={true} />
-        <SidebarTrigger className="md:hidden" />
+        <SidebarTrigger />
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
@@ -76,12 +76,14 @@ export function AppSidebar() {
       <SidebarFooter>
          <SidebarMenu>
            <SidebarMenuItem>
-            <SidebarMenuButton tooltip="User Settings">
-              {userAvatar && <Avatar className="size-7">
-                <AvatarImage src={userAvatar.imageUrl} alt="User" />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>}
-              <span className='truncate'>Esther Howard</span>
+            <SidebarMenuButton tooltip="User Settings" asChild>
+                <Link href="/profile">
+                    {userAvatar && <Avatar className="size-7">
+                        <AvatarImage src={userAvatar.imageUrl} alt="User" />
+                        <AvatarFallback>U</AvatarFallback>
+                    </Avatar>}
+                    <span className='truncate'>Esther Howard</span>
+                </Link>
             </SidebarMenuButton>
            </SidebarMenuItem>
            <SidebarMenuItem>
