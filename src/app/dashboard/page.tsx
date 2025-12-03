@@ -1,10 +1,10 @@
 
 'use client';
 
-import { BarChart, Users, Megaphone, AlertTriangle, AreaChart, Activity } from 'lucide-react';
+import { Users, Megaphone, AlertTriangle, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 
 const chartData = [
@@ -92,7 +92,13 @@ export default function DashboardPage() {
               className="h-[300px] w-full"
             >
               <ResponsiveContainer>
-                <AreaChart data={chartData}>
+                <AreaChart
+                  data={chartData}
+                  margin={{
+                    left: 12,
+                    right: 12,
+                  }}
+                >
                   <defs>
                     <linearGradient id="colorReports" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8} />
