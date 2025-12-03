@@ -22,7 +22,7 @@ export default function SkillsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             placeholder="Search by category (e.g., electrician, plumber...)"
-            className="pl-10 text-base"
+            className="pl-10 text-base bg-background/50"
           />
         </div>
       </div>
@@ -31,7 +31,7 @@ export default function SkillsPage() {
         {artisans.map((artisan) => {
           const image = PlaceHolderImages.find((img) => img.id === artisan.imageId);
           return (
-            <Card key={artisan.id} className="p-4">
+            <Card key={artisan.id} glassy className="p-4">
               <div className="flex items-start gap-4">
                 {image && (
                   <Image

@@ -5,9 +5,9 @@ import { AppHeader } from "./app-header";
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen bg-gradient-to-br from-blue-950 via-slate-900 to-violet-950">
         <AppSidebar />
-        <SidebarInset className="flex flex-col flex-1">
+        <SidebarInset>
           <AppHeader />
           {children}
         </SidebarInset>

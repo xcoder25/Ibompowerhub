@@ -24,7 +24,7 @@ export default function AlertsPage() {
         {alerts.map((alert) => {
           const userAvatar = PlaceHolderImages.find((img) => img.id === alert.user.avatarId);
           return (
-            <Card key={alert.id} className="overflow-hidden">
+            <Card key={alert.id} glassy className="overflow-hidden">
               <CardHeader className="p-4">
                 <div className="flex items-start gap-4">
                   {userAvatar && (

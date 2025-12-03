@@ -28,15 +28,15 @@ export default function TransportPage() {
         </p>
       </div>
 
-      <Card>
+      <Card glassy>
         <CardHeader>
           <CardTitle className="font-headline">Route Fare Estimator</CardTitle>
           <CardDescription>Enter your origin and destination to get an estimated fare.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-            <Input placeholder="Origin" className='text-base' />
-            <Input placeholder="Destination" className='text-base'/>
+            <Input placeholder="Origin" className='text-base bg-background/50' />
+            <Input placeholder="Destination" className='text-base bg-background/50'/>
           </div>
           <Button className="w-full md:w-auto">
             Estimate Fare
@@ -45,7 +45,7 @@ export default function TransportPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card glassy>
         <CardHeader>
           <CardTitle className="font-headline">Local Fare Reference</CardTitle>
           <CardDescription>Standard fares for popular routes within Calabar.</CardDescription>

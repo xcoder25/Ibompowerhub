@@ -10,9 +10,9 @@ export default function ProfilePage() {
   const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
 
   return (
-    <div className="flex-1 p-4 sm:p-6 md:p-8 bg-secondary/50">
+    <div className="flex-1 p-4 sm:p-6 md:p-8 bg-transparent">
       <div className="max-w-4xl mx-auto space-y-8">
-        <Card>
+        <Card glassy>
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row items-center gap-6">
               {userAvatar && (
@@ -42,7 +42,7 @@ export default function ProfilePage() {
         </Card>
 
         <div className="grid md:grid-cols-3 gap-6">
-            <Card>
+            <Card glassy>
                 <CardHeader className='flex-row items-center gap-4 space-y-0'>
                     <FileText className='size-6 text-primary' />
                     <CardTitle className='font-headline'>My Reports</CardTitle>
@@ -52,7 +52,7 @@ export default function ProfilePage() {
                     <p className='text-xs text-muted-foreground'>Total reports submitted</p>
                 </CardContent>
             </Card>
-             <Card>
+             <Card glassy>
                 <CardHeader className='flex-row items-center gap-4 space-y-0'>
                     <Star className='size-6 text-primary' />
                     <CardTitle className='font-headline'>Favorites</CardTitle>
@@ -62,7 +62,7 @@ export default function ProfilePage() {
                     <p className='text-xs text-muted-foreground'>Saved sellers & artisans</p>
                 </CardContent>
             </Card>
-             <Card>
+             <Card glassy>
                 <CardHeader className='flex-row items-center gap-4 space-y-0'>
                     <Settings className='size-6 text-primary' />
                     <CardTitle className='font-headline'>Settings</CardTitle>
@@ -73,7 +73,7 @@ export default function ProfilePage() {
             </Card>
         </div>
 
-        <Card>
+        <Card glassy>
           <CardHeader>
             <CardTitle className="font-headline">Provider Dashboard</CardTitle>
             <CardDescription>Manage your services and availability.</CardDescription>

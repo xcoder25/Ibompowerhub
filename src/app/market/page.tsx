@@ -20,7 +20,7 @@ export default function MarketPage() {
         {sellers.map((seller) => {
           const image = PlaceHolderImages.find((img) => img.id === seller.imageId);
           return (
-            <Card key={seller.id} className="overflow-hidden">
+            <Card key={seller.id} glassy className="overflow-hidden">
               {image && (
                 <div className="relative aspect-[3/2] w-full">
                   <Image

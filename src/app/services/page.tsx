@@ -20,7 +20,7 @@ export default function ServicesPage() {
         {services.map((service) => {
           const image = PlaceHolderImages.find((img) => img.id === service.iconId);
           return (
-            <Card key={service.id} className="flex flex-col">
+            <Card key={service.id} glassy className="flex flex-col">
               <CardHeader className="flex flex-row items-center gap-4">
                 {image && (
                   <Image

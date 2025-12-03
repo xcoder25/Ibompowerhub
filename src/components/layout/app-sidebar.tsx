@@ -46,7 +46,7 @@ export function AppSidebar() {
   const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar-1');
 
   return (
-    <Sidebar>
+    <Sidebar variant="inset" side='left'>
       <SidebarHeader>
         <Logo withText={true} />
       </SidebarHeader>

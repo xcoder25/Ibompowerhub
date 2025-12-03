@@ -22,7 +22,7 @@ export function AppHeader() {
   const isMobile = useIsMobile();
 
   return (
-    <header className="flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 sticky top-0 z-30">
+    <header className="flex h-16 items-center gap-4 border-b bg-transparent px-4 md:px-6 sticky top-0 z-30">
       <div className="flex items-center gap-2">
          <SidebarTrigger className="md:hidden" />
          {isMobile && <Logo />}
@@ -35,7 +35,7 @@ export function AppHeader() {
             <Input
               type="search"
               placeholder="Search place, route, service..."
-              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background"
+              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background/50"
             />
           </div>
         </form>
