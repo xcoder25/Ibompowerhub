@@ -71,15 +71,24 @@ export default function NeighborhoodStatus() {
             <div className='space-y-3'>
                 <div className="flex flex-wrap gap-2">
                     <Badge variant="outline" className={cn('text-sm border-2', statusConfig.power[status.powerStatus].color)}>
-                        <statusConfig.power[status.powerStatus].icon className="mr-2 h-4 w-4" />
+                        {(() => {
+                            const Icon = statusConfig.power[status.powerStatus].icon;
+                            return <Icon className="mr-2 h-4 w-4" />;
+                        })()}
                         {statusConfig.power[status.powerStatus].label}
                     </Badge>
                     <Badge variant="outline" className={cn('text-sm border-2', statusConfig.flood[status.floodRisk].color)}>
-                        <statusConfig.flood[status.floodRisk].icon className="mr-2 h-4 w-4" />
+                        {(() => {
+                            const Icon = statusConfig.flood[status.floodRisk].icon;
+                            return <Icon className="mr-2 h-4 w-4" />;
+                        })()}
                         {statusConfig.flood[status.floodRisk].label}
                     </Badge>
                       <Badge variant="outline" className={cn('text-sm border-2', statusConfig.waste[status.wasteOverflow].color)}>
-                        <statusConfig.waste[status.wasteOverflow].icon className="mr-2 h-4 w-4" />
+                        {(() => {
+                            const Icon = statusConfig.waste[status.wasteOverflow].icon;
+                            return <Icon className="mr-2 h-4 w-4" />;
+                        })()}
                         {statusConfig.waste[status.wasteOverflow].label}
                     </Badge>
                 </div>
