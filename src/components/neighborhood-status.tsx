@@ -12,20 +12,20 @@ import { cn } from '@/lib/utils';
 
 const statusConfig = {
     power: {
-      ON: { icon: Zap, color: 'bg-green-500', label: 'Power On' },
-      OFF: { icon: Zap, color: 'bg-red-500', label: 'Power Off' },
-      UNKNOWN: { icon: Zap, color: 'bg-gray-500', label: 'Power Unknown' },
+      ON: { icon: Zap, color: 'text-green-500 border-green-500', label: 'Power On' },
+      OFF: { icon: Zap, color: 'text-red-500 border-red-500', label: 'Power Off' },
+      UNKNOWN: { icon: Zap, color: 'text-gray-500 border-gray-500', label: 'Power Unknown' },
     },
     flood: {
-      LOW: { icon: AlertTriangle, color: 'bg-green-500', label: 'Low Risk' },
-      MEDIUM: { icon: AlertTriangle, color: 'bg-yellow-500', label: 'Medium Risk' },
-      HIGH: { icon: AlertTriangle, color: 'bg-red-500', label: 'High Risk' },
-      UNKNOWN: { icon: AlertTriangle, color: 'bg-gray-500', label: 'Flood Unknown' },
+      LOW: { icon: AlertTriangle, color: 'text-green-500 border-green-500', label: 'Low Risk' },
+      MEDIUM: { icon: AlertTriangle, color: 'text-yellow-500 border-yellow-500', label: 'Medium Risk' },
+      HIGH: { icon: AlertTriangle, color: 'text-red-500 border-red-500', label: 'High Risk' },
+      UNKNOWN: { icon: AlertTriangle, color: 'text-gray-500 border-gray-500', label: 'Flood Unknown' },
     },
     waste: {
-      NO: { icon: CheckCircle, color: 'bg-green-500', label: 'Clean' },
-      YES: { icon: Trash2, color: 'bg-yellow-500', label: 'Waste Overflow' },
-      UNKNOWN: { icon: Trash2, color: 'bg-gray-500', label: 'Waste Unknown' },
+      NO: { icon: CheckCircle, color: 'text-green-500 border-green-500', label: 'Clean' },
+      YES: { icon: Trash2, color: 'text-yellow-500 border-yellow-500', label: 'Waste Overflow' },
+      UNKNOWN: { icon: Trash2, color: 'text-gray-500 border-gray-500', label: 'Waste Unknown' },
     },
   };
 
@@ -70,15 +70,15 @@ export default function NeighborhoodStatus() {
         {status && (
             <div className='space-y-3'>
                 <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className={cn('text-sm border-2', statusConfig.power[status.powerStatus].color.replace('bg-', 'border-'))}>
+                    <Badge variant="outline" className={cn('text-sm border-2', statusConfig.power[status.powerStatus].color)}>
                         <statusConfig.power[status.powerStatus].icon className="mr-2 h-4 w-4" />
                         {statusConfig.power[status.powerStatus].label}
                     </Badge>
-                    <Badge variant="outline" className={cn('text-sm border-2', statusConfig.flood[status.floodRisk].color.replace('bg-', 'border-'))}>
+                    <Badge variant="outline" className={cn('text-sm border-2', statusConfig.flood[status.floodRisk].color)}>
                         <statusConfig.flood[status.floodRisk].icon className="mr-2 h-4 w-4" />
                         {statusConfig.flood[status.floodRisk].label}
                     </Badge>
-                      <Badge variant="outline" className={cn('text-sm border-2', statusConfig.waste[status.wasteOverflow].color.replace('bg-', 'border-'))}>
+                      <Badge variant="outline" className={cn('text-sm border-2', statusConfig.waste[status.wasteOverflow].color)}>
                         <statusConfig.waste[status.wasteOverflow].icon className="mr-2 h-4 w-4" />
                         {statusConfig.waste[status.wasteOverflow].label}
                     </Badge>
