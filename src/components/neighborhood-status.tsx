@@ -49,49 +49,51 @@ export default function NeighborhoodStatus() {
   };
 
   return (
-    <Card className="w-full max-w-sm bg-background/80 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="font-headline">Neighborhood Status</CardTitle>
-        <CardDescription>AI-powered summary from recent reports.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-            <Textarea
-            placeholder="Enter report summaries..."
-            value={reportSummaries}
-            onChange={(e) => setReportSummaries(e.target.value)}
-            className="h-24"
-            />
-        </div>
+    <>
+      <Card className="w-full max-w-sm bg-background/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="font-headline">Neighborhood Status</CardTitle>
+          <CardDescription>AI-powered summary from recent reports.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+              <Textarea
+              placeholder="Enter report summaries..."
+              value={reportSummaries}
+              onChange={(e) => setReportSummaries(e.target.value)}
+              className="h-24"
+              />
+          </div>
 
-        {loading && <div className="flex items-center justify-center p-4"><Loader2 className="animate-spin" /></div>}
+          {loading && <div className="flex items-center justify-center p-4"><Loader2 className="animate-spin" /></div>}
 
-        {status && (
-            <div className='space-y-3'>
-                <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className={cn('text-sm border-2', statusConfig.power[status.powerStatus].color.replace('bg-', 'border-'))}>
-                        <statusConfig.power[status.powerStatus].icon className="mr-2 h-4 w-4" />
-                        {statusConfig.power[status.powerStatus].label}
-                    </Badge>
-                    <Badge variant="outline" className={cn('text-sm border-2', statusConfig.flood[status.floodRisk].color.replace('bg-', 'border-'))}>
-                        <statusConfig.flood[status.floodRisk].icon className="mr-2 h-4 w-4" />
-                        {statusConfig.flood[status.floodRisk].label}
-                    </Badge>
-                     <Badge variant="outline" className={cn('text-sm border-2', statusConfig.waste[status.wasteOverflow].color.replace('bg-', 'border-'))}>
-                        <statusConfig.waste[status.wasteOverflow].icon className="mr-2 h-4 w-4" />
-                        {statusConfig.waste[status.wasteOverflow].label}
-                    </Badge>
-                </div>
-                 <p className="text-sm text-muted-foreground pt-2">{status.overallStatus}</p>
-            </div>
-        )}
+          {status && (
+              <div className='space-y-3'>
+                  <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className={cn('text-sm border-2', statusConfig.power[status.powerStatus].color.replace('bg-', 'border-'))}>
+                          <statusConfig.power[status.powerStatus].icon className="mr-2 h-4 w-4" />
+                          {statusConfig.power[status.powerStatus].label}
+                      </Badge>
+                      <Badge variant="outline" className={cn('text-sm border-2', statusConfig.flood[status.floodRisk].color.replace('bg-', 'border-'))}>
+                          <statusConfig.flood[status.floodRisk].icon className="mr-2 h-4 w-4" />
+                          {statusConfig.flood[status.floodRisk].label}
+                      </Badge>
+                       <Badge variant="outline" className={cn('text-sm border-2', statusConfig.waste[status.wasteOverflow].color.replace('bg-', 'border-'))}>
+                          <statusConfig.waste[status.wasteOverflow].icon className="mr-2 h-4 w-4" />
+                          {statusConfig.waste[status.wasteOverflow].label}
+                      </Badge>
+                  </div>
+                   <p className="text-sm text-muted-foreground pt-2">{status.overallStatus}</p>
+              </div>
+          )}
 
-      </CardContent>
-      <CardFooter>
-        <Button onClick={handleAnalysis} disabled={loading} className="w-full">
-          {loading ? 'Analyzing...' : 'Analyze Reports'}
-        </Button>
-      </CardFooter>
-    </Card>
+        </CardContent>
+        <CardFooter>
+          <Button onClick={handleAnalysis} disabled={loading} className="w-full">
+            {loading ? 'Analyzing...' : 'Analyze Reports'}
+          </Button>
+        </CardFooter>
+      </Card>
+    </>
   );
 }
