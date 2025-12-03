@@ -26,14 +26,14 @@ const recentReports = [
 
 export default function DashboardPage() {
   return (
-    <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8 bg-muted/30">
+    <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2">
         <h1 className="font-headline text-3xl font-bold tracking-tight">Community Dashboard</h1>
         <p className="text-muted-foreground">An overview of your neighborhood's pulse.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card glassy>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -43,7 +43,7 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground">+32 since last week</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card glassy>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Reports</CardTitle>
             <Megaphone className="h-4 w-4 text-muted-foreground" />
@@ -53,7 +53,7 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground">5 resolved today</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card glassy>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">High-Priority Alerts</CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
@@ -63,7 +63,7 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground">New power outage report</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card glassy>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Community Engagement</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
@@ -76,7 +76,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        <Card className="lg:col-span-3">
+        <Card glassy className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="font-headline">Report Trends</CardTitle>
             <CardDescription>Number of reports submitted over the past 7 days.</CardDescription>
@@ -118,7 +118,7 @@ export default function DashboardPage() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="lg:col-span-2">
+        <Card glassy className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="font-headline">Recent Reports</CardTitle>
             <CardDescription>A live feed of the latest issues in the community.</CardDescription>

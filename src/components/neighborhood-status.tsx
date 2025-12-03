@@ -50,7 +50,7 @@ export default function NeighborhoodStatus() {
   };
 
   return (
-    <Card className="w-full max-w-sm bg-background/80 backdrop-blur-sm">
+    <Card glassy className="w-full max-w-sm">
       <CardHeader>
         <CardTitle className="font-headline">Neighborhood Status</CardTitle>
         <CardDescription>AI-powered summary from recent reports.</CardDescription>
@@ -61,7 +61,7 @@ export default function NeighborhoodStatus() {
             placeholder="Enter report summaries..."
             value={reportSummaries}
             onChange={(e) => setReportSummaries(e.target.value)}
-            className="h-24"
+            className="h-24 bg-background/50"
             />
         </div>
 
