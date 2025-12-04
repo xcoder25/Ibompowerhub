@@ -20,7 +20,7 @@ export function AppMobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-4 left-4 right-4 z-40 h-16">
+    <nav className="md:hidden fixed bottom-4 left-4 right-4 z-40 h-14">
       <div className="relative w-full h-full bg-primary/80 backdrop-blur-lg rounded-full shadow-lg flex items-center justify-around text-primary-foreground">
         {mobileNavItems.slice(0, 2).map((item) => {
           const isActive = pathname === item.href || (item.href === '/dashboard' && pathname === '/');
@@ -33,21 +33,21 @@ export function AppMobileNav() {
                 isActive ? "text-white" : "text-primary-foreground/70"
               )}
             >
-              <item.icon className="h-6 w-6" />
+              <item.icon className="h-5 w-5" />
               <span className="text-xs mt-1 font-medium">{item.label}</span>
             </Link>
           );
         })}
 
-        <div className="absolute -top-7 left-1/2 -translate-x-1/2">
+        <div className="absolute -top-5 left-1/2 -translate-x-1/2">
           <ReportIssueDialog>
             <DialogTrigger asChild>
               <Button
-                className="h-16 w-16 rounded-full shadow-lg border-4 border-background"
+                className="h-14 w-14 rounded-full shadow-lg border-4 border-background"
                 aria-label="Report an issue"
                 size="icon"
               >
-                <Plus className="h-8 w-8" />
+                <Plus className="h-7 w-7" />
               </Button>
             </DialogTrigger>
           </ReportIssueDialog>
@@ -64,7 +64,7 @@ export function AppMobileNav() {
                  isActive ? "text-white" : "text-primary-foreground/70"
               )}
             >
-              <item.icon className="h-6 w-6" />
+              <item.icon className="h-5 w-5" />
               <span className="text-xs mt-1 font-medium">{item.label}</span>
             </Link>
           );
