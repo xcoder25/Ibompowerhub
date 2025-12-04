@@ -16,7 +16,7 @@ const useMockAuth = () => {
     useEffect(() => {
         // In a real app, you'd check for a token or session here.
         // For now, we'll just simulate it.
-        const userHasSignedUp = localStorage.getItem('hasSignedUp') === 'true';
+        const userHasSignedUp = typeof window !== 'undefined' && localStorage.getItem('hasSignedUp') === 'true';
         setIsSignedUp(userHasSignedUp);
     }, []);
     return { isSignedUp };
@@ -49,29 +49,29 @@ export default function LandingPage() {
             priority
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/50 to-transparent dark:from-black/80 dark:via-black/50"></div>
         
         <div className="relative z-10 flex flex-col items-center">
-            <Logo withText={true} className="text-5xl text-slate-800" />
-            <p className="mt-4 max-w-2xl text-lg text-slate-600 leading-relaxed">
+            <Logo withText={true} className="text-5xl text-slate-800 dark:text-slate-200" />
+            <p className="mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
               One map. All the services. Everyday life, simplified.
             </p>
             <div className='mt-8 flex flex-col sm:flex-row gap-4'>
                 {isSignedUp ? (
                     <Button asChild size="lg">
-                        <Link href="/login"> 
+                        <Link href="/auth/login"> 
                             Login to Continue <ArrowRight className="ml-2" />
                         </Link>
                     </Button>
                 ) : (
                     <>
                         <Button asChild size="lg">
-                            <Link href="/signup">
+                            <Link href="/auth/signup">
                                 Get Started <ArrowRight className="ml-2" />
                             </Link>
                         </Button>
                         <Button asChild size="lg" variant="secondary">
-                            <Link href="/login">
+                            <Link href="/auth/login">
                                 Login
                             </Link>
                         </Button>

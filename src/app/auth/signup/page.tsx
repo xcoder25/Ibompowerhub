@@ -55,7 +55,9 @@ export default function SignupPage() {
       description: "You've successfully signed up!",
     });
     // In a real app, you'd handle auth state and redirect
-    localStorage.setItem('hasSignedUp', 'true');
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('hasSignedUp', 'true');
+    }
     router.push('/map');
   }
 
@@ -125,7 +127,7 @@ export default function SignupPage() {
           </Form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
-            <Link href="/login" className="underline">
+            <Link href="/auth/login" className="underline">
               Login
             </Link>
           </div>
