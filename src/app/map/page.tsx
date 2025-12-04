@@ -29,16 +29,18 @@ export default function MapPage() {
         </div>
       </div>
 
-      <ReportIssueDialog>
-        <DialogTrigger asChild>
-          <Button
-            className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl z-20"
-            aria-label="Report an issue"
-          >
-            <Plus className="h-8 w-8" />
-          </Button>
-        </DialogTrigger>
-      </ReportIssueDialog>
+      <div className='md:hidden'>
+        <ReportIssueDialog>
+          <DialogTrigger asChild>
+            <Button
+              className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-2xl z-20"
+              aria-label="Report an issue"
+            >
+              <Plus className="h-8 w-8" />
+            </Button>
+          </DialogTrigger>
+        </ReportIssueDialog>
+      </div>
     </div>
   );
 }
