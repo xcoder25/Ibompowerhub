@@ -14,6 +14,7 @@ import {
   GanttChartSquare,
   ShoppingBag,
   Bus,
+  Home,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { PieChart, Pie, Cell } from 'recharts';
 
 const quickLinks = [
+  { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/map', icon: Map, label: 'Map View' },
   { href: '/services', icon: GanttChartSquare, label: 'Services' },
   { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
@@ -153,17 +155,17 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
+            <CardContent className="grid grid-cols-3 gap-2">
               {quickLinks.map((item) => (
                 <Link
                   href={item.href}
                   key={item.label}
-                  className="flex flex-col items-center gap-2 p-4 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
+                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
                 >
-                  <div className="flex items-center justify-center p-3 rounded-full bg-primary/10 text-primary">
-                    <item.icon className="size-6" />
+                  <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
+                    <item.icon className="size-5" />
                   </div>
-                  <span className="text-sm font-medium">{item.label}</span>
+                  <span className="text-xs font-medium">{item.label}</span>
                 </Link>
               ))}
             </CardContent>
