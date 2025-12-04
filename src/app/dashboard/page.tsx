@@ -3,20 +3,20 @@
 
 import Link from 'next/link';
 import {
-  Plus,
   Bell,
   Wrench,
   User,
   Power,
   CloudRain,
   Trash2,
-  LayoutGrid,
   ArrowRight,
+  Map,
+  GanttChartSquare,
+  ShoppingBag,
+  Bus,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ReportIssueDialog } from '@/components/report-issue-dialog';
-import { DialogTrigger } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { recentActivities } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -25,9 +25,12 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { PieChart, Pie, Cell } from 'recharts';
 
 const quickLinks = [
-  { href: '/map', icon: LayoutGrid, label: 'Map View' },
+  { href: '/map', icon: Map, label: 'Map View' },
+  { href: '/services', icon: GanttChartSquare, label: 'Services' },
+  { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
+  { href: '/skills', icon: Wrench, label: 'SkillsHub' },
+  { href: '/transport', icon: Bus, label: 'Transport' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
-  { href: '/services', icon: Wrench, label: 'Services' },
   { href: '/profile', icon: User, label: 'Profile' },
 ];
 
