@@ -41,7 +41,7 @@ export default function LandingPage() {
       <div className="relative h-screen w-full flex flex-col items-center justify-center text-center p-4 overflow-hidden">
         {seaImage && (
           <Image
-            src={seaImage.imageUrl}
+            src="https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt={seaImage.description}
             fill
             className="object-cover animate-pan-slow"
@@ -49,11 +49,11 @@ export default function LandingPage() {
             priority
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/50 to-transparent dark:from-black/80 dark:via-black/50"></div>
+        <div className="absolute inset-0 bg-black/30"></div>
         
         <div className="relative z-10 flex flex-col items-center">
-            <Logo withText={true} className="text-5xl text-slate-800 dark:text-slate-200" />
-            <p className="mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+            <Logo withText={true} className="text-5xl text-white" />
+            <p className="mt-4 max-w-2xl text-lg text-slate-200 leading-relaxed">
               One map. All the services. Everyday life, simplified.
             </p>
             <div className='mt-8 flex flex-col sm:flex-row gap-4'>
