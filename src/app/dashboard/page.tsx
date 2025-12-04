@@ -123,24 +123,13 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {recentActivities.map((activity) => {
-                const activityUserAvatar = PlaceHolderImages.find((img) => img.id === activity.user.avatarId);
                 const ActivityIcon = activityIcons[activity.type as keyof typeof activityIcons];
                 return (
-                  <div key={activity.id} className="flex items-start gap-4">
-                    {activityUserAvatar && (
-                      <Avatar className="size-10 border-2 border-background">
-                        <AvatarImage src={activityUserAvatar.imageUrl} />
-                        <AvatarFallback>{activity.user.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                    )}
+                  <div key={activity.id} className="flex items-center gap-3">
+                    {ActivityIcon && <ActivityIcon.icon className={cn('size-5', ActivityIcon.color)} />}
                     <div className="flex-1 text-sm">
-                      <p><span className="font-semibold">{activity.user.name}</span> reported a new issue.</p>
-                      <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
-                        {ActivityIcon && <ActivityIcon.icon className={cn('size-3.5', ActivityIcon.color)} />}
-                        <span>{activity.type}</span>
-                        <span className="font-mono">&#8226;</span>
-                        <span>{activity.time}</span>
-                      </div>
+                      <p><span className="font-semibold">{activity.type}</span> report by {activity.user.name}.</p>
+                      <p className="text-xs text-muted-foreground">{activity.time}</p>
                     </div>
                   </div>
                 );
