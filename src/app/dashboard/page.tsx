@@ -122,11 +122,16 @@ export default function DashboardPage() {
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentActivities.map((activity) => {
-                const ActivityIcon = activityIcons[activity.type as keyof typeof activityIcons];
+              {recentActivities.slice(0, 3).map((activity) => {
+                const activityUserAvatar = PlaceHolderImages.find((img) => img.id === activity.user.avatarId);
                 return (
                   <div key={activity.id} className="flex items-center gap-3">
-                    {ActivityIcon && <ActivityIcon.icon className={cn('size-5', ActivityIcon.color)} />}
+                    {activityUserAvatar && (
+                        <Avatar className="size-9">
+                            <AvatarImage src={activityUserAvatar.imageUrl} alt={activity.user.name} />
+                            <AvatarFallback>{activity.user.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                    )}
                     <div className="flex-1 text-sm">
                       <p><span className="font-semibold">{activity.type}</span> report by {activity.user.name}.</p>
                       <p className="text-xs text-muted-foreground">{activity.time}</p>
