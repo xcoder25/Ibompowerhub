@@ -61,3 +61,30 @@ export const alerts = [
         user: { name: "Mike E.", avatarId: "user-avatar-3" },
       },
   ];
+
+  export const recentActivities = [
+    {
+      id: 1,
+      type: "Power Outage",
+      time: "15m ago",
+      user: { name: "David U.", avatarId: "user-avatar-1" },
+    },
+    {
+      id: 2,
+      type: "Flood Alert",
+      time: "1h ago",
+      user: { name: "Sarah B.", avatarId: "user-avatar-2" },
+    },
+    {
+        id: 3,
+        type: "Waste Overflow",
+        time: "3h ago",
+        user: { name: "Mike E.", avatarId: "user-avatar-3" },
+      },
+      {
+        id: 4,
+        type: "Power Outage",
+        time: "5h ago",
+        user: { name: "Esther H.", avatarId: "user-avatar-1" },
+      }
+  ];
