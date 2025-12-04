@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -16,10 +15,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { Logo } from '@/components/logo';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -33,7 +31,6 @@ const formSchema = z.object({
 export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const mapImage = PlaceHolderImages.find((img) => img.id === 'map-main');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,64 +55,54 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex-1 flex flex-col items-center justify-center p-4">
-      {mapImage && (
-        <Image
-          src={mapImage.imageUrl}
-          alt={mapImage.description}
-          fill
-          className="object-cover"
-          data-ai-hint={mapImage.imageHint}
-        />
-      )}
-      <div className="absolute inset-0 bg-black/50"></div>
-      <Card glassy className="w-full max-w-sm z-10">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="name@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full mt-2">
-                Login
-              </Button>
-            </form>
-          </Form>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="underline">
-              Sign up
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="flex-1 flex flex-col items-center justify-center p-4 bg-background">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="text-center space-y-2">
+            <Logo withText={true} className="text-3xl justify-center" />
+            <h1 className="text-2xl font-headline">Welcome Back</h1>
+            <p className="text-muted-foreground">Enter your credentials to access your account</p>
+        </div>
+        
+        <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                    <Input placeholder="name@example.com" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <Button type="submit" className="w-full mt-2">
+            Login
+            </Button>
+        </form>
+        </Form>
+        <div className="mt-4 text-center text-sm">
+        Don&apos;t have an account?{' '}
+        <Link href="/auth/signup" className="underline font-semibold">
+            Sign up
+        </Link>
+        </div>
+      </div>
     </div>
   );
 }
