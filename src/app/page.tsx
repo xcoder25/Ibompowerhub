@@ -52,8 +52,8 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-black/30"></div>
         
         <div className="relative z-10 flex flex-col items-center">
-            <Logo withText={true} className="text-5xl text-white" />
-            <p className="mt-4 max-w-2xl text-lg text-slate-200 leading-relaxed">
+            <Logo withText={true} className="text-4xl md:text-5xl text-white" />
+            <p className="mt-4 max-w-2xl text-base md:text-lg text-slate-200 leading-relaxed">
               One map. All the services. Everyday life, simplified.
             </p>
             <div className='mt-8 flex flex-col sm:flex-row gap-4'>
