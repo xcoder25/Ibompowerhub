@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const noNavRoutes = ['/', '/login', '/signup'];
+  const noNavRoutes = ['/', '/auth/login', '/auth/signup'];
   const showNav = !noNavRoutes.includes(pathname);
 
   return (
@@ -20,7 +20,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <div className="flex flex-col flex-1">
           {showNav && <AppHeader />}
           <SidebarInset>
-            <main className={cn("flex-1", showNav && "pb-20 md:pb-0")}>
+            <main className={cn("flex-1 flex flex-col", showNav && "pb-20 md:pb-0")}>
               {children}
             </main>
           </SidebarInset>
