@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -88,10 +89,15 @@ export default {
             height: '0',
           },
         },
+        'pan-slow': {
+          '0%': { 'background-position': '0% 0%' },
+          '100%': { 'background-position': '100% 100%' },
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'pan-slow': 'pan-slow 30s linear infinite alternate',
       },
     },
   },

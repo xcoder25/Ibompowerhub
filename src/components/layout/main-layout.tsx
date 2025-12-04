@@ -10,8 +10,8 @@ import { cn } from '@/lib/utils';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  // Don't show nav on the landing page
-  const showNav = pathname !== '/';
+  const noNavRoutes = ['/', '/login', '/signup'];
+  const showNav = !noNavRoutes.includes(pathname);
 
   return (
     <SidebarProvider>

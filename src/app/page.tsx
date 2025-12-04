@@ -28,7 +28,7 @@ export default function LandingPage() {
   const mapImage = PlaceHolderImages.find((img) => img.id === 'map-main');
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
+    const timer = setTimeout(() => setLoading(false), 1500); // Shorter splash screen
     return () => clearTimeout(timer);
   }, []);
 
@@ -38,26 +38,27 @@ export default function LandingPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <div className="relative h-screen flex flex-col items-center justify-center text-center p-4 overflow-hidden">
+      <div className="relative h-screen w-full flex flex-col items-center justify-center text-center p-4 overflow-hidden">
         {mapImage && (
           <Image
             src={mapImage.imageUrl}
             alt={mapImage.description}
             fill
-            className="object-cover"
+            className="object-cover animate-pan-slow"
             data-ai-hint={mapImage.imageHint}
+            priority
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-blue-950/40 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/60 to-transparent"></div>
+        
         <div className="relative z-10 flex flex-col items-center">
-            <Logo withText={true} className="text-4xl" />
-            <p className="mt-4 max-w-2xl text-lg text-primary-foreground/80">
+            <Logo withText={true} className="text-5xl" />
+            <p className="mt-4 max-w-2xl text-lg text-primary-foreground/80 leading-relaxed">
               One map. All the services. Everyday life, simplified.
             </p>
             <div className='mt-8 flex flex-col sm:flex-row gap-4'>
                 {isSignedUp ? (
                     <Button asChild size="lg">
-                        {/* We'll create the /login page next */}
                         <Link href="/login"> 
                             Login to Continue <ArrowRight className="ml-2" />
                         </Link>
@@ -65,7 +66,6 @@ export default function LandingPage() {
                 ) : (
                     <>
                         <Button asChild size="lg">
-                             {/* We'll create the /signup page next */}
                             <Link href="/signup">
                                 Get Started <ArrowRight className="ml-2" />
                             </Link>
