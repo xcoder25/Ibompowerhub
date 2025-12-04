@@ -146,20 +146,6 @@ export default function DashboardPage() {
 
         {/* Right Column */}
         <div className="space-y-6">
-          <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-            <CardContent className="p-6 text-center">
-              <Avatar className="h-20 w-20 mx-auto mb-4 border-4 border-primary shadow-md">
-                {userAvatar && <AvatarImage src={userAvatar.imageUrl} alt="Esther Howard" />}
-                <AvatarFallback>EH</AvatarFallback>
-              </Avatar>
-              <h3 className="font-headline text-xl font-bold">Esther Howard</h3>
-              <p className="text-sm text-muted-foreground">12 Reports Submitted</p>
-              <Button className="mt-4 w-full" asChild>
-                <Link href="/profile">View Profile</Link>
-              </Button>
-            </CardContent>
-          </Card>
-
           <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '400ms' }}>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
