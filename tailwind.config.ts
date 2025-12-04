@@ -92,12 +92,23 @@ export default {
         'pan-slow': {
           '0%': { 'background-position': '0% 0%' },
           '100%': { 'background-position': '100% 100%' },
+        },
+        'fade-in-up': {
+            '0%': {
+                opacity: '0',
+                transform: 'translateY(10px)'
+            },
+            '100%': {
+                opacity: '1',
+                transform: 'translateY(0)'
+            },
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'pan-slow': 'pan-slow 30s linear infinite alternate',
+        'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
       },
     },
   },
