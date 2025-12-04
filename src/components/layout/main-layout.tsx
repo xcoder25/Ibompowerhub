@@ -7,16 +7,24 @@ import { AppSidebar } from "./app-sidebar";
 import { AppMobileNav } from "./app-mobile-nav";
 import { AppHeader } from "./app-header";
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useEffect, useState } from 'react';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const noNavRoutes = ['/', '/auth/login', '/auth/signup'];
   const showNav = !noNavRoutes.includes(pathname);
+  const isMobile = useIsMobile();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
-        {showNav && <AppSidebar />}
+        {showNav && isClient && !isMobile && <AppSidebar />}
         <div className="flex flex-col flex-1">
           {showNav && <AppHeader />}
           <SidebarInset>
@@ -24,7 +32,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
           </SidebarInset>
-          {showNav && <AppMobileNav />}
+          {showNav && isClient && isMobile && <AppMobileNav />}
         </div>
       </div>
     </SidebarProvider>
