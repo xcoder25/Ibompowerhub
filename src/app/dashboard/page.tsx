@@ -86,11 +86,11 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                 <div className="h-48">
+                 <div className="h-40">
                     <ChartContainer config={chartConfig}>
                         <PieChart accessibilityLayer>
                             <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-                            <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={70}>
+                            <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={60}>
                                 {chartData.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={entry.fill} />
                                 ))}
@@ -98,12 +98,12 @@ export default function DashboardPage() {
                         </PieChart>
                     </ChartContainer>
                 </div>
-                <div className="space-y-3">
-                  <p className="text-4xl font-bold">15</p>
-                  <p className="text-muted-foreground">Total Active Reports</p>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                <div className="space-y-2">
+                  <p className="text-3xl font-bold">15</p>
+                  <p className="text-sm text-muted-foreground">Total Active Reports</p>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
                     {chartData.map((entry) => (
-                      <div key={entry.name} className="flex items-center gap-2">
+                      <div key={entry.name} className="flex items-center gap-1.5">
                         <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.fill }} />
                         <span>{entry.name}</span>
                       </div>
