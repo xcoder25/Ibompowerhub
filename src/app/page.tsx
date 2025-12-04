@@ -25,7 +25,7 @@ const useMockAuth = () => {
 export default function LandingPage() {
   const [loading, setLoading] = useState(true);
   const { isSignedUp } = useMockAuth();
-  const mapImage = PlaceHolderImages.find((img) => img.id === 'map-main');
+  const seaImage = PlaceHolderImages.find((img) => img.id === 'sea-background');
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1500); // Shorter splash screen
@@ -39,21 +39,21 @@ export default function LandingPage() {
   return (
     <div className="flex-1 flex flex-col">
       <div className="relative h-screen w-full flex flex-col items-center justify-center text-center p-4 overflow-hidden">
-        {mapImage && (
+        {seaImage && (
           <Image
-            src={mapImage.imageUrl}
-            alt={mapImage.description}
+            src={seaImage.imageUrl}
+            alt={seaImage.description}
             fill
             className="object-cover animate-pan-slow"
-            data-ai-hint={mapImage.imageHint}
+            data-ai-hint={seaImage.imageHint}
             priority
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/50 to-transparent"></div>
         
         <div className="relative z-10 flex flex-col items-center">
-            <Logo withText={true} className="text-5xl" />
-            <p className="mt-4 max-w-2xl text-lg text-primary-foreground/80 leading-relaxed">
+            <Logo withText={true} className="text-5xl text-slate-800" />
+            <p className="mt-4 max-w-2xl text-lg text-slate-600 leading-relaxed">
               One map. All the services. Everyday life, simplified.
             </p>
             <div className='mt-8 flex flex-col sm:flex-row gap-4'>

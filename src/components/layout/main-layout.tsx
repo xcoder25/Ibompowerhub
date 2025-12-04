@@ -15,7 +15,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-gradient-to-br from-blue-950 via-slate-900 to-violet-950">
+      <div className="flex min-h-screen bg-background">
         {showNav && <AppSidebar />}
         <div className="flex flex-col flex-1">
           {showNav && <AppHeader />}
