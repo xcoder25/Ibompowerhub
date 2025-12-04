@@ -122,7 +122,7 @@ export default function DashboardPage() {
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentActivities.slice(0, 3).map((activity) => {
+              {recentActivities.slice(0, 2).map((activity) => {
                 const activityUserAvatar = PlaceHolderImages.find((img) => img.id === activity.user.avatarId);
                 return (
                   <div key={activity.id} className="flex items-center gap-3">
