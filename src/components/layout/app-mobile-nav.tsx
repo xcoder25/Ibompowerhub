@@ -7,7 +7,7 @@ import { Home, Map, Bell, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const mobileNavItems = [
-  { href: '/', icon: Home, label: 'Home' },
+  { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/map', icon: Map, label: 'Map' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
   { href: '/profile', icon: User, label: 'Profile' },
@@ -25,7 +25,7 @@ export function AppMobileNav() {
             href={item.href}
             className={cn(
               "flex flex-col items-center justify-center w-full h-full text-muted-foreground transition-colors duration-200 rounded-lg",
-              pathname === item.href ? "text-primary bg-primary/10" : "hover:text-primary"
+              (pathname === item.href || (item.href === '/dashboard' && pathname === '/')) ? "text-primary bg-primary/10" : "hover:text-primary"
             )}
           >
             <item.icon className="h-6 w-6" />

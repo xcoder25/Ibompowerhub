@@ -14,7 +14,6 @@ import {
   Settings,
   LogOut,
   HelpCircle,
-  LayoutDashboard,
   Home,
 } from 'lucide-react';
 import {
@@ -33,9 +32,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const navItems = [
-  { href: '/', icon: Home, label: 'Home' },
+  { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/map', icon: Map, label: 'Map View' },
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/services', icon: GanttChartSquare, label: 'Services' },
   { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
@@ -60,7 +58,7 @@ export function AppSidebar() {
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === item.href}
+                isActive={pathname === item.href || (item.href === '/dashboard' && pathname === '/')}
                 tooltip={item.label}
               >
                 <Link href={item.href}>
