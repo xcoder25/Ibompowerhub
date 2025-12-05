@@ -179,7 +179,7 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-3 gap-2">
+            <CardContent className="grid grid-cols-4 gap-2">
               {quickLinks.map((item) => (
                 <Link
                   href={item.href}
