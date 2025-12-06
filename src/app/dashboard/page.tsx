@@ -78,35 +78,6 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
-          <Card glassy className="shadow-lg animate-fade-in-up">
-            <CardContent className="pt-6 flex flex-col md:flex-row items-center gap-6">
-              {userAvatar && (
-                <Avatar className="h-20 w-20 border-4 border-primary">
-                  <AvatarImage src={userAvatar.imageUrl} alt="Esther Howard" />
-                  <AvatarFallback>EH</AvatarFallback>
-                </Avatar>
-              )}
-              <div className="flex-1 text-center md:text-left">
-                <h2 className="font-headline text-2xl font-bold">Esther Howard</h2>
-                <p className="text-muted-foreground">Resident / Service Provider</p>
-                 <Button variant="link" className="px-0 h-auto" asChild>
-                    <Link href="/profile">View Profile <ArrowRight className="ml-1 size-4" /></Link>
-                </Button>
-              </div>
-              <div className='flex gap-4'>
-                <div className='text-center'>
-                    <p className='text-2xl font-bold'>12</p>
-                    <p className='text-xs text-muted-foreground'>My Reports</p>
-                </div>
-                <div className='text-center'>
-                    <p className='text-2xl font-bold'>5</p>
-                    <p className='text-xs text-muted-foreground'>Favorites</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-
           <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '100ms' }}>
             <CardHeader>
               <CardTitle>Community Pulse</CardTitle>
