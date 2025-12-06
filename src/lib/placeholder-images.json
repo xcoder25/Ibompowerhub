@@ -167,6 +167,102 @@
       "description": "A doctor checking a patient's blood pressure.",
       "imageUrl": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "health screening"
+    },
+    {
+      "id": "health-hospital",
+      "description": "The exterior of a modern hospital building.",
+      "imageUrl": "https://images.unsplash.com/photo-1666214278791-b9f2dfa8a834?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "hospital exterior"
+    },
+    {
+      "id": "health-clinic",
+      "description": "A clean and professional clinic waiting room.",
+      "imageUrl": "https://images.unsplash.com/photo-1586773860414-93523928d293?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "clinic waiting room"
+    },
+    {
+      "id": "health-pharmacy",
+      "description": "A pharmacy aisle with shelves of medicine.",
+      "imageUrl": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "pharmacy aisle"
+    },
+    {
+      "id": "job-tech",
+      "description": "A person working on a laptop in a modern office.",
+      "imageUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "office work"
+    },
+    {
+      "id": "job-retail",
+      "description": "A friendly cashier smiling at a checkout counter.",
+      "imageUrl": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "retail store"
+    },
+    {
+      "id": "job-construction",
+      "description": "Construction workers on a building site.",
+      "imageUrl": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "construction site"
+    },
+    {
+      "id": "property-apartment",
+      "description": "A modern apartment building exterior.",
+      "imageUrl": "https://images.unsplash.com/photo-1570129477492-45c003edd2e0?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "apartment building"
+    },
+    {
+      "id": "property-house",
+      "description": "A beautiful suburban house with a green lawn.",
+      "imageUrl": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "suburban house"
+    },
+    {
+      "id": "property-land",
+      "description": "A vast expanse of open land for sale.",
+      "imageUrl": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "open land"
+    },
+    {
+      "id": "education-school",
+      "description": "A classic brick school building.",
+      "imageUrl": "https://images.unsplash.com/photo-1580582932707-520aed93a94d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "school building"
+    },
+    {
+      "id": "education-university",
+      "description": "A grand university campus building.",
+      "imageUrl": "https://images.unsplash.com/photo-1498092651296-641e88c3b057?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "university campus"
+    },
+    {
+      "id": "education-library",
+      "description": "A public library with shelves full of books.",
+      "imageUrl": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "library books"
+    },
+    {
+      "id": "forum-discussion",
+      "description": "People having a lively discussion.",
+      "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "group discussion"
+    },
+    {
+      "id": "forum-townhall",
+      "description": "A community town hall meeting.",
+      "imageUrl": "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "community meeting"
+    },
+    {
+      "id": "safety-alert",
+      "description": "An emergency alert notification on a phone.",
+      "imageUrl": "https://images.unsplash.com/photo-1618042164217-64c7a6500586?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "emergency alert"
+    },
+    {
+      "id": "safety-emergency-services",
+      "description": "An ambulance with its lights on.",
+      "imageUrl": "https://images.unsplash.com/photo-1580920469499-4a4781c53b24?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "ambulance emergency"
     }
   ]
 }

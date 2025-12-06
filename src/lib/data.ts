@@ -1,6 +1,6 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain } from 'lucide-react';
+import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain, Briefcase, Building2, Vote, Phone } from 'lucide-react';
 
 export const services = [
   { id: 'agro-connect', name: 'AgroConnect', iconId: 'agro-connect', description: 'Fresh farm produce near you', href: '/market' },
@@ -97,4 +97,56 @@ export const alerts = [
         time: "5h ago",
         user: { name: "Esther H.", avatarId: "user-avatar-1" },
       }
+  ];
+
+  export const jobListings = [
+    { id: 1, title: 'Frontend Developer', company: 'Tech Solutions Ltd.', location: 'Calabar', type: 'Full-time', imageId: 'job-tech' },
+    { id: 2, title: 'Store Manager', company: 'Calabar Supermart', location: 'Marian', type: 'Full-time', imageId: 'job-retail' },
+    { id: 3, title: 'Site Supervisor', company: 'CRS Construction', location: 'Akpabuyo', type: 'Contract', imageId: 'job-construction' },
+  ];
+
+  export const propertyListings = [
+    { id: 1, title: '3 Bedroom Flat in a Serene Environment', price: '₦1,200,000/yr', type: 'For Rent', imageId: 'property-apartment' },
+    { id: 2, title: 'Newly-built 4 Bedroom Duplex', price: '₦85,000,000', type: 'For Sale', imageId: 'property-house' },
+    { id: 3, title: 'Half Plot of Land in a Developing Area', price: '₦5,000,000', type: 'For Sale', imageId: 'property-land' },
+  ];
+
+  export const healthFacilities = [
+    { id: 1, name: 'UCTH (University of Calabar Teaching Hospital)', type: 'Hospital', imageId: 'health-hospital', phone: '08012345678', hours: '24 Hours' },
+    { id: 2, name: 'Asi Ukpo Comprehensive Medical Centre', type: 'Clinic', imageId: 'health-clinic', phone: '09011223344', hours: '8am - 9pm' },
+    { id: 3, 'name': 'City Pharmacy', 'type': 'Pharmacy', imageId: 'health-pharmacy', phone: '07098765432', hours: '8am - 10pm' },
+  ];
+
+  export const educationalInstitutions = [
+    { id: 1, name: 'University of Calabar (UNICAL)', type: 'University', imageId: 'education-university' },
+    { id: 2, name: 'Hope Waddell Training Institution', type: 'Secondary School', imageId: 'education-school' },
+    { id: 3, name: 'CRS Library Board', type: 'Library', imageId: 'education-library' },
+  ];
+
+  export const forumTopics = [
+    { id: 1, title: 'Best places to get fresh seafood in Calabar?', category: 'Food & Drink', replies: 12, author: 'Esther H.', imageId: 'forum-discussion' },
+    { id: 2, title: 'Town Hall Meeting on Security', category: 'Community', replies: 45, author: 'Admin', imageId: 'forum-townhall' },
+  ];
+
+  export const polls = [
+    { id: 1, title: 'Should streetlights be on all night?', votes: { yes: 128, no: 34 }, totalVotes: 162 },
+    { id: 2, title: 'Which road needs urgent repairs the most?', votes: { 'Marian Road': 78, 'Murtala Mohammed Highway': 55, 'Atimbo Road': 23 }, totalVotes: 156 },
+  ];
+
+  export const emergencyContacts = [
+    { id: 1, name: 'Police Control Room', number: '112' },
+    { id: 2, name: 'Ambulance Service', number: '199' },
+    { id: 3, name: 'State Security Service (SSS)', number: '08033033779' },
+  ];
+
+  export const waterSchedule = [
+    { area: '8 Miles', days: 'Mon, Wed, Fri', time: '6am - 12pm' },
+    { area: 'State Housing', days: 'Tue, Thu, Sat', time: '6am - 12pm' },
+    { area: 'Marian', days: 'Daily', time: '5am - 10am' },
+  ];
+
+  export const powerSchedule = [
+    { area: 'Federal Housing', group: 'A', 'in': '6 hours', out: '12 hours' },
+    { area: 'Etta Agbor', group: 'B', 'in': '12 hours', out: '6 hours' },
+    { area: 'MCC Road', group: 'C', 'in': '8 hours', out: '8 hours' },
   ];
