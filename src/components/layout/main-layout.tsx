@@ -22,19 +22,29 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     setIsClient(true);
   }, []);
 
+  if (!showNav) {
+    return <main className="flex-1 flex flex-col">{children}</main>;
+  }
+
+  if (!isClient) {
+    // Return a placeholder or null during server-side rendering
+    // to avoid hydration mismatch for components that rely on client-side info.
+    return null;
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
-        {showNav && isClient && !isMobile && <AppSidebar />}
+        {!isMobile && <AppSidebar />}
         <div className="flex flex-col flex-1">
-          {showNav && isClient && <AppHeader />}
+          <AppHeader />
           <SidebarInset>
-            <main className={cn("flex-1 flex flex-col", showNav && "pb-24 md:pb-0")}>
+            <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0")}>
               {children}
             </main>
           </SidebarInset>
-          {showNav && isClient && <AssistantWidget />}
-          {showNav && isClient && isMobile && <AppMobileNav />}
+          <AssistantWidget />
+          {isMobile && <AppMobileNav />}
         </div>
       </div>
     </SidebarProvider>
