@@ -14,7 +14,8 @@ import {
   Bus,
   Home,
   Package,
-  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,21 +27,19 @@ import { PieChart, Pie, Cell } from 'recharts';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useEffect, useState } from 'react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-
 
 const primaryQuickLinks = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/map', icon: Map, label: 'Map View' },
   { href: '/services', icon: GanttChartSquare, label: 'Services' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
+  { href: '/profile', icon: User, label: 'Profile' },
 ];
 
 const secondaryQuickLinks = [
     { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
     { href: '/skills', icon: Wrench, label: 'SkillsHub' },
     { href: '/transport', icon: Bus, label: 'Transport' },
-    { href: '/profile', icon: User, label: 'Profile' },
 ]
 
 const chartData = [
@@ -69,7 +68,8 @@ const chartConfig = {
 
 export default function DashboardPage() {
   const [isFirstLogin, setIsFirstLogin] = useState(false);
-  const [showMore, setShowMore] = useState(false);
+  const [showSecondaryActions, setShowSecondaryActions] = useState(false);
+
 
   useEffect(() => {
     const firstLogin = localStorage.getItem('isFirstDashboardVisit') !== 'false';
@@ -80,6 +80,8 @@ export default function DashboardPage() {
         setIsFirstLogin(false);
     }
   }, []);
+
+  const visibleActions = showSecondaryActions ? secondaryQuickLinks : primaryQuickLinks;
 
   return (
     <div className="flex-1 space-y-6 bg-muted/30 p-4 sm:p-6 md:p-8">
@@ -161,13 +163,23 @@ export default function DashboardPage() {
 
         {/* Right Column */}
         <div className="space-y-6">
-          <Collapsible asChild open={showMore} onOpenChange={setShowMore}>
              <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '200ms' }}>
                 <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-4 gap-2">
-                {primaryQuickLinks.map((item) => (
+                 {showSecondaryActions && (
+                     <button
+                        onClick={() => setShowSecondaryActions(false)}
+                        className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
+                     >
+                        <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
+                            <ChevronLeft className="size-5" />
+                        </div>
+                        <span className="text-xs font-medium">Back</span>
+                    </button>
+                 )}
+                {visibleActions.map((item) => (
                     <Link
                     href={item.href}
                     key={item.label}
@@ -179,31 +191,19 @@ export default function DashboardPage() {
                     <span className="text-xs font-medium">{item.label}</span>
                     </Link>
                 ))}
-                 <CollapsibleContent className='col-span-4 contents'>
-                    {secondaryQuickLinks.map((item) => (
-                        <Link
-                        href={item.href}
-                        key={item.label}
+                 {!showSecondaryActions && (
+                     <button
+                        onClick={() => setShowSecondaryActions(true)}
                         className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
-                        >
+                     >
                         <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
-                            <item.icon className="size-5" />
+                            <ChevronRight className="size-5" />
                         </div>
-                        <span className="text-xs font-medium">{item.label}</span>
-                        </Link>
-                    ))}
-                </CollapsibleContent>
+                        <span className="text-xs font-medium">More</span>
+                    </button>
+                 )}
                 </CardContent>
-                <CardFooter className='justify-center'>
-                    <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                            {showMore ? 'Show Less' : 'Show More'}
-                            <ChevronDown className={cn("ml-2 size-4 transition-transform", showMore && "rotate-180")} />
-                        </Button>
-                    </CollapsibleTrigger>
-                </CardFooter>
             </Card>
-          </Collapsible>
           
           <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '400ms' }}>
             <CardHeader className="flex flex-row items-center justify-between">
