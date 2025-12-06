@@ -44,7 +44,6 @@ const navItems = [
   { href: '/alerts', icon: Bell, label: 'Alerts' },
   { href: '/issues', icon: Lightbulb, label: 'Issues' },
   { href: '/safety', icon: Shield, label: 'Safety' },
-  { href: '/assistant', icon: Bot, label: 'AI Assistant' },
   { href: '/profile', icon: User, label: 'Profile' },
 ];
 

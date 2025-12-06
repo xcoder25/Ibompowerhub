@@ -61,7 +61,6 @@ const primaryQuickLinks = [
 ];
 
 const secondaryQuickLinks = [
-    { href: '/assistant', icon: Bot, label: 'AI Assistant' },
     { href: '/water', icon: Droplets, label: 'Water' },
     { href: '/forums', icon: MessageSquare, label: 'Forums' },
     { href: '/events', icon: Calendar, label: 'Events' },

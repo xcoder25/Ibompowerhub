@@ -1,7 +1,6 @@
 
 'use client';
 
-import Link from 'next/link';
 import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,8 +13,12 @@ import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+type AssistantFABProps = {
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+};
 
-export function AssistantFAB() {
+
+export function AssistantFAB({ onClick }: AssistantFABProps) {
   const fabRef = useRef<HTMLButtonElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -33,22 +36,28 @@ export function AssistantFAB() {
   const handleDragStart = (clientX: number, clientY: number) => {
     if (!fabRef.current) return;
     setIsDragging(true);
-    setHasMoved(false);
+    setHasMoved(false); // Reset move status on new drag start
+    // Calculate offset from the top-left of the button
+    const rect = fabRef.current.getBoundingClientRect();
     setDragStart({
-      x: clientX - fabRef.current.offsetLeft,
-      y: clientY - fabRef.current.offsetTop,
+      x: clientX - rect.left,
+      y: clientY - rect.top,
     });
   };
 
   const handleDragMove = (clientX: number, clientY: number) => {
     if (!isDragging || !fabRef.current) return;
 
+    // Calculate new position based on cursor position and initial offset
     const newX = clientX - dragStart.x;
     const newY = clientY - dragStart.y;
     
     // Check if the button has moved more than a few pixels to count as a drag
-    if (Math.abs(newX - position.x) > 5 || Math.abs(newY - position.y) > 5) {
-      setHasMoved(true);
+    if (!hasMoved) {
+        const currentRect = fabRef.current.getBoundingClientRect();
+        if (Math.abs(newX - currentRect.left) > 5 || Math.abs(newY - currentRect.top) > 5) {
+            setHasMoved(true);
+        }
     }
 
     // Constrain movement within the viewport
@@ -63,11 +72,16 @@ export function AssistantFAB() {
 
   const handleDragEnd = () => {
     setIsDragging(false);
+    // Important: Reset hasMoved after a short delay to allow the click event to process
+    setTimeout(() => setHasMoved(false), 0);
   };
   
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (hasMoved) {
-      e.preventDefault(); // Prevent navigation if it was a drag
+      e.preventDefault(); // Prevent click if it was a drag
+      e.stopPropagation();
+    } else {
+        onClick(e); // Fire the passed onClick handler
     }
   }
 
@@ -77,7 +91,6 @@ export function AssistantFAB() {
         <TooltipTrigger asChild>
           <Button
             ref={fabRef}
-            asChild
             className={cn(
               'fixed h-14 w-14 rounded-full shadow-2xl z-30 cursor-grab',
               isDragging && 'cursor-grabbing'
@@ -96,10 +109,9 @@ export function AssistantFAB() {
             onTouchMove={(e) => handleDragMove(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchEnd={handleDragEnd}
             onClick={handleClick}
+            aria-label="AI Assistant"
           >
-            <Link href="/assistant" aria-label="AI Assistant" draggable="false">
-              <MessageSquare className="h-7 w-7" />
-            </Link>
+            <MessageSquare className="h-7 w-7" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="left">

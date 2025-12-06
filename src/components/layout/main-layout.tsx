@@ -8,7 +8,7 @@ import { AppHeader } from "./app-header";
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
-import { AssistantFAB } from '../assistant-fab';
+import { AssistantWidget } from '../assistant-widget';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -32,7 +32,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
           </SidebarInset>
-          {showNav && isClient && <AssistantFAB />}
+          {showNav && isClient && <AssistantWidget />}
           {showNav && isClient && isMobile && <AppMobileNav />}
         </div>
       </div>
