@@ -13,7 +13,6 @@ import {
   ShoppingBag,
   Bus,
   Home,
-  Package,
   ChevronLeft,
   ChevronRight,
   BookOpen,
@@ -27,7 +26,6 @@ import {
   Shield,
   Lightbulb,
   LogOut,
-  Bot,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,6 +54,7 @@ const primaryQuickLinks = [
   { href: '/market', icon: ShoppingBag, label: 'Market' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
   { href: '/transport', icon: Bus, label: 'Transport' },
+  { href: '/directory', icon: Building2, label: 'Directory' },
   { href: '/issues', icon: Lightbulb, label: 'Issues' },
   { href: '/safety', icon: Shield, label: 'Safety' },
 ];
@@ -188,12 +187,12 @@ export default function DashboardPage() {
                              <CarouselItem>
                                 <div className="grid grid-cols-4 gap-x-2 gap-y-4">
                                     {primaryQuickLinks.slice(8).map((item) => <QuickActionItem key={item.label} item={item} />)}
-                                    {secondaryQuickLinks.slice(0, 6).map((item) => <QuickActionItem key={item.label} item={item} />)}
+                                    {secondaryQuickLinks.slice(0, 5).map((item) => <QuickActionItem key={item.label} item={item} />)}
                                 </div>
                             </CarouselItem>
                              <CarouselItem>
                                 <div className="grid grid-cols-4 gap-x-2 gap-y-4">
-                                    {secondaryQuickLinks.slice(6).map((item) => <QuickActionItem key={item.label} item={item} />)}
+                                    {secondaryQuickLinks.slice(5).map((item) => <QuickActionItem key={item.label} item={item} />)}
                                 </div>
                             </CarouselItem>
                         </CarouselContent>

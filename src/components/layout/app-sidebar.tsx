@@ -18,6 +18,7 @@ import {
   Lightbulb,
   Shield,
   Bot,
+  Building2,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -41,6 +42,7 @@ const navItems = [
   { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
   { href: '/transport', icon: Bus, label: 'Transport Guide' },
+  { href: '/directory', icon: Building2, label: 'Directory' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
   { href: '/issues', icon: Lightbulb, label: 'Issues' },
   { href: '/safety', icon: Shield, label: 'Safety' },
@@ -63,7 +65,7 @@ export function AppSidebar() {
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === item.href || (item.href === '/dashboard' && pathname === '/')}
+                isActive={pathname.startsWith(item.href) && (item.href !== '/' || pathname === '/')}
                 tooltip={item.label}
               >
                 <Link href={item.href}>
