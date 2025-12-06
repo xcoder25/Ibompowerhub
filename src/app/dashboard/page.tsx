@@ -16,6 +16,16 @@ import {
   Package,
   ChevronLeft,
   ChevronRight,
+  BookOpen,
+  Building2,
+  HeartPulse,
+  Briefcase,
+  Vote,
+  Calendar,
+  MessageSquare,
+  Droplets,
+  Shield,
+  Lightbulb,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,12 +44,24 @@ const primaryQuickLinks = [
   { href: '/services', icon: GanttChartSquare, label: 'Services' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
   { href: '/profile', icon: User, label: 'Profile' },
+  { href: '/market', icon: ShoppingBag, label: 'Market' },
+  { href: '/skills', icon: Wrench, label: 'SkillsHub' },
+  { href: '/transport', icon: Bus, label: 'Transport' },
+  { href: '/issues', icon: Lightbulb, label: 'Issues' },
+  { href: '/safety', icon: Shield, label: 'Safety' },
 ];
 
 const secondaryQuickLinks = [
-    { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
-    { href: '/skills', icon: Wrench, label: 'SkillsHub' },
-    { href: '/transport', icon: Bus, label: 'Transport' },
+    { href: '/water', icon: Droplets, label: 'Water' },
+    { href: '/forums', icon: MessageSquare, label: 'Forums' },
+    { href: '/events', icon: Calendar, label: 'Events' },
+    { href: '/voting', icon: Vote, label: 'Voting' },
+    { href: '/jobs', icon: Briefcase, label: 'Jobs' },
+    { href: '/health', icon: HeartPulse, label: 'Health' },
+    { href: '/property', icon: Building2, label: 'Property' },
+    { href: '/education', icon: BookOpen, label: 'Education' },
+    { href: '/power', icon: Power, label: 'Power' },
+    { href: '/logout', icon: LogOut, label: 'Logout' },
 ]
 
 const chartData = [
@@ -148,9 +170,6 @@ export default function DashboardPage() {
             <span className="text-xs font-medium">{item.label}</span>
             </Link>
         ))}
-         {/* Fill remaining space to keep layout consistent */}
-         <div className="flex flex-col items-center gap-1.5 p-2 rounded-lg text-center" />
-         <div className="flex flex-col items-center gap-1.5 p-2 rounded-lg text-center" />
     </>
   );
 
@@ -239,7 +258,7 @@ export default function DashboardPage() {
                 <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className={cn("grid grid-cols-4 gap-2", animationClass)}>
+                    <div className={cn("grid grid-cols-5 gap-2", animationClass)}>
                         {showSecondaryActions ? secondaryActions : primaryActions}
                     </div>
                 </CardContent>

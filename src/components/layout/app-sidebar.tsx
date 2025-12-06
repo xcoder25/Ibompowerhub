@@ -15,6 +15,8 @@ import {
   LogOut,
   HelpCircle,
   Home,
+  Lightbulb,
+  Shield,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -39,6 +41,8 @@ const navItems = [
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
   { href: '/transport', icon: Bus, label: 'Transport Guide' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
+  { href: '/issues', icon: Lightbulb, label: 'Issues' },
+  { href: '/safety', icon: Shield, label: 'Safety' },
   { href: '/profile', icon: User, label: 'Profile' },
 ];
 
