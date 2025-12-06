@@ -69,6 +69,7 @@ const chartConfig = {
 export default function DashboardPage() {
   const [isFirstLogin, setIsFirstLogin] = useState(false);
   const [showSecondaryActions, setShowSecondaryActions] = useState(false);
+  const [animationClass, setAnimationClass] = useState('');
 
 
   useEffect(() => {
@@ -81,7 +82,77 @@ export default function DashboardPage() {
     }
   }, []);
 
-  const visibleActions = showSecondaryActions ? secondaryQuickLinks : primaryQuickLinks;
+  const handleToggleActions = (showSecondary: boolean) => {
+    if (showSecondary) {
+      setAnimationClass('animate-slide-out-to-left');
+      setTimeout(() => {
+        setShowSecondaryActions(true);
+        setAnimationClass('animate-slide-in-from-right');
+      }, 300);
+    } else {
+      setAnimationClass('animate-slide-out-to-right');
+      setTimeout(() => {
+        setShowSecondaryActions(false);
+        setAnimationClass('animate-slide-in-from-left');
+      }, 300);
+    }
+  };
+
+
+  const primaryActions = (
+    <>
+      {primaryQuickLinks.map((item) => (
+        <Link
+          href={item.href}
+          key={item.label}
+          className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
+        >
+          <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
+            <item.icon className="size-5" />
+          </div>
+          <span className="text-xs font-medium">{item.label}</span>
+        </Link>
+      ))}
+      <button
+        onClick={() => handleToggleActions(true)}
+        className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
+      >
+        <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
+          <ChevronRight className="size-5" />
+        </div>
+        <span className="text-xs font-medium">More</span>
+      </button>
+    </>
+  );
+
+  const secondaryActions = (
+    <>
+        <button
+            onClick={() => handleToggleActions(false)}
+            className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
+        >
+            <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
+            <ChevronLeft className="size-5" />
+            </div>
+            <span className="text-xs font-medium">Back</span>
+        </button>
+        {secondaryQuickLinks.map((item) => (
+            <Link
+            href={item.href}
+            key={item.label}
+            className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
+            >
+            <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
+                <item.icon className="size-5" />
+            </div>
+            <span className="text-xs font-medium">{item.label}</span>
+            </Link>
+        ))}
+         {/* Fill remaining space to keep layout consistent */}
+         <div className="flex flex-col items-center gap-1.5 p-2 rounded-lg text-center" />
+         <div className="flex flex-col items-center gap-1.5 p-2 rounded-lg text-center" />
+    </>
+  );
 
   return (
     <div className="flex-1 space-y-6 bg-muted/30 p-4 sm:p-6 md:p-8">
@@ -163,45 +234,14 @@ export default function DashboardPage() {
 
         {/* Right Column */}
         <div className="space-y-6">
-             <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+             <Card glassy className="shadow-lg animate-fade-in-up overflow-hidden" style={{ animationDelay: '200ms' }}>
                 <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-4 gap-2">
-                 {showSecondaryActions && (
-                     <button
-                        onClick={() => setShowSecondaryActions(false)}
-                        className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
-                     >
-                        <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
-                            <ChevronLeft className="size-5" />
-                        </div>
-                        <span className="text-xs font-medium">Back</span>
-                    </button>
-                 )}
-                {visibleActions.map((item) => (
-                    <Link
-                    href={item.href}
-                    key={item.label}
-                    className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
-                    >
-                    <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
-                        <item.icon className="size-5" />
+                <CardContent>
+                    <div className={cn("grid grid-cols-4 gap-2", animationClass)}>
+                        {showSecondaryActions ? secondaryActions : primaryActions}
                     </div>
-                    <span className="text-xs font-medium">{item.label}</span>
-                    </Link>
-                ))}
-                 {!showSecondaryActions && (
-                     <button
-                        onClick={() => setShowSecondaryActions(true)}
-                        className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
-                     >
-                        <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
-                            <ChevronRight className="size-5" />
-                        </div>
-                        <span className="text-xs font-medium">More</span>
-                    </button>
-                 )}
                 </CardContent>
             </Card>
           
