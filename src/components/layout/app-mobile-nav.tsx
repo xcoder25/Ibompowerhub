@@ -20,8 +20,8 @@ export function AppMobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-4 left-4 right-4 z-40 h-14">
-      <div className="relative w-full h-full bg-primary/80 backdrop-blur-lg rounded-full shadow-lg flex items-center justify-around text-primary-foreground">
+    <nav className="md:hidden fixed bottom-4 left-4 right-4 z-40 h-16">
+      <div className="relative w-full h-full bg-primary/90 backdrop-blur-lg rounded-full shadow-lg flex items-center justify-around text-primary-foreground">
         {mobileNavItems.slice(0, 2).map((item) => {
           const isActive = pathname === item.href || (item.href === '/dashboard' && pathname === '/');
           return (
@@ -39,15 +39,15 @@ export function AppMobileNav() {
           );
         })}
 
-        <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2">
           <ReportIssueDialog>
             <DialogTrigger asChild>
               <Button
-                className="h-14 w-14 rounded-full shadow-lg border-4 border-background"
+                className="h-16 w-16 rounded-full shadow-lg border-4 border-background"
                 aria-label="Report an issue"
                 size="icon"
               >
-                <Plus className="h-7 w-7" />
+                <Plus className="h-8 w-8" />
               </Button>
             </DialogTrigger>
           </ReportIssueDialog>

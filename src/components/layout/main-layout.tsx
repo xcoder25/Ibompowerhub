@@ -1,4 +1,3 @@
-
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -9,6 +8,7 @@ import { AppHeader } from "./app-header";
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
+import { AssistantFAB } from '../assistant-fab';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -32,6 +32,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
           </SidebarInset>
+          {showNav && isClient && <AssistantFAB />}
           {showNav && isClient && isMobile && <AppMobileNav />}
         </div>
       </div>
