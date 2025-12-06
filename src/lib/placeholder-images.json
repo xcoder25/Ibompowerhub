@@ -149,6 +149,24 @@
       "description": "A comfortable and well-lit hotel room.",
       "imageUrl": "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "hotel room"
+    },
+    {
+      "id": "event-carnival",
+      "description": "People in colorful costumes at a street carnival.",
+      "imageUrl": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "carnival festival"
+    },
+    {
+      "id": "event-market",
+      "description": "A bustling outdoor market with many people.",
+      "imageUrl": "https://images.unsplash.com/photo-1567138334495-29069d41966a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "market crowd"
+    },
+    {
+      "id": "event-health",
+      "description": "A doctor checking a patient's blood pressure.",
+      "imageUrl": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "health screening"
     }
   ]
 }

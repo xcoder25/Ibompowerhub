@@ -54,15 +54,15 @@ const primaryQuickLinks = [
   { href: '/market', icon: ShoppingBag, label: 'Market' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
   { href: '/transport', icon: Bus, label: 'Transport' },
-  { href: '/directory', icon: Building2, label: 'Directory' },
-  { href: '/issues', icon: Lightbulb, label: 'Issues' },
-  { href: '/safety', icon: Shield, label: 'Safety' },
 ];
 
 const secondaryQuickLinks = [
+    { href: '/directory', icon: Building2, label: 'Directory' },
+    { href: '/events', icon: Calendar, label: 'Events' },
+    { href: '/issues', icon: Lightbulb, label: 'Issues' },
+    { href: '/safety', icon: Shield, label: 'Safety' },
     { href: '/water', icon: Droplets, label: 'Water' },
     { href: '/forums', icon: MessageSquare, label: 'Forums' },
-    { href: '/events', icon: Calendar, label: 'Events' },
     { href: '/voting', icon: Vote, label: 'Voting' },
     { href: '/jobs', icon: Briefcase, label: 'Jobs' },
     { href: '/health', icon: HeartPulse, label: 'Health' },
@@ -181,18 +181,17 @@ export default function DashboardPage() {
                         <CarouselContent>
                             <CarouselItem>
                                 <div className="grid grid-cols-4 gap-x-2 gap-y-4">
-                                    {primaryQuickLinks.slice(0, 8).map((item) => <QuickActionItem key={item.label} item={item} />)}
+                                    {primaryQuickLinks.map((item) => <QuickActionItem key={item.label} item={item} />)}
                                 </div>
                             </CarouselItem>
                              <CarouselItem>
                                 <div className="grid grid-cols-4 gap-x-2 gap-y-4">
-                                    {primaryQuickLinks.slice(8).map((item) => <QuickActionItem key={item.label} item={item} />)}
-                                    {secondaryQuickLinks.slice(0, 5).map((item) => <QuickActionItem key={item.label} item={item} />)}
+                                    {secondaryQuickLinks.slice(0, 8).map((item) => <QuickActionItem key={item.label} item={item} />)}
                                 </div>
                             </CarouselItem>
                              <CarouselItem>
                                 <div className="grid grid-cols-4 gap-x-2 gap-y-4">
-                                    {secondaryQuickLinks.slice(5).map((item) => <QuickActionItem key={item.label} item={item} />)}
+                                    {secondaryQuickLinks.slice(8).map((item) => <QuickActionItem key={item.label} item={item} />)}
                                 </div>
                             </CarouselItem>
                         </CarouselContent>

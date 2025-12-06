@@ -19,6 +19,7 @@ import {
   Shield,
   Bot,
   Building2,
+  Calendar,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -43,6 +44,7 @@ const navItems = [
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
   { href: '/transport', icon: Bus, label: 'Transport Guide' },
   { href: '/directory', icon: Building2, label: 'Directory' },
+  { href: '/events', icon: Calendar, label: 'Events' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
   { href: '/issues', icon: Lightbulb, label: 'Issues' },
   { href: '/safety', icon: Shield, label: 'Safety' },
