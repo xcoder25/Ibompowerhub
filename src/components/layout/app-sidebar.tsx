@@ -20,6 +20,13 @@ import {
   Bot,
   Building2,
   Calendar,
+  HeartPulse,
+  Briefcase,
+  Vote,
+  Droplets,
+  BookOpen,
+  Power,
+  MessageSquare,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -48,6 +55,14 @@ const navItems = [
   { href: '/alerts', icon: Bell, label: 'Alerts' },
   { href: '/issues', icon: Lightbulb, label: 'Issues' },
   { href: '/safety', icon: Shield, label: 'Safety' },
+  { href: '/water', icon: Droplets, label: 'Water' },
+  { href: '/forums', icon: MessageSquare, label: 'Forums' },
+  { href: '/voting', icon: Vote, label: 'Voting' },
+  { href: '/jobs', icon: Briefcase, label: 'Jobs' },
+  { href: '/health', icon: HeartPulse, label: 'Health' },
+  { href: '/property', icon: Building2, label: 'Property' },
+  { href: '/education', icon: BookOpen, label: 'Education' },
+  { href: '/power', icon: Power, label: 'Power' },
   { href: '/profile', icon: User, label: 'Profile' },
 ];
 
@@ -106,9 +121,11 @@ export function AppSidebar() {
             </SidebarMenuButton>
            </SidebarMenuItem>
            <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Logout">
-              <LogOut />
-              <span>Logout</span>
+            <SidebarMenuButton tooltip="Logout" asChild>
+              <Link href="/logout">
+                <LogOut />
+                <span>Logout</span>
+              </Link>
             </SidebarMenuButton>
            </SidebarMenuItem>
          </SidebarMenu>
