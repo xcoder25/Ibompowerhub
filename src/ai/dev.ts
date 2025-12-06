@@ -3,3 +3,4 @@ config();
 
 import '@/ai/flows/neighborhood-status-tool.ts';
 import '@/ai/flows/crs-assistant-flow.ts';
+import '@/ai/flows/waste-service-flow.ts';

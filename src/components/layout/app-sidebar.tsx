@@ -27,6 +27,7 @@ import {
   BookOpen,
   Power,
   MessageSquare,
+  Trash2,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -55,6 +56,7 @@ const navItems = [
   { href: '/alerts', icon: Bell, label: 'Alerts' },
   { href: '/issues', icon: Lightbulb, label: 'Issues' },
   { href: '/safety', icon: Shield, label: 'Safety' },
+  { href: '/waste', icon: Trash2, label: 'Waste' },
   { href: '/water', icon: Droplets, label: 'Water' },
   { href: '/forums', icon: MessageSquare, label: 'Forums' },
   { href: '/voting', icon: Vote, label: 'Voting' },

@@ -60,6 +60,8 @@ export function ReportIssueDialog({ children }: { children: React.ReactNode }) {
                 <SelectItem value="power">Power Outage</SelectItem>
                 <SelectItem value="flood">Flooding</SelectItem>
                 <SelectItem value="waste">Waste Management</SelectItem>
+                <SelectItem value="illegal-dumping">Illegal Dumping</SelectItem>
+                <SelectItem value="missed-pickup">Missed Waste Pickup</SelectItem>
                 <SelectItem value="transport">Transport Issue</SelectItem>
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>

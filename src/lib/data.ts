@@ -6,7 +6,7 @@ export const services = [
   { id: 'agro-connect', name: 'AgroConnect', iconId: 'agro-connect', description: 'Fresh farm produce near you', href: '/market' },
   { id: 'skills-hub', name: 'SkillsHub', iconId: 'skills-hub', description: 'Find reliable artisans', href: '/skills' },
   { id: 'laundry-hub', name: 'LaundryHub', iconId: 'laundry-hub', description: 'Convenient laundry services', href: '#' },
-  { id: 'clean-crs', name: 'CleanCRS', iconId: 'clean-crs', description: 'Report waste issues', href: '#' },
+  { id: 'clean-crs', name: 'CleanCRS', iconId: 'clean-crs', description: 'Report waste issues', href: '/waste' },
   { id: 'transport-guide', name: 'Transport Guide', iconId: 'transport-guide', description: 'Fares and routes', href: '/transport' },
   { id: 'community-safety', name: 'Community Safety', iconId: 'community-safety', description: 'Stay safe and informed', href: '/alerts' },
 ];
