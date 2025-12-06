@@ -26,10 +26,14 @@ import {
   Shield,
   Lightbulb,
   LogOut,
+  Zap,
+  AlertTriangle,
+  Trash2,
+  CheckCircle,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { recentActivities } from '@/lib/data';
+import { recentActivities, polls } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -44,6 +48,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+
 
 const primaryQuickLinks = [
   { href: '/dashboard', icon: Home, label: 'Home' },
@@ -96,8 +103,33 @@ const chartConfig = {
     },
 };
 
+const statusConfig = {
+    power: { ON: { icon: Zap, color: 'text-green-500 border-green-500', label: 'Power On' }, OFF: { icon: Zap, color: 'text-red-500 border-red-500', label: 'Power Off' }, UNKNOWN: { icon: Zap, color: 'text-gray-500 border-gray-500', label: 'Power Unknown' } },
+    flood: { LOW: { icon: AlertTriangle, color: 'text-green-500 border-green-500', label: 'Low Risk' }, MEDIUM: { icon: AlertTriangle, color: 'text-yellow-500 border-yellow-500', label: 'Medium Risk' }, HIGH: { icon: AlertTriangle, color: 'text-red-500 border-red-500', label: 'High Risk' }, UNKNOWN: { icon: AlertTriangle, color: 'text-gray-500 border-gray-500', label: 'Flood Unknown' } },
+    waste: { NO: { icon: CheckCircle, color: 'text-green-500 border-green-500', label: 'Clean' }, YES: { icon: Trash2, color: 'text-yellow-500 border-yellow-500', label: 'Waste Overflow' }, UNKNOWN: { icon: Trash2, color: 'text-gray-500 border-gray-500', label: 'Waste Unknown' } },
+};
+
+const neighborhoodStatus = {
+    powerStatus: 'ON',
+    floodRisk: 'LOW',
+    wasteOverflow: 'NO',
+    overallStatus: 'Overall, the neighborhood is stable with power on and no immediate flood risk.'
+};
+
+const featuredPoll = polls[0];
+
+
 export default function DashboardPage() {
   const [isFirstLogin, setIsFirstLogin] = useState(false);
+  const [votedPolls, setVotedPolls] = useState<Record<number, string>>({});
+
+  const handleVote = (pollId: number, option: string) => {
+    if (votedPolls[pollId]) return;
+    setVotedPolls(prev => ({ ...prev, [pollId]: option }));
+  };
+  const hasVotedOnFeatured = !!votedPolls[featuredPoll.id];
+  const userVote = votedPolls[featuredPoll.id];
+
 
   useEffect(() => {
     const firstLogin = localStorage.getItem('isFirstDashboardVisit') !== 'false';
@@ -134,40 +166,108 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
-          <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-            <CardHeader>
-              <CardTitle>Community Pulse</CardTitle>
-              <CardDescription>Live breakdown of active community reports.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                 <div className="h-40">
-                    <ChartContainer config={chartConfig}>
-                        <PieChart accessibilityLayer>
-                            <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-                            <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={60}>
-                                {chartData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                                ))}
-                            </Pie>
-                        </PieChart>
-                    </ChartContainer>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-3xl font-bold">15</p>
-                  <p className="text-sm text-muted-foreground">Total Active Reports</p>
-                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
-                    {chartData.map((entry) => (
-                      <div key={entry.name} className="flex items-center gap-1.5">
-                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.fill }} />
-                        <span>{entry.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            <Carousel className="w-full">
+                <CarouselContent>
+                    <CarouselItem>
+                        <Card glassy className="shadow-lg">
+                            <CardHeader>
+                            <CardTitle>Community Pulse</CardTitle>
+                            <CardDescription>Live breakdown of active community reports.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                                <div className="h-40">
+                                    <ChartContainer config={chartConfig}>
+                                        <PieChart accessibilityLayer>
+                                            <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+                                            <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={60}>
+                                                {chartData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                                ))}
+                                            </Pie>
+                                        </PieChart>
+                                    </ChartContainer>
+                                </div>
+                                <div className="space-y-2">
+                                <p className="text-3xl font-bold">15</p>
+                                <p className="text-sm text-muted-foreground">Total Active Reports</p>
+                                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                                    {chartData.map((entry) => (
+                                    <div key={entry.name} className="flex items-center gap-1.5">
+                                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.fill }} />
+                                        <span>{entry.name}</span>
+                                    </div>
+                                    ))}
+                                </div>
+                                </div>
+                            </div>
+                            </CardContent>
+                        </Card>
+                    </CarouselItem>
+                     <CarouselItem>
+                        <Card glassy className="shadow-lg">
+                            <CardHeader>
+                                <CardTitle>Neighborhood Status</CardTitle>
+                                <CardDescription>AI-powered summary from recent reports.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4 h-[208px] flex flex-col justify-center">
+                                <div className="flex flex-wrap gap-2">
+                                     <Badge variant="outline" className={cn('text-sm border-2', statusConfig.power[neighborhoodStatus.powerStatus as keyof typeof statusConfig.power].color)}>
+                                        {React.createElement(statusConfig.power[neighborhoodStatus.powerStatus as keyof typeof statusConfig.power].icon, { className: "mr-2 h-4 w-4" })}
+                                        {statusConfig.power[neighborhoodStatus.powerStatus as keyof typeof statusConfig.power].label}
+                                    </Badge>
+                                    <Badge variant="outline" className={cn('text-sm border-2', statusConfig.flood[neighborhoodStatus.floodRisk as keyof typeof statusConfig.flood].color)}>
+                                        {React.createElement(statusConfig.flood[neighborhoodStatus.floodRisk as keyof typeof statusConfig.flood].icon, { className: "mr-2 h-4 w-4" })}
+                                        {statusConfig.flood[neighborhoodStatus.floodRisk as keyof typeof statusConfig.flood].label}
+                                    </Badge>
+                                    <Badge variant="outline" className={cn('text-sm border-2', statusConfig.waste[neighborhoodStatus.wasteOverflow as keyof typeof statusConfig.waste].color)}>
+                                        {React.createElement(statusConfig.waste[neighborhoodStatus.wasteOverflow as keyof typeof statusConfig.waste].icon, { className: "mr-2 h-4 w-4" })}
+                                        {statusConfig.waste[neighborhoodStatus.wasteOverflow as keyof typeof statusConfig.waste].label}
+                                    </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground pt-2">{neighborhoodStatus.overallStatus}</p>
+                            </CardContent>
+                        </Card>
+                    </CarouselItem>
+                     <CarouselItem>
+                        <Card glassy className="shadow-lg">
+                            <CardHeader>
+                                <CardTitle className="font-headline text-lg">{featuredPoll.title}</CardTitle>
+                                <CardDescription>{featuredPoll.totalVotes} votes so far</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-3 h-[208px] overflow-y-auto">
+                                {Object.entries(featuredPoll.votes).map(([option, count]) => {
+                                    const percentage = Math.round((count / featuredPoll.totalVotes) * 100);
+                                    return (
+                                    <div key={option}>
+                                        <div className="mb-2 flex items-center justify-between">
+                                        <span className={cn("font-medium", hasVotedOnFeatured && userVote === option && "text-primary")}>
+                                            {option}
+                                        </span>
+                                        {hasVotedOnFeatured && <span className="text-sm font-semibold">{percentage}%</span>}
+                                        </div>
+                                        {hasVotedOnFeatured ? (
+                                        <Progress value={percentage} />
+                                        ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full justify-start"
+                                            onClick={() => handleVote(featuredPoll.id, option)}
+                                        >
+                                            Vote for {option}
+                                        </Button>
+                                        )}
+                                    </div>
+                                    );
+                                })}
+                            </CardContent>
+                        </Card>
+                    </CarouselItem>
+                </CarouselContent>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+            </Carousel>
         </div>
 
         {/* Right Column */}
@@ -232,3 +332,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
