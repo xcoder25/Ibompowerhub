@@ -7,21 +7,17 @@ import {
   Wrench,
   User,
   Power,
-  CloudRain,
-  Trash2,
   ArrowRight,
   Map,
   GanttChartSquare,
   ShoppingBag,
   Bus,
   Home,
-  FileText,
-  Star,
   Package,
+  ChevronDown,
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { recentActivities } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
@@ -30,17 +26,22 @@ import { PieChart, Pie, Cell } from 'recharts';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useEffect, useState } from 'react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
-const quickLinks = [
+
+const primaryQuickLinks = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/map', icon: Map, label: 'Map View' },
   { href: '/services', icon: GanttChartSquare, label: 'Services' },
-  { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
-  { href: '/skills', icon: Wrench, label: 'SkillsHub' },
-  { href: '/transport', icon: Bus, label: 'Transport' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
-  { href: '/profile', icon: User, label: 'Profile' },
 ];
+
+const secondaryQuickLinks = [
+    { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
+    { href: '/skills', icon: Wrench, label: 'SkillsHub' },
+    { href: '/transport', icon: Bus, label: 'Transport' },
+    { href: '/profile', icon: User, label: 'Profile' },
+]
 
 const chartData = [
   { name: 'Power Outage', value: 8, fill: 'hsl(var(--chart-1))' },
@@ -67,8 +68,8 @@ const chartConfig = {
 };
 
 export default function DashboardPage() {
-  const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
   const [isFirstLogin, setIsFirstLogin] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   useEffect(() => {
     const firstLogin = localStorage.getItem('isFirstDashboardVisit') !== 'false';
@@ -160,25 +161,49 @@ export default function DashboardPage() {
 
         {/* Right Column */}
         <div className="space-y-6">
-          <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-4 gap-2">
-              {quickLinks.map((item) => (
-                <Link
-                  href={item.href}
-                  key={item.label}
-                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
-                >
-                  <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
-                    <item.icon className="size-5" />
-                  </div>
-                  <span className="text-xs font-medium">{item.label}</span>
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
+          <Collapsible asChild open={showMore} onOpenChange={setShowMore}>
+             <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+                <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-4 gap-2">
+                {primaryQuickLinks.map((item) => (
+                    <Link
+                    href={item.href}
+                    key={item.label}
+                    className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
+                    >
+                    <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
+                        <item.icon className="size-5" />
+                    </div>
+                    <span className="text-xs font-medium">{item.label}</span>
+                    </Link>
+                ))}
+                 <CollapsibleContent className='col-span-4 contents'>
+                    {secondaryQuickLinks.map((item) => (
+                        <Link
+                        href={item.href}
+                        key={item.label}
+                        className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-background/50 hover:bg-accent transition-colors text-center"
+                        >
+                        <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10 text-primary">
+                            <item.icon className="size-5" />
+                        </div>
+                        <span className="text-xs font-medium">{item.label}</span>
+                        </Link>
+                    ))}
+                </CollapsibleContent>
+                </CardContent>
+                <CardFooter className='justify-center'>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                            {showMore ? 'Show Less' : 'Show More'}
+                            <ChevronDown className={cn("ml-2 size-4 transition-transform", showMore && "rotate-180")} />
+                        </Button>
+                    </CollapsibleTrigger>
+                </CardFooter>
+            </Card>
+          </Collapsible>
           
           <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '400ms' }}>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -193,10 +218,9 @@ export default function DashboardPage() {
                 return (
                   <div key={activity.id} className="flex items-center gap-3">
                     {activityUserAvatar && (
-                        <Avatar className="size-9">
-                            <AvatarImage src={activityUserAvatar.imageUrl} alt={activity.user.name} />
-                            <AvatarFallback>{activity.user.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
+                        <div className='size-9 rounded-full overflow-hidden'>
+                            <img src={activityUserAvatar.imageUrl} alt={activity.user.name} className='w-full h-full object-cover' />
+                        </div>
                     )}
                     <div className="flex-1 text-sm">
                       <p><span className="font-semibold">{activity.type}</span> report by {activity.user.name}.</p>
