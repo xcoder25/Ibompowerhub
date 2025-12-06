@@ -68,18 +68,8 @@ export function AssistantWidget() {
 
   if (isOpen) {
     return (
-        <div className={cn(
-            "fixed z-40",
-            isMobile 
-                ? "inset-0" 
-                : "bottom-6 right-6"
-        )}>
-            <Card className={cn(
-                "flex flex-col shadow-2xl",
-                isMobile 
-                    ? "h-full w-full rounded-none border-none"
-                    : "h-[600px] w-96 rounded-2xl"
-            )}>
+        <div className="fixed z-40 bottom-6 right-6">
+            <Card className="flex flex-col shadow-2xl h-[600px] w-96 rounded-2xl">
                 <CardHeader className="flex flex-row items-center justify-between border-b">
                     <div className="flex items-center gap-3">
                         <Avatar className="size-8 border">
