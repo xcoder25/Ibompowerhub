@@ -27,6 +27,7 @@ import {
   Shield,
   Lightbulb,
   LogOut,
+  Bot,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -60,6 +61,7 @@ const primaryQuickLinks = [
 ];
 
 const secondaryQuickLinks = [
+    { href: '/assistant', icon: Bot, label: 'AI Assistant' },
     { href: '/water', icon: Droplets, label: 'Water' },
     { href: '/forums', icon: MessageSquare, label: 'Forums' },
     { href: '/events', icon: Calendar, label: 'Events' },
