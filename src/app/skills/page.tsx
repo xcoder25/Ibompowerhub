@@ -1,13 +1,21 @@
+
+'use client';
+
 import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { artisans } from '@/lib/data';
+import { artisans as initialArtisans } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Star, MapPin, Phone, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { RequestQuoteDialog } from '@/components/request-quote-dialog';
 
 export default function SkillsPage() {
+  const [artisans, setArtisans] = useState(initialArtisans);
+
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
       <div className="mb-8">
@@ -47,12 +55,26 @@ export default function SkillsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-headline text-lg font-semibold">{artisan.name}</h3>
-                      <Badge>{artisan.skill}</Badge>
+                      <div className='flex items-center gap-2 mt-1'>
+                        <Badge>{artisan.skill}</Badge>
+                         <Badge
+                          variant='outline'
+                          className={cn(
+                            artisan.availability === 'Available'
+                              ? 'border-green-500 text-green-700'
+                              : 'border-amber-500 text-amber-700'
+                          )}
+                        >
+                          {artisan.availability}
+                        </Badge>
+                      </div>
                     </div>
-                    <Button>
-                      <Phone className="mr-2 h-4 w-4" />
-                      Contact
-                    </Button>
+                     <RequestQuoteDialog artisan={artisan}>
+                        <Button>
+                          <Phone className="mr-2 h-4 w-4" />
+                          Request Quote
+                        </Button>
+                    </RequestQuoteDialog>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
                     <div className="flex items-center">
