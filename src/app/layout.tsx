@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Toaster } from '@/components/ui/toaster';
 import MainLayout from '@/components/layout/main-layout';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'PowerHub CRS',
@@ -23,7 +23,6 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <MainLayout>{children}</MainLayout>
-        <Toaster />
       </body>
     </html>
   );
