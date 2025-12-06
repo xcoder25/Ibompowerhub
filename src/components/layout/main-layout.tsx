@@ -1,3 +1,4 @@
+
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -26,7 +27,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <div className="flex min-h-screen bg-background">
         {showNav && isClient && !isMobile && <AppSidebar />}
         <div className="flex flex-col flex-1">
-          {showNav && <AppHeader />}
+          {showNav && isClient && <AppHeader />}
           <SidebarInset>
             <main className={cn("flex-1 flex flex-col", showNav && "pb-24 md:pb-0")}>
               {children}
