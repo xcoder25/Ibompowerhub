@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bot } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -21,7 +21,7 @@ export function AssistantFAB() {
             size="icon"
           >
             <Link href="/assistant" aria-label="AI Assistant">
-              <Bot className="h-7 w-7" />
+              <MessageSquare className="h-7 w-7" />
             </Link>
           </Button>
         </TooltipTrigger>
