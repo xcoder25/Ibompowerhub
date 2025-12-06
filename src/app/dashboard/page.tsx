@@ -168,36 +168,6 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-
-            <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-              <CardHeader>
-                <CardTitle className="font-headline">Provider Mode</CardTitle>
-                <CardDescription>Manage your services and availability.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                 <div className="flex items-center justify-between rounded-lg border p-3">
-                    <div className='flex items-center gap-4'>
-                        <Package className='size-6 text-muted-foreground'/>
-                        <div>
-                            <Label htmlFor="listing-status" className='font-semibold'>My Listings</Label>
-                            <p className='text-sm text-muted-foreground'>Manage your products or services</p>
-                        </div>
-                    </div>
-                    <Button variant="outline" size="sm">View</Button>
-                </div>
-                 <div className="flex items-center justify-between rounded-lg border p-3">
-                    <div className='flex items-center gap-4'>
-                        <Power className='size-6 text-muted-foreground'/>
-                        <div>
-                            <Label htmlFor="availability-status" className='font-semibold'>Availability</Label>
-                            <p className='text-sm text-muted-foreground'>Set your status to available</p>
-                        </div>
-                    </div>
-                  <Switch id="availability-status" defaultChecked/>
-                </div>
-              </CardContent>
-            </Card>
-
         </div>
 
         {/* Right Column */}
