@@ -29,6 +29,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { PieChart, Pie, Cell } from 'recharts';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useEffect, useState } from 'react';
 
 const quickLinks = [
   { href: '/dashboard', icon: Home, label: 'Home' },
@@ -67,11 +68,24 @@ const chartConfig = {
 
 export default function DashboardPage() {
   const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
+
+  useEffect(() => {
+    const firstLogin = localStorage.getItem('isFirstDashboardVisit') !== 'false';
+    if (firstLogin) {
+        setIsFirstLogin(true);
+        localStorage.setItem('isFirstDashboardVisit', 'false');
+    } else {
+        setIsFirstLogin(false);
+    }
+  }, []);
 
   return (
     <div className="flex-1 space-y-6 bg-muted/30 p-4 sm:p-6 md:p-8">
       <div className="space-y-2">
-        <h1 className="font-headline text-3xl font-bold tracking-tight">Welcome, Esther!</h1>
+        <h1 className="font-headline text-3xl font-bold tracking-tight">
+            {isFirstLogin ? 'Welcome to your Dashboard, Esther!' : 'Welcome back, Esther!'}
+        </h1>
         <p className="text-muted-foreground">Here&apos;s your community snapshot for today.</p>
       </div>
 
@@ -174,7 +188,7 @@ export default function DashboardPage() {
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentActivities.slice(0, 3).map((activity) => {
+              {recentActivities.slice(0, 2).map((activity) => {
                 const activityUserAvatar = PlaceHolderImages.find((img) => img.id === activity.user.avatarId);
                 return (
                   <div key={activity.id} className="flex items-center gap-3">
