@@ -1,6 +1,7 @@
 
 'use client';
-import { GoogleMap as GoogleMapApi, LoadScript } from '@react-google-maps/api';
+import { GoogleMap as GoogleMapApi, LoadScript, MarkerF, DirectionsRenderer } from '@react-google-maps/api';
+import { type MapLocation } from '@/app/map/page';
 
 const containerStyle = {
   width: '100%',
@@ -12,7 +13,18 @@ const center = {
   lng: 8.34
 };
 
-export function GoogleMap() {
+const mapOptions = {
+    disableDefaultUI: true,
+    zoomControl: true,
+};
+
+type GoogleMapProps = {
+    origin: MapLocation | null;
+    destination: MapLocation | null;
+    directions: google.maps.DirectionsResult | null;
+}
+
+export function GoogleMap({ origin, destination, directions }: GoogleMapProps) {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
     if (!apiKey) {
@@ -25,14 +37,17 @@ export function GoogleMap() {
   return (
     <LoadScript
       googleMapsApiKey={apiKey}
+      libraries={['places']}
     >
       <GoogleMapApi
         mapContainerStyle={containerStyle}
         center={center}
         zoom={13}
+        options={mapOptions}
       >
-        { /* Child components, such as markers, info windows, etc. */ }
-        <></>
+        {origin && <MarkerF position={origin} />}
+        {destination && <MarkerF position={destination} />}
+        {directions && <DirectionsRenderer directions={directions} />}
       </GoogleMapApi>
     </LoadScript>
   )

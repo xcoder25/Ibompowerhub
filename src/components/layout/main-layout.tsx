@@ -29,16 +29,18 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     );
   }
 
+  const isMapPage = pathname === '/map';
+
   return (
     <SidebarProvider>
         {isClient ? (
             <div className="flex min-h-screen bg-background">
                 {!isMobile && <AppSidebar />}
                 <div className="flex flex-col flex-1">
-                    <AppHeader />
+                    {!isMapPage && <AppHeader />}
                     <SidebarInset>
-                        <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0")}>
-                        {children}
+                        <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0", isMapPage && "md:pb-0")}>
+                           {children}
                         </main>
                     </SidebarInset>
                     <AssistantWidget />

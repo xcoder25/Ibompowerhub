@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, Bell, User as UserIcon, Settings, LogOut } from 'lucide-react';
+import { Search, Bell, User as UserIcon, Settings, LogOut, Map } from 'lucide-react';
 import Link from 'next/link';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
@@ -17,18 +17,22 @@ import {
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Logo } from '../logo';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export function AppHeader() {
   const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
   const isMobile = useIsMobile();
+  const pathname = usePathname();
+  const isMapPage = pathname === '/map';
 
   return (
-    <header className="flex h-16 items-center gap-4 border-b bg-transparent px-4 md:px-6 sticky top-0 z-30 backdrop-blur-sm bg-background/80 md:bg-transparent md:backdrop-blur-none">
+    <header className={cn("flex h-16 items-center gap-4 border-b bg-transparent px-4 md:px-6", isMapPage ? "absolute top-0 left-0 right-0 z-20 border-none" : "sticky top-0 z-30 backdrop-blur-sm bg-background/80 md:bg-transparent md:backdrop-blur-none")}>
       <div className="flex items-center gap-2 md:hidden">
          <Logo />
       </div>
      
-      <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+      <div className={cn("flex w-full items-center gap-4", isMapPage && "md:hidden")}>
         <form className="ml-auto flex-1 sm:flex-initial">
           <div className="relative hidden md:block">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -79,6 +83,15 @@ export function AppHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+       {isMapPage && (
+          <div className='md:hidden ml-auto'>
+                <Button variant="outline" size="icon" asChild>
+                    <Link href="/dashboard">
+                        <Map />
+                    </Link>
+                </Button>
+          </div>
+        )}
     </header>
   );
 }
