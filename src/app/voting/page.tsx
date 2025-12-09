@@ -37,7 +37,7 @@ export default function VotingPage() {
               <CardContent>
                 <div className="space-y-4">
                   {Object.entries(poll.votes).map(([option, count]) => {
-                    const percentage = Math.round((count / poll.totalVotes) * 100);
+                    const percentage = poll.totalVotes > 0 ? Math.round((count / poll.totalVotes) * 100) : 0;
                     return (
                       <div key={option}>
                         <div className="mb-2 flex items-center justify-between">

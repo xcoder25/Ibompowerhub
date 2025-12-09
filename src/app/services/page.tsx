@@ -23,14 +23,15 @@ export default function ServicesPage() {
             <Card key={service.id} glassy className="flex flex-col">
               <CardHeader className="flex flex-row items-center gap-4">
                 {image && (
-                  <Image
-                    src={image.imageUrl}
-                    alt={service.name}
-                    width={64}
-                    height={64}
-                    className="rounded-lg object-cover"
-                    data-ai-hint={image.imageHint}
-                  />
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                    <Image
+                      src={image.imageUrl}
+                      alt={service.name}
+                      fill
+                      className="object-cover"
+                      data-ai-hint={image.imageHint}
+                    />
+                  </div>
                 )}
                 <div>
                   <CardTitle className="font-headline">{service.name}</CardTitle>

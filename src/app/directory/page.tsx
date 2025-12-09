@@ -10,7 +10,6 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { MapPin, Phone, Search, Building2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 
 export default function DirectoryPage() {
   const [searchTerm, setSearchTerm] = useState('');

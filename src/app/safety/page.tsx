@@ -8,7 +8,6 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function SafetyPage() {
   const alertImage = PlaceHolderImages.find(img => img.id === 'safety-alert');
-  const emergencyServicesImage = PlaceHolderImages.find(img => img.id === 'safety-emergency-services');
 
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
