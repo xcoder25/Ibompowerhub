@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -13,8 +14,6 @@ import {
   ShoppingBag,
   Bus,
   Home,
-  ChevronLeft,
-  ChevronRight,
   BookOpen,
   Building2,
   HeartPulse,
@@ -38,9 +37,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart, Pie, Cell } from 'recharts';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Carousel,
   CarouselContent,
@@ -269,6 +266,32 @@ export default function DashboardPage() {
                 <CarouselPrevious className="left-2" />
                 <CarouselNext className="right-2" />
             </Carousel>
+          <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Recent Activity</CardTitle>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/alerts">View all <ArrowRight className="ml-2 size-4" /></Link>
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentActivities.slice(0, 2).map((activity) => {
+                const activityUserAvatar = PlaceHolderImages.find((img) => img.id === activity.user.avatarId);
+                return (
+                  <div key={activity.id} className="flex items-center gap-3">
+                    {activityUserAvatar && (
+                        <div className='size-9 rounded-full overflow-hidden'>
+                            <img src={activityUserAvatar.imageUrl} alt={activity.user.name} className='w-full h-full object-cover' />
+                        </div>
+                    )}
+                    <div className="flex-1 text-sm">
+                      <p><span className="font-semibold">{activity.type}</span> report by {activity.user.name}.</p>
+                      <p className="text-xs text-muted-foreground">{activity.time}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right Column */}
@@ -301,35 +324,10 @@ export default function DashboardPage() {
                     </Carousel>
                 </CardContent>
             </Card>
-          
-          <Card glassy className="shadow-lg animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Recent Activity</CardTitle>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/alerts">View all <ArrowRight className="ml-2 size-4" /></Link>
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentActivities.slice(0, 2).map((activity) => {
-                const activityUserAvatar = PlaceHolderImages.find((img) => img.id === activity.user.avatarId);
-                return (
-                  <div key={activity.id} className="flex items-center gap-3">
-                    {activityUserAvatar && (
-                        <div className='size-9 rounded-full overflow-hidden'>
-                            <img src={activityUserAvatar.imageUrl} alt={activity.user.name} className='w-full h-full object-cover' />
-                        </div>
-                    )}
-                    <div className="flex-1 text-sm">
-                      <p><span className="font-semibold">{activity.type}</span> report by {activity.user.name}.</p>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
   );
 }
+
+    
