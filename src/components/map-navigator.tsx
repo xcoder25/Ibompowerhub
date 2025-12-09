@@ -17,6 +17,7 @@ import { Separator } from './ui/separator';
 type MapNavigatorProps = {
   origin: MapLocation | null;
   destination: MapLocation | null;
+  directions: google.maps.DirectionsResult | null;
   setOrigin: (location: MapLocation | null) => void;
   setDestination: (location: MapLocation | null) => void;
   setDirections: (directions: google.maps.DirectionsResult | null) => void;
@@ -24,7 +25,7 @@ type MapNavigatorProps = {
   setTravelMode: (mode: google.maps.TravelMode) => void;
 };
 
-export function MapNavigator({ origin, destination, setOrigin, setDestination, setDirections, travelMode, setTravelMode }: MapNavigatorProps) {
+export function MapNavigator({ origin, destination, directions, setOrigin, setDestination, setDirections, travelMode, setTravelMode }: MapNavigatorProps) {
   const originRef = useRef<HTMLInputElement>(null);
   const destinationRef = useRef<HTMLInputElement>(null);
   const aiQueryRef = useRef<HTMLInputElement>(null);

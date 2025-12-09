@@ -51,6 +51,7 @@ export default function MapPage() {
             <MapNavigator
               origin={origin}
               destination={destination}
+              directions={directions}
               setOrigin={setOrigin}
               setDestination={setDestination}
               setDirections={setDirections}
