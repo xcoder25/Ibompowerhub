@@ -21,24 +21,20 @@
         },
         "role": {
           "type": "string",
-          "description": "The user's role (Resident, Seller, Service Provider, Driver)."
+          "description": "The user's role within the platform (e.g., Resident, Seller, Service Provider, Driver)."
         },
         "rating": {
           "type": "number",
-          "description": "The user's rating (e.g., average rating from services)."
+          "description": "User rating, if applicable (e.g., for service providers)."
         },
-        "profilePictureUrl": {
+        "profileImageUrl": {
           "type": "string",
-          "description": "URL of the user's profile picture.",
+          "description": "URL of the user's profile image.",
           "format": "uri"
-        },
-        "bio": {
-          "type": "string",
-          "description": "A short biography or description of the user."
         },
         "location": {
           "type": "string",
-          "description": "The current location of the user"
+          "description": "The user's current location, useful for proximity based services."
         }
       },
       "required": [
@@ -52,32 +48,33 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Report",
       "type": "object",
-      "description": "Represents a report submitted by a user.",
+      "description": "Represents a report submitted by a user regarding an issue (e.g., power outage, flood).",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the report."
-        },
-        "category": {
-          "type": "string",
-          "description": "Category of the report (e.g., Power, Flood, Waste)."
-        },
-        "coords": {
-          "type": "string",
-          "description": "Coordinates (latitude/longitude) of the report location."
+          "description": "Unique identifier for the report.",
+          "format": "uuid"
         },
         "userId": {
           "type": "string",
           "description": "Reference to User. (Relationship: User 1:N Report)"
         },
+        "category": {
+          "type": "string",
+          "description": "Category of the report (e.g., power, flood, waste)."
+        },
+        "coords": {
+          "type": "string",
+          "description": "Geographical coordinates of the reported issue."
+        },
         "media": {
           "type": "string",
-          "description": "URL of the media (photo/video) attached to the report.",
+          "description": "URL of the attached media (image, video) for the report.",
           "format": "uri"
         },
         "status": {
           "type": "string",
-          "description": "Status of the report (e.g., Open, In Progress, Resolved)."
+          "description": "Status of the report (e.g., pending, in progress, resolved)."
         },
         "upvotes": {
           "type": "number",
@@ -90,15 +87,16 @@
         },
         "description": {
           "type": "string",
-          "description": "A description of the problem"
+          "description": "Additional details provided by the user, such as the location or time of the incident."
         }
       },
       "required": [
         "id",
+        "userId",
         "category",
         "coords",
-        "userId",
         "status",
+        "upvotes",
         "timestamp"
       ]
     },
@@ -106,23 +104,24 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Service",
       "type": "object",
-      "description": "Represents a service offered by a service provider.",
+      "description": "Represents a service offered by a user (e.g., AgroConnect, SkillsHub, LaundryHub).",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the service."
-        },
-        "category": {
-          "type": "string",
-          "description": "Category of the service (e.g., AgroConnect, SkillsHub)."
+          "description": "Unique identifier for the service.",
+          "format": "uuid"
         },
         "ownerId": {
           "type": "string",
           "description": "Reference to User. (Relationship: User 1:N Service)"
         },
+        "category": {
+          "type": "string",
+          "description": "Category of the service (e.g., AgroConnect, SkillsHub)."
+        },
         "location": {
           "type": "string",
-          "description": "Location of the service provider."
+          "description": "Location where the service is offered."
         },
         "priceRange": {
           "type": "string",
@@ -138,17 +137,13 @@
         },
         "description": {
           "type": "string",
-          "description": "Additional details about the services offered."
-        },
-        "availability": {
-          "type": "boolean",
-          "description": "Whether the provider is currently available."
+          "description": "A description of the service offered."
         }
       },
       "required": [
         "id",
-        "category",
         "ownerId",
+        "category",
         "location",
         "priceRange",
         "contact",
@@ -159,7 +154,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Area",
       "type": "object",
-      "description": "Represents aggregated statistics for a specific area.",
+      "description": "Represents an area and its aggregated stats (e.g., power status, flood score, waste score).",
       "properties": {
         "id": {
           "type": "string",
@@ -167,7 +162,7 @@
         },
         "powerStatus": {
           "type": "string",
-          "description": "Status of the power supply in the area (ON/OFF)."
+          "description": "Status of power in the area (e.g., ON, OFF)."
         },
         "floodScore": {
           "type": "number",
@@ -179,29 +174,27 @@
         }
       },
       "required": [
-        "id",
-        "powerStatus",
-        "floodScore",
-        "wasteScore"
+        "id"
       ]
     },
     "Transaction": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Transaction",
       "type": "object",
-      "description": "Represents a transaction (booking, pickup) within the platform.",
+      "description": "Represents a transaction (e.g., bookings, pickups) between users and service providers.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the transaction."
+          "description": "Unique identifier for the transaction.",
+          "format": "uuid"
         },
         "userId": {
           "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N Transaction) User initiating the transaction."
+          "description": "Reference to User. (Relationship: User 1:N Transaction) User initiating the transaction (e.g., booking a service)."
         },
         "serviceId": {
           "type": "string",
-          "description": "Reference to Service. (Relationship: Service 1:N Transaction) Service involved in the transaction."
+          "description": "Reference to Service. (Relationship: Service 1:N Transaction) The service that is being transacted."
         },
         "timestamp": {
           "type": "string",
@@ -212,13 +205,9 @@
           "type": "number",
           "description": "Amount involved in the transaction."
         },
-        "type": {
-          "type": "string",
-          "description": "Type of transaction (e.g., Booking, Pickup, Payment)."
-        },
         "status": {
           "type": "string",
-          "description": "Status of the transaction (e.g., Pending, Completed, Cancelled)."
+          "description": "Status of the transaction (e.g., pending, completed, cancelled)."
         }
       },
       "required": [
@@ -227,7 +216,6 @@
         "serviceId",
         "timestamp",
         "amount",
-        "type",
         "status"
       ]
     }
@@ -247,7 +235,7 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user profiles. Path-based ownership ensures only the user can access their own document.",
+          "description": "Stores user profiles. Only the user can access their own data.",
           "params": [
             {
               "name": "userId",
@@ -263,7 +251,7 @@
           "schema": {
             "$ref": "#/backend/entities/Report"
           },
-          "description": "Stores reports submitted by users. Access control is based on the `userId` field within the document.",
+          "description": "Stores reports submitted by users. Publicly readable, write-protected to authenticated users.",
           "params": [
             {
               "name": "reportId",
@@ -279,7 +267,7 @@
           "schema": {
             "$ref": "#/backend/entities/Service"
           },
-          "description": "Stores services offered by service providers. Access control based on the `ownerId` field.",
+          "description": "Stores service listings offered by users. Only the service owner can edit or delete their services.",
           "params": [
             {
               "name": "serviceId",
@@ -295,7 +283,7 @@
           "schema": {
             "$ref": "#/backend/entities/Area"
           },
-          "description": "Stores aggregated statistics for specific areas.",
+          "description": "Stores aggregated stats for different areas. Publicly readable.",
           "params": [
             {
               "name": "areaId",
@@ -311,7 +299,7 @@
           "schema": {
             "$ref": "#/backend/entities/Transaction"
           },
-          "description": "Stores transactions within the platform. Access control is based on the `userId` field within the document.",
+          "description": "Stores transactions between users and service providers.",
           "params": [
             {
               "name": "transactionId",
@@ -321,6 +309,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to support the PowerHub CRS application, focusing on user interaction, reporting, service marketplace, and community alerts.  The design emphasizes Authorization Independence (CRITICAL), achieved via denormalization, and supports the required QAPs (using segregation and/or membership models).\n\n**Authorization Independence via Denormalization:** The primary strategy to ensure Authorization Independence is to denormalize authorization context whenever parent data is relevant for child document access.  For example, any subcollections under `/users/{userId}` inherit ownership, eliminating the need for `get()` calls in security rules. For collaborative entities, membership maps are used to define roles, again avoiding `get()` calls and ensuring atomic operations are possible.\n\n**Structural Segregation (Homogeneous Security Posture):** The structure segregates data based on access requirements. User-specific data is stored under `/users/{userId}`, ensuring path-based ownership. Public reports and services are stored in root-level collections with appropriate security rules enforced using the `ownerId` field, which is the denormalized authorization context.\n\n**Access Modeling (Standardization and Consistency):** Path-based ownership (`/users/{userId}/...`) is used for private user data.  Membership maps are employed for collaborative scenarios. Global roles, if needed, can be implemented via existence checks on dedicated collections like `/roles_admin/{uid}`.\n\n**QAPs (Rules are not Filters):** Secure `list` operations are enabled through structural segregation and denormalization.  For example, listing reports is secured by ensuring all documents in the `/reports` collection have consistent security requirements based on the `userId` and other properties.\n"
+    "reasoning": "This Firestore structure is designed to support the PowerHub CRS application, focusing on user management, reporting, service marketplaces, and community alerts. It prioritizes authorization independence, clarity, and scalability, aligning with the specified design principles. The structure employs path-based ownership for user-specific data and membership maps for collaborative data. It also leverages structural segregation by keeping data that requires different security posture in different collections. \n\nKey structural choices and their justifications:\n\n1.  **User Data (`/users/{userId}`):** Stores user profiles. Path-based ownership simplifies security rules, ensuring only the user can access their own data.\n\n2.  **Reports (`/reports/{reportId}`):** Stores reports submitted by users.  Each document contains the `userId` to identify who created the report.  Publicly readable (QAP: Rules are not filters) but write-protected to authenticated users only.  The `reportId` is a UUID.\n\n3.  **Services (`/services/{serviceId}`):** Stores service listings offered by users. Each service document includes the `ownerId` to denote the service provider. This path structure ensures that only the service owner can edit or delete their services.\n\n4.  **Areas (`/areas/{areaId}`):** Stores aggregated stats for different areas.  Publicly readable.\n\n5.  **Transactions (`/transactions/{transactionId}`):** Stores transactions between users and service providers.  Each transaction document contains the `userId` and `serviceId` to establish the relationship. Allows tracking transaction history and status.\n\nThis structure enables Authorization Independence by avoiding hierarchical `get()` calls. Access control is enforced directly on each document using the `request.auth.uid` and the denormalized `ownerId` or `userId` fields.  It also supports the required QAPs (Rules are not Filters). The `/reports` and `/areas` collections can be listed without filtering, as their security posture allows public read access.  Private user data is secured using path-based ownership."
   }
 }
