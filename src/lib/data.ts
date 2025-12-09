@@ -129,7 +129,7 @@ export const alerts = [
   ];
 
   export const polls = [
-    { id: 1, title: 'Should streetlights be on all night?', votes: { yes: 128, no: 34 }, totalVotes: 162 },
+    { id: 1, title: 'Should streetlights be on all night?', votes: { Yes: 128, No: 34 }, totalVotes: 162 },
     { id: 2, title: 'Which road needs urgent repairs the most?', votes: { 'Marian Road': 78, 'Murtala Mohammed Highway': 55, 'Atimbo Road': 23 }, totalVotes: 156 },
   ];
 

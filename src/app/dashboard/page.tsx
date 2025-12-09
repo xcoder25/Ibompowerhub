@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -69,6 +68,7 @@ const secondaryQuickLinks = [
     { href: '/events', icon: Calendar, label: 'Events' },
     { href: '/issues', icon: Lightbulb, label: 'Issues' },
     { href: '/safety', icon: Shield, label: 'Safety' },
+    { href: '/waste', icon: Trash2, label: 'Waste'},
     { href: '/water', icon: Droplets, label: 'Water' },
     { href: '/forums', icon: MessageSquare, label: 'Forums' },
     { href: '/voting', icon: Vote, label: 'Voting' },
@@ -238,7 +238,7 @@ export default function DashboardPage() {
                             </CardHeader>
                             <CardContent className="space-y-3 h-[208px] overflow-y-auto">
                                 {Object.entries(featuredPoll.votes).map(([option, count]) => {
-                                    const percentage = Math.round((count / featuredPoll.totalVotes) * 100);
+                                    const percentage = featuredPoll.totalVotes > 0 ? Math.round((count / featuredPoll.totalVotes) * 100) : 0;
                                     return (
                                     <div key={option}>
                                         <div className="mb-2 flex items-center justify-between">
@@ -333,5 +333,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
