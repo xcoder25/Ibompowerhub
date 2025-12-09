@@ -50,7 +50,6 @@ import { Progress } from '@/components/ui/progress';
 
 
 const primaryQuickLinks = [
-  { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/map', icon: Map, label: 'Map View' },
   { href: '/services', icon: GanttChartSquare, label: 'Services' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
@@ -58,6 +57,7 @@ const primaryQuickLinks = [
   { href: '/market', icon: ShoppingBag, label: 'Market' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
   { href: '/transport', icon: Bus, label: 'Transport' },
+  { href: '/property', icon: Building2, label: 'Property' },
 ];
 
 const secondaryQuickLinks = [
@@ -71,7 +71,6 @@ const secondaryQuickLinks = [
     { href: '/voting', icon: Vote, label: 'Voting' },
     { href: '/jobs', icon: Briefcase, label: 'Jobs' },
     { href: '/health', icon: HeartPulse, label: 'Health' },
-    { href: '/property', icon: Building2, label: 'Property' },
     { href: '/education', icon: BookOpen, label: 'Education' },
     { href: '/power', icon: Power, label: 'Power' },
     { href: '/logout', icon: LogOut, label: 'Logout' },
@@ -329,5 +328,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
