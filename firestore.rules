@@ -1,0 +1,117 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model for private data, while enabling a public-read/owner-write model for shared community data like reports and services. The primary goal is to ensure users have full control over their own content and profile information.
+ * Data Structure: Private user data is stored in a top-level /users/{userId} collection. Publicly-discoverable content, such as community reports and offered services, is stored in separate top-level collections (/reports, /services). This structural segregation simplifies security and improves query performance.
+ * Key Security Decisions:
+ * - User profiles (/users) are private. Users can only access their own document and cannot list or view other users' profiles.
+ * - Public data (/reports, /services, /areas) is readable by anyone, including unauthenticated users, to support the app's core browsing and discovery features.
+ * - Writes to public collections are strictly controlled. A user can only create, update, or delete documents where their UID matches a denormalized ownership field (e.g., 'userId' or 'ownerId') within the document itself.
+ * - Transactions (/transactions) are considered private and can only be read or written by the user who created them. Listing all transactions is explicitly disallowed to prevent data leaks.
+ * - Aggregated data (/areas) is treated as read-only for clients, assuming it is managed by a secure backend process.
+ * Denormalization for Authorization: This ruleset relies on denormalized ownership fields (e.g., `report.userId`, `service.ownerId`) directly on documents in public collections. This avoids slow and costly `get()` calls in rules, ensuring authorization decisions are fast and efficient.
+ * Structural Segregation: User-specific private data (/users/{userId}) is structurally separated from shared public data (/reports, /services). This is a more secure and performant pattern for managing access than using a boolean flag within a single collection, especially for list operations.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for reusable logic
+    
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user's UID matches the provided userId.
+     * This is the primary function for validating ownership based on path or document data.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks for ownership on an existing document.
+     * Crucially used for update and delete operations to prevent actions on non-existent data.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Rules for user profile documents.
+     * @path /users/{userId}
+     * @allow (create) A new user creating their own profile document upon signup. auth.uid must match {userId}.
+     * @deny (get) An authenticated user trying to read another user's profile document.
+     * @principle Restricts access to a user's own data tree, enforcing privacy and data isolation.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for community-submitted reports.
+     * @path /reports/{reportId}
+     * @allow (get, list) Any user, including unauthenticated ones, reading report details.
+     * @deny (update) A user trying to update a report they did not create.
+     * @principle Enforces a "Public Read, Owner-Only Write" model, allowing community visibility while protecting content integrity.
+     */
+    match /reports/{reportId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(resource.data.userId);
+    }
+
+    /**
+     * @description Rules for services offered by providers.
+     * @path /services/{serviceId}
+     * @allow (get, list) Any user, including unauthenticated ones, browsing available services.
+     * @deny (create) An unauthenticated user trying to create a new service listing.
+     * @principle Enforces a "Public Read, Owner-Only Write" model, allowing a public marketplace where providers retain control of their listings.
+     */
+    match /services/{serviceId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.ownerId) && request.resource.data.ownerId == resource.data.ownerId;
+      allow delete: if isExistingOwner(resource.data.ownerId);
+    }
+
+    /**
+     * @description Rules for aggregated area statistics. This data is considered public and read-only for clients.
+     * @path /areas/{areaId}
+     * @allow (get, list) Any user, including unauthenticated ones, viewing area data.
+     * @deny (create, update, delete) Any client trying to modify this data, which is assumed to be managed by a backend process.
+     * @principle Protects aggregated data from client-side manipulation, ensuring data integrity.
+     */
+    match /areas/{areaId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rules for private user transactions.
+     * @path /transactions/{transactionId}
+     * @allow (get) A user reading the details of their own transaction. auth.uid must match the transaction's 'userId' field.
+     * @deny (list) Any user attempting to list documents from the transactions collection to prevent data leakage.
+     * @principle Enforces strict document ownership for sensitive financial or booking data.
+     */
+    match /transactions/{transactionId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if false;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(resource.data.userId);
+    }
+  }
+}
