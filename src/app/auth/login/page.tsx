@@ -51,7 +51,7 @@ export default function LoginPage() {
     if (typeof window !== 'undefined') {
         localStorage.setItem('hasSignedUp', 'true'); // Simulate signup for landing page logic
     }
-    router.push('/map');
+    router.push('/dashboard');
   }
 
   return (

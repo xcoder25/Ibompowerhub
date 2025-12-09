@@ -60,7 +60,7 @@ export default function SignupPage() {
     if (typeof window !== 'undefined') {
         localStorage.setItem('hasSignedUp', 'true');
     }
-    router.push('/map');
+    router.push('/dashboard');
   }
 
   const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (

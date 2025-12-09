@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, Bell, User as UserIcon, Settings, LogOut, Map } from 'lucide-react';
+import { Search, Bell, User as UserIcon, Settings, LogOut, Home } from 'lucide-react';
 import Link from 'next/link';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
@@ -87,7 +87,7 @@ export function AppHeader() {
           <div className='md:hidden ml-auto'>
                 <Button variant="outline" size="icon" asChild>
                     <Link href="/dashboard">
-                        <Map />
+                        <Home />
                     </Link>
                 </Button>
           </div>
