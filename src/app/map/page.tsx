@@ -1,3 +1,4 @@
+
 'use client';
 import { useState } from 'react';
 import { GoogleMap } from '@/components/google-map';
@@ -16,7 +17,7 @@ export default function MapPage() {
   const [origin, setOrigin] = useState<MapLocation | null>(null);
   const [destination, setDestination] = useState<MapLocation | null>(null);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
-  const [travelMode, setTravelMode] = useState<google.maps.TravelMode>(google.maps.TravelMode.DRIVING);
+  const [travelMode, setTravelMode] = useState<google.maps.TravelMode>('DRIVING' as google.maps.TravelMode);
   
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
