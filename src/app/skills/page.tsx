@@ -40,22 +40,22 @@ export default function SkillsPage() {
           const image = PlaceHolderImages.find((img) => img.id === artisan.imageId);
           return (
             <Card key={artisan.id} glassy className="p-4">
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
                 {image && (
                   <Image
                     src={image.imageUrl}
                     alt={artisan.name}
                     width={80}
                     height={80}
-                    className="rounded-full object-cover border-2 border-primary"
+                    className="rounded-full object-cover border-2 border-primary self-center sm:self-start"
                     data-ai-hint={image.imageHint}
                   />
                 )}
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
+                <div className="flex-1 w-full">
+                  <div className="flex flex-col sm:flex-row items-start justify-between">
                     <div>
                       <h3 className="font-headline text-lg font-semibold">{artisan.name}</h3>
-                      <div className='flex items-center gap-2 mt-1'>
+                      <div className='flex items-center flex-wrap gap-2 mt-1'>
                         <Badge>{artisan.skill}</Badge>
                          <Badge
                           variant='outline'
@@ -69,14 +69,16 @@ export default function SkillsPage() {
                         </Badge>
                       </div>
                     </div>
-                     <RequestQuoteDialog artisan={artisan}>
-                        <Button>
-                          <Phone className="mr-2 h-4 w-4" />
-                          Request Quote
-                        </Button>
-                    </RequestQuoteDialog>
+                     <div className="mt-4 sm:mt-0 w-full sm:w-auto">
+                        <RequestQuoteDialog artisan={artisan}>
+                            <Button className="w-full sm:w-auto">
+                              <Phone className="mr-2 h-4 w-4" />
+                              Request Quote
+                            </Button>
+                        </RequestQuoteDialog>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
+                  <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mt-3 pt-3 border-t sm:border-none sm:pt-0 sm:mt-2">
                     <div className="flex items-center">
                       <Star className="mr-1 h-4 w-4 text-yellow-400 fill-yellow-400" />
                       <span>{artisan.rating}</span>
