@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Map,
   GanttChartSquare,
@@ -44,7 +44,9 @@ import {
 } from '@/components/ui/sidebar';
 import { Logo } from '../logo';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useAuth, useUser } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 const mainNav = [
   { href: '/dashboard', icon: Home, label: 'Home' },
@@ -84,7 +86,29 @@ const resourcesNav = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar-1');
+  const { user } = useUser();
+  const auth = useAuth();
+  const { toast } = useToast();
+  const router = useRouter();
+
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out.",
+      });
+      router.push('/auth/login');
+    } catch (error) {
+      console.error("Error signing out: ", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+      });
+    }
+  };
 
   const renderNavGroup = (items: typeof mainNav, groupLabel: string) => (
       <SidebarGroup>
@@ -129,11 +153,11 @@ export function AppSidebar() {
            <SidebarMenuItem>
             <SidebarMenuButton tooltip="User Settings" asChild>
                 <Link href="/profile">
-                    {userAvatar && <Avatar className="size-7">
-                        <AvatarImage src={userAvatar.imageUrl} alt="User" />
-                        <AvatarFallback>U</AvatarFallback>
-                    </Avatar>}
-                    <span className='truncate'>Esther Howard</span>
+                    <Avatar className="size-7">
+                        <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
+                        <AvatarFallback>{user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
+                    </Avatar>
+                    <span className='truncate'>{user?.displayName ?? 'Profile'}</span>
                 </Link>
             </SidebarMenuButton>
            </SidebarMenuItem>
@@ -144,11 +168,9 @@ export function AppSidebar() {
             </SidebarMenuButton>
            </SidebarMenuItem>
            <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Logout" asChild>
-              <Link href="/logout">
+            <SidebarMenuButton tooltip="Logout" onClick={handleSignOut}>
                 <LogOut />
                 <span>Logout</span>
-              </Link>
             </SidebarMenuButton>
            </SidebarMenuItem>
          </SidebarMenu>
@@ -156,5 +178,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
-    

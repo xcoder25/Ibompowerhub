@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Search, Bell, User as UserIcon, Settings, LogOut, Home } from 'lucide-react';
@@ -14,17 +15,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Logo } from '../logo';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useAuth, useUser } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 export function AppHeader() {
-  const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
+  const { user } = useUser();
+  const auth = useAuth();
+  const { toast } = useToast();
+  const router = useRouter();
+
   const isMobile = useIsMobile();
   const pathname = usePathname();
   const isMapPage = pathname === '/map';
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out.",
+      });
+      router.push('/auth/login');
+    } catch (error) {
+      console.error("Error signing out: ", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+      });
+    }
+  };
 
   return (
     <header className={cn("flex h-16 items-center gap-4 border-b bg-transparent px-4 md:px-6", isMapPage ? "absolute top-0 left-0 right-0 z-20 border-none" : "sticky top-0 z-30 backdrop-blur-sm bg-background/80 md:bg-transparent md:backdrop-blur-none")}>
@@ -51,14 +76,10 @@ export function AppHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
-              {userAvatar ? (
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={userAvatar.imageUrl} alt="User" />
-                  <AvatarFallback>EH</AvatarFallback>
-                </Avatar>
-              ) : (
-                <UserIcon className="h-5 w-5" />
-              )}
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
+                <AvatarFallback>{user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
+              </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
@@ -76,7 +97,7 @@ export function AppHeader() {
                 Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut}>
                 <LogOut className='mr-2' />
                 Logout
             </DropdownMenuItem>

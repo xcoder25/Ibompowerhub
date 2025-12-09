@@ -1,7 +1,7 @@
 
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { AppMobileNav } from "./app-mobile-nav";
@@ -11,11 +11,17 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
 import { AssistantWidget } from '../assistant-widget';
 import { Toaster } from '../ui/toaster';
+import { useUser } from '@/firebase';
+import { SplashScreen } from '../splash-screen';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const noNavRoutes = ['/', '/auth/login', '/auth/signup'];
-  const showNav = !noNavRoutes.includes(pathname);
+  const router = useRouter();
+  const { user, isUserLoading } = useUser();
+  const noNavRoutes = ['/'];
+  const authRoutes = ['/auth/login', '/auth/signup'];
+  
+  const showNav = !noNavRoutes.includes(pathname) && !authRoutes.includes(pathname);
   const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
 
@@ -23,10 +29,27 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     setIsClient(true);
   }, []);
 
-  if (!showNav) {
+  useEffect(() => {
+    if (!isUserLoading && !user && !authRoutes.includes(pathname) && pathname !== '/') {
+      router.push('/auth/login');
+    }
+    if (!isUserLoading && user && authRoutes.includes(pathname)) {
+      router.push('/dashboard');
+    }
+  }, [user, isUserLoading, pathname, router, authRoutes]);
+
+  if (isUserLoading && isClient) {
+    return <SplashScreen />;
+  }
+
+  if (authRoutes.includes(pathname) || pathname === '/') {
     return (
         <main className="flex-1 flex flex-col">{children}</main>
     );
+  }
+
+  if (!user && isClient) {
+    return <SplashScreen />; // Or a dedicated access-denied page
   }
 
   const isMapPage = pathname === '/map';

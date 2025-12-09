@@ -1,13 +1,59 @@
+
+'use client';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Edit, Star, FileText, Settings, LogOut, Package, Power } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useUser, useAuth } from '@/firebase';
+import { useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
+import { doc, getDoc } from 'firebase/firestore';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useEffect, useState } from 'react';
+
+type UserProfile = {
+    name: string;
+    role: string;
+    profileImageUrl?: string;
+    rating?: number;
+};
 
 export default function ProfilePage() {
-  const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
+  const { user } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
+  const firestore = useFirestore();
+
+  const userDocRef = useMemoFirebase(
+    () => (user ? doc(firestore, 'users', user.uid) : null),
+    [firestore, user]
+  );
+  
+  const { data: userProfile, isLoading } = useDoc<UserProfile>(userDocRef);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out.",
+      });
+      router.push('/auth/login');
+    } catch (error) {
+      console.error("Error signing out: ", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+      });
+    }
+  };
+
 
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8 bg-transparent">
@@ -15,22 +61,20 @@ export default function ProfilePage() {
         <Card glassy>
           <CardContent className="pt-6">
             <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-              {userAvatar && (
                 <Avatar className="h-24 w-24 border-4 border-primary">
-                  <AvatarImage src={userAvatar.imageUrl} alt="Esther Howard" />
-                  <AvatarFallback>EH</AvatarFallback>
+                  <AvatarImage src={userProfile?.profileImageUrl ?? user?.photoURL ?? undefined} alt={userProfile?.name ?? "User"} />
+                  <AvatarFallback>{userProfile?.name?.charAt(0) ?? user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
                 </Avatar>
-              )}
               <div className="flex-1">
-                <h1 className="font-headline text-3xl font-bold">Esther Howard</h1>
-                <p className="text-muted-foreground">Resident / Service Provider</p>
+                <h1 className="font-headline text-3xl font-bold">{userProfile?.name ?? user?.displayName}</h1>
+                <p className="text-muted-foreground">{userProfile?.role ?? 'Resident'}</p>
                 <div className="flex items-center justify-center sm:justify-start gap-1 mt-1 text-yellow-400">
                   <Star className="w-5 h-5 fill-current" />
                   <Star className="w-5 h-5 fill-current" />
                   <Star className="w-5 h-5 fill-current" />
                   <Star className="w-5 h-5 fill-current" />
                   <Star className="w-5 h-5" />
-                  <span className="text-muted-foreground ml-2">(4.1 Rating)</span>
+                  <span className="text-muted-foreground ml-2">({userProfile?.rating ?? 4.1} Rating)</span>
                 </div>
               </div>
               <Button className="w-full sm:w-auto">
@@ -101,6 +145,13 @@ export default function ProfilePage() {
             </div>
           </CardContent>
         </Card>
+        
+        <div className="flex justify-center">
+            <Button variant="destructive" onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+            </Button>
+        </div>
 
       </div>
     </div>

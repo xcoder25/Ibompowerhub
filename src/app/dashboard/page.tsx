@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/carousel';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useUser } from '@/firebase';
 
 
 const primaryQuickLinks = [
@@ -73,7 +74,6 @@ const secondaryQuickLinks = [
     { href: '/health', icon: HeartPulse, label: 'Health' },
     { href: '/education', icon: BookOpen, label: 'Education' },
     { href: '/power', icon: Power, label: 'Power' },
-    { href: '/logout', icon: LogOut, label: 'Logout' },
 ]
 
 const chartData = [
@@ -117,8 +117,8 @@ const featuredPoll = polls[0];
 
 
 export default function DashboardPage() {
-  const [isFirstLogin, setIsFirstLogin] = useState(false);
   const [votedPolls, setVotedPolls] = useState<Record<number, string>>({});
+  const { user } = useUser();
 
   const handleVote = (pollId: number, option: string) => {
     if (votedPolls[pollId]) return;
@@ -126,17 +126,6 @@ export default function DashboardPage() {
   };
   const hasVotedOnFeatured = !!votedPolls[featuredPoll.id];
   const userVote = votedPolls[featuredPoll.id];
-
-
-  useEffect(() => {
-    const firstLogin = localStorage.getItem('isFirstDashboardVisit') !== 'false';
-    if (firstLogin) {
-        setIsFirstLogin(true);
-        localStorage.setItem('isFirstDashboardVisit', 'false');
-    } else {
-        setIsFirstLogin(false);
-    }
-  }, []);
 
   const QuickActionItem = ({ item }: { item: { href: string; icon: React.ElementType; label: string } }) => (
     <Link
@@ -155,7 +144,7 @@ export default function DashboardPage() {
     <div className="flex-1 space-y-6 bg-muted/30 p-4 sm:p-6 md:p-8">
       <div className="space-y-2">
         <h1 className="font-headline text-3xl font-bold tracking-tight">
-            {isFirstLogin ? 'Welcome to your Dashboard, Esther!' : 'Welcome back, Esther!'}
+            Welcome back, {user?.displayName?.split(' ')[0] || 'User'}!
         </h1>
         <p className="text-muted-foreground">Here&apos;s your community snapshot for today.</p>
       </div>
@@ -328,7 +317,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
-
-    

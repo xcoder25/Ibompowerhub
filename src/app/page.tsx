@@ -9,30 +9,27 @@ import { SplashScreen } from '@/components/splash-screen';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Logo } from '@/components/logo';
-
-// Mock authentication state. We'll replace this with real auth later.
-const useMockAuth = () => {
-    const [isSignedUp, setIsSignedUp] = useState(false);
-    useEffect(() => {
-        // In a real app, you'd check for a token or session here.
-        // For now, we'll just simulate it.
-        const userHasSignedUp = typeof window !== 'undefined' && localStorage.getItem('hasSignedUp') === 'true';
-        setIsSignedUp(userHasSignedUp);
-    }, []);
-    return { isSignedUp };
-}
+import { useUser } from '@/firebase';
+import { useRouter } from 'next/navigation';
 
 export default function LandingPage() {
   const [loading, setLoading] = useState(true);
-  const { isSignedUp } = useMockAuth();
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
   const seaImage = PlaceHolderImages.find((img) => img.id === 'sea-background');
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500); // Shorter splash screen
+    const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, isUserLoading, router]);
+
+  if (loading || isUserLoading || user) {
     return <SplashScreen />;
   }
 
@@ -57,26 +54,16 @@ export default function LandingPage() {
               One map. All the services. Everyday life, simplified.
             </p>
             <div className='mt-8 flex flex-col sm:flex-row gap-4'>
-                {isSignedUp ? (
-                    <Button asChild size="lg">
-                        <Link href="/auth/login"> 
-                            Login to Continue <ArrowRight className="ml-2" />
-                        </Link>
-                    </Button>
-                ) : (
-                    <>
-                        <Button asChild size="lg">
-                            <Link href="/auth/signup">
-                                Get Started <ArrowRight className="ml-2" />
-                            </Link>
-                        </Button>
-                        <Button asChild size="lg" variant="secondary">
-                            <Link href="/auth/login">
-                                Login
-                            </Link>
-                        </Button>
-                    </>
-                )}
+                <Button asChild size="lg">
+                    <Link href="/auth/signup">
+                        Get Started <ArrowRight className="ml-2" />
+                    </Link>
+                </Button>
+                <Button asChild size="lg" variant="secondary">
+                    <Link href="/auth/login">
+                        Login
+                    </Link>
+                </Button>
             </div>
         </div>
       </div>
