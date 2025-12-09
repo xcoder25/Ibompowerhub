@@ -16,6 +16,7 @@ const center = {
 const mapOptions = {
     disableDefaultUI: true,
     zoomControl: true,
+    mapId: 'e918999f89995826', // A style for a cleaner look
 };
 
 type GoogleMapProps = {
@@ -32,9 +33,21 @@ export function GoogleMap({ origin, destination, directions }: GoogleMapProps) {
         zoom={13}
         options={mapOptions}
       >
-        {origin && <MarkerF position={origin} />}
-        {destination && <MarkerF position={destination} />}
-        {directions && <DirectionsRenderer directions={directions} />}
+        {origin && !directions && <MarkerF position={origin} />}
+        {destination && !directions && <MarkerF position={destination} />}
+        {directions && (
+            <DirectionsRenderer 
+                directions={directions} 
+                options={{
+                    suppressMarkers: false,
+                    polylineOptions: {
+                        strokeColor: 'hsl(var(--primary))',
+                        strokeWeight: 6,
+                        strokeOpacity: 0.8,
+                    }
+                }}
+            />
+        )}
       </GoogleMapApi>
   )
 }

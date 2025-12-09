@@ -16,6 +16,8 @@ export default function MapPage() {
   const [origin, setOrigin] = useState<MapLocation | null>(null);
   const [destination, setDestination] = useState<MapLocation | null>(null);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
+  const [travelMode, setTravelMode] = useState<google.maps.TravelMode>(google.maps.TravelMode.DRIVING);
+  
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   const { isLoaded } = useLoadScript({
@@ -46,9 +48,13 @@ export default function MapPage() {
       <div className="absolute top-0 left-0 right-0 z-10 p-4 w-full h-full pointer-events-none">
         <div className='pointer-events-auto'>
             <MapNavigator
-            setOrigin={setOrigin}
-            setDestination={setDestination}
-            setDirections={setDirections}
+              origin={origin}
+              destination={destination}
+              setOrigin={setOrigin}
+              setDestination={setDestination}
+              setDirections={setDirections}
+              travelMode={travelMode}
+              setTravelMode={setTravelMode}
             />
         </div>
       </div>
