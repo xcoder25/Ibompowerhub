@@ -64,14 +64,14 @@ export default function SafetyPage() {
           </CardTitle>
           <CardDescription>Quick access to emergency services in Calabar.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <CardContent className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {emergencyContacts.map((contact) => (
-            <div key={contact.id} className="flex items-center justify-between rounded-lg border p-4">
+            <div key={contact.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border p-4 gap-3">
                 <div>
                     <p className="font-semibold">{contact.name}</p>
                     <p className="text-lg font-mono tracking-wider">{contact.number}</p>
                 </div>
-                <Button asChild size="sm">
+                <Button asChild size="sm" className="w-full sm:w-auto">
                   <a href={`tel:${contact.number}`}>Call Now</a>
                 </Button>
             </div>

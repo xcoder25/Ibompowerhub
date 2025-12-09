@@ -70,7 +70,7 @@ export default function AlertsPage() {
                 </div>
               </CardHeader>
               <CardContent className="px-4 space-y-3">
-                 <div className='flex items-center gap-2'>
+                 <div className='flex items-center gap-2 flex-wrap'>
                     <Badge variant="outline" className='border-2'>
                         <alert.Icon className={cn("mr-2 h-4 w-4", alert.iconColor)} />
                         {alert.type}
@@ -125,13 +125,15 @@ export default function AlertsPage() {
                                 </div>
                              )
                         })}
-                         <div className='flex items-center gap-2 pt-2'>
-                            <Avatar className='size-8'>
-                                <AvatarImage src={PlaceHolderImages.find(img => img.id === 'user-avatar-1')?.imageUrl} alt="You" />
-                                <AvatarFallback>Y</AvatarFallback>
-                            </Avatar>
-                            <Input placeholder='Add a comment...' className='bg-background'/>
-                            <Button size='sm'>Post</Button>
+                         <div className='flex flex-col sm:flex-row items-center gap-2 pt-2'>
+                            <div className='flex items-center gap-2 w-full'>
+                                <Avatar className='size-8'>
+                                    <AvatarImage src={PlaceHolderImages.find(img => img.id === 'user-avatar-1')?.imageUrl} alt="You" />
+                                    <AvatarFallback>Y</AvatarFallback>
+                                </Avatar>
+                                <Input placeholder='Add a comment...' className='bg-background flex-1'/>
+                            </div>
+                            <Button size='sm' className='w-full sm:w-auto'>Post</Button>
                         </div>
                     </div>
                 </div>

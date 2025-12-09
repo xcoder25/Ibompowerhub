@@ -14,17 +14,17 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto space-y-8">
         <Card glassy>
           <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
               {userAvatar && (
                 <Avatar className="h-24 w-24 border-4 border-primary">
                   <AvatarImage src={userAvatar.imageUrl} alt="Esther Howard" />
                   <AvatarFallback>EH</AvatarFallback>
                 </Avatar>
               )}
-              <div className="flex-1 text-center md:text-left">
+              <div className="flex-1">
                 <h1 className="font-headline text-3xl font-bold">Esther Howard</h1>
                 <p className="text-muted-foreground">Resident / Service Provider</p>
-                <div className="flex items-center justify-center md:justify-start gap-1 mt-1 text-yellow-400">
+                <div className="flex items-center justify-center sm:justify-start gap-1 mt-1 text-yellow-400">
                   <Star className="w-5 h-5 fill-current" />
                   <Star className="w-5 h-5 fill-current" />
                   <Star className="w-5 h-5 fill-current" />
@@ -33,7 +33,7 @@ export default function ProfilePage() {
                   <span className="text-muted-foreground ml-2">(4.1 Rating)</span>
                 </div>
               </div>
-              <Button>
+              <Button className="w-full sm:w-auto">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Profile
               </Button>
@@ -79,7 +79,7 @@ export default function ProfilePage() {
             <CardDescription>Manage your services and availability.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border p-4 gap-4">
                 <div className='flex items-center gap-4'>
                     <Package className='size-6 text-muted-foreground'/>
                     <div>
@@ -87,9 +87,9 @@ export default function ProfilePage() {
                         <p className='text-sm text-muted-foreground'>Manage your products or services</p>
                     </div>
                 </div>
-                <Button variant="outline">View Listings</Button>
+                <Button variant="outline" className="w-full sm:w-auto shrink-0">View Listings</Button>
             </div>
-             <div className="flex items-center justify-between rounded-lg border p-4">
+             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border p-4 gap-4">
                 <div className='flex items-center gap-4'>
                     <Power className='size-6 text-muted-foreground'/>
                     <div>
@@ -97,7 +97,7 @@ export default function ProfilePage() {
                         <p className='text-sm text-muted-foreground'>Set your status to available for requests</p>
                     </div>
                 </div>
-              <Switch id="availability-status" defaultChecked/>
+              <Switch id="availability-status" defaultChecked className="ml-auto sm:ml-0"/>
             </div>
           </CardContent>
         </Card>

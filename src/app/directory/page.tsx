@@ -47,6 +47,7 @@ export default function DirectoryPage() {
               key={category}
               variant={selectedCategory === category ? 'default' : 'outline'}
               onClick={() => setSelectedCategory(category)}
+              size="sm"
             >
               {category}
             </Button>
