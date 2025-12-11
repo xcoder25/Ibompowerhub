@@ -1,4 +1,5 @@
 
+
 // This configuration is populated by environment variables.
 // If you are running this project locally, you will need to create a .env file
 // in the root of your project with the following content:
@@ -16,6 +17,19 @@ export function getFirebaseConfig() {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   };
 
+  // On the server, these might be undefined. We return an empty object
+  // and let the client-side provider handle the initialization.
+  if (
+    typeof window === 'undefined' &&
+    (!firebaseConfig.apiKey ||
+    !firebaseConfig.authDomain ||
+    !firebaseConfig.projectId ||
+    !firebaseConfig.appId)
+  ) {
+    return {};
+  }
+
+
   if (
     !firebaseConfig.apiKey ||
     !firebaseConfig.authDomain ||
@@ -23,7 +37,7 @@ export function getFirebaseConfig() {
     !firebaseConfig.appId
   ) {
     throw new Error(
-      'Missing NEXT_PUBLIC_FIREBASE_CONFIG environment variable'
+      'Missing Firebase config. Make sure to set NEXT_PUBLIC_FIREBASE_* environment variables.'
     );
   }
 

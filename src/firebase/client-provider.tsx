@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, type ReactNode } from 'react';
@@ -11,10 +12,24 @@ interface FirebaseClientProviderProps {
 export function FirebaseClientProvider({
   children,
 }: FirebaseClientProviderProps) {
-  const { firebaseApp, auth, firestore } = useMemo(
-    () => getFirebaseInstances(),
-    []
-  );
+  const instances = useMemo(() => {
+    try {
+      return getFirebaseInstances();
+    } catch (e) {
+      // This can happen on the server if env vars are missing.
+      // We'll return null and let the provider handle it.
+      return null;
+    }
+  }, []);
+
+  if (!instances) {
+    // This could render a loading state or an error message if you want
+    // but for now, we just won't render the provider, children will be un-rendered
+    // until client-side hydration provides the config.
+    return <>{children}</>;
+  }
+
+  const { firebaseApp, auth, firestore } = instances;
 
   return (
     <FirebaseProvider

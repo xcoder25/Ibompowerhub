@@ -11,9 +11,8 @@ import { useUser, useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { useEffect, useState } from 'react';
 
 type UserProfile = {
     name: string;
@@ -30,7 +29,7 @@ export default function ProfilePage() {
   const firestore = useFirestore();
 
   const userDocRef = useMemoFirebase(
-    () => (user ? doc(firestore, 'users', user.uid) : null),
+    () => (user && firestore ? doc(firestore, 'users', user.uid) : null),
     [firestore, user]
   );
   

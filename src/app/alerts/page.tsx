@@ -10,8 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { useCollection, useFirestore, useUser, WithId, useMemoFirebase } from '@/firebase';
-import { collection, addDoc, doc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
+import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
+import { collection, addDoc, doc, updateDoc, increment, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 type Alert = {
@@ -19,7 +19,7 @@ type Alert = {
   Icon: LucideIcon;
   iconColor: string;
   location: string;
-  time: any;
+  time: Timestamp;
   description: string;
   upvotes: number;
   commentsCount: number;
@@ -27,17 +27,17 @@ type Alert = {
   status: string;
   user: {
       name: string;
-      avatarId: string;
+      avatarUrl: string;
   }
 };
 
 type Comment = {
     text: string;
     userId: string;
-    timestamp: any;
+    timestamp: Timestamp;
     user: {
         name: string;
-        avatarId: string;
+        avatarUrl: string;
     }
 }
 
@@ -56,11 +56,11 @@ export default function AlertsPage() {
   const firestore = useFirestore();
   const { user } = useUser();
 
-  const alertsRef = useMemoFirebase(() => collection(firestore, 'reports'), [firestore]);
+  const alertsRef = useMemoFirebase(() => firestore ? collection(firestore, 'reports') : null, [firestore]);
   const { data: alerts, isLoading: alertsLoading } = useCollection<Alert>(alertsRef);
   
   const handleUpvote = async (alertId: string) => {
-    if (!user) return;
+    if (!user || !firestore) return;
     const alertRef = doc(firestore, 'reports', alertId);
     await updateDoc(alertRef, {
       upvotes: increment(1)
@@ -68,7 +68,7 @@ export default function AlertsPage() {
   };
 
   const handleAddComment = async (alertId: string) => {
-    if (!user || !newComment.trim()) return;
+    if (!user || !newComment.trim() || !firestore) return;
 
     const commentsRef = collection(firestore, 'reports', alertId, 'comments');
     await addDoc(commentsRef, {
@@ -94,7 +94,7 @@ export default function AlertsPage() {
   };
   
   function CommentSection({ alertId }: { alertId: string}) {
-      const commentsRef = useMemoFirebase(() => collection(firestore, 'reports', alertId, 'comments'), [firestore, alertId]);
+      const commentsRef = useMemoFirebase(() => firestore ? collection(firestore, 'reports', alertId, 'comments') : null, [firestore, alertId]);
       const { data: comments, isLoading: commentsLoading } = useCollection<Comment>(commentsRef);
       const { user } = useUser();
 
@@ -113,7 +113,7 @@ export default function AlertsPage() {
                             <div>
                                 <div className='flex items-center gap-2'>
                                     <p className='font-semibold text-sm'>{comment.user.name}</p>
-                                    <p className='text-xs text-muted-foreground'>{new Date(comment.timestamp?.toDate()).toLocaleTimeString()}</p>
+                                    <p className='text-xs text-muted-foreground'>{comment.timestamp ? new Date(comment.timestamp?.toDate()).toLocaleTimeString() : ''}</p>
                                 </div>
                                 <p className='text-sm'>{comment.text}</p>
                             </div>
@@ -164,7 +164,7 @@ export default function AlertsPage() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <p className="font-semibold">{alert.user?.name}</p>
-                      <p className="text-xs text-muted-foreground">{new Date(alert.time?.toDate()).toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">{alert.time ? new Date(alert.time?.toDate()).toLocaleString() : ''}</p>
                     </div>
                     <p className="text-sm text-muted-foreground">in {alert.location}</p>
                   </div>
