@@ -20,7 +20,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const router = useRouter();
   const { user, isUserLoading } = useUser();
-  const firestore = useFirestore();
+  const firestore = useFirestore(); // This is safe now because MainLayout is wrapped in the provider.
   const { toast } = useToast();
   
   const noNavRoutes = ['/'];
@@ -29,7 +29,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
 
-  // Ref to track if the welcome toast has been shown for the current session
   const welcomeToastShown = useRef(false);
 
   useEffect(() => {
@@ -37,14 +36,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }, []);
 
   useEffect(() => {
-    if (isUserLoading || !firestore) return; // Wait until auth state and firestore are confirmed
+    if (isUserLoading || !firestore || !isClient) return;
 
-    // Handle user state changes
     if (user) {
-      // User is logged in
       const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
 
-      // Create user profile in Firestore if it doesn't exist
       const userDocRef = doc(firestore, 'users', user.uid);
       getDoc(userDocRef).then(docSnap => {
         if (!docSnap.exists()) {
@@ -53,13 +49,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             name: user.displayName,
             email: user.email,
             profileImageUrl: user.photoURL,
-            role: 'Resident', // Default role
+            role: 'Resident',
             createdAt: serverTimestamp()
           }, { merge: true });
         }
       });
       
-      // If user is on an auth page, redirect to dashboard
       if (authRoutes.includes(pathname)) {
         if (!welcomeToastShown.current) {
             toast({
@@ -71,22 +66,18 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         router.push('/dashboard');
       }
     } else {
-      // User is not logged in
-      // If user is on a protected route, redirect to login
       if (!authRoutes.includes(pathname) && pathname !== '/') {
         router.push('/auth/login');
       }
-      // Reset toast shown ref on sign-out
       welcomeToastShown.current = false;
     }
-  }, [user, isUserLoading, pathname, router, firestore, toast]);
+  }, [user, isUserLoading, pathname, router, firestore, toast, isClient]);
 
 
-  if (isUserLoading && isClient) {
+  if (!isClient || isUserLoading) {
     return <SplashScreen />;
   }
   
-  // For auth pages or landing, show children without layout
   if (authRoutes.includes(pathname) || pathname === '/') {
     return (
         <main className="flex-1 flex flex-col">
@@ -96,15 +87,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     );
   }
 
-  // If still loading or no user on a protected page, show splash
-  if (!user && isClient) {
+  if (!user) {
     return <SplashScreen />;
   }
 
   const isMapPage = pathname === '/map';
   const showNav = !noNavRoutes.includes(pathname) && !authRoutes.includes(pathname);
   
-  if (!isClient || !showNav) {
+  if (!showNav) {
     return (
         <main className="flex-1 flex flex-col">
             {children}
