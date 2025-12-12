@@ -1,5 +1,4 @@
 
-
 // This configuration is populated by environment variables.
 // If you are running this project locally, you will need to create a .env file
 // in the root of your project with the following content:

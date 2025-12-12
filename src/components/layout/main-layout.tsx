@@ -11,11 +11,10 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState, useRef } from 'react';
 import { AssistantWidget } from '../assistant-widget';
 import { Toaster } from '../ui/toaster';
-import { useUser, useFirestore, useFirebase } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { SplashScreen } from '../splash-screen';
 import { useToast } from '@/hooks/use-toast';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -39,7 +38,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }, []);
 
   useEffect(() => {
-    if (isUserLoading) return; // Wait until auth state is confirmed
+    if (isUserLoading || !firestore) return; // Wait until auth state and firestore are confirmed
 
     // Handle user state changes
     if (user) {
@@ -56,6 +55,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             email: user.email,
             profileImageUrl: user.photoURL,
             role: 'Resident', // Default role
+            createdAt: serverTimestamp()
           }, { merge: true });
         }
       });
@@ -80,7 +80,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       // Reset toast shown ref on sign-out
       welcomeToastShown.current = false;
     }
-  }, [user, isUserLoading, pathname, router, firestore, toast, authRoutes]);
+  }, [user, isUserLoading, pathname, router, firestore, toast]);
 
 
   if (isUserLoading && isClient) {
@@ -106,7 +106,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <SidebarProvider>
-        {isClient ? (
+        {isClient && showNav ? (
             <div className="flex min-h-screen bg-background">
                 {!isMobile && <AppSidebar />}
                 <div className="flex flex-col flex-1">
@@ -121,7 +121,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </div>
                 <Toaster />
             </div>
-        ) : null}
+        ) : <main className="flex-1 flex flex-col">{children}</main>}
     </SidebarProvider>
   );
 }

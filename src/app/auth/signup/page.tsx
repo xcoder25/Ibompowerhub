@@ -57,14 +57,16 @@ export default function SignupPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!auth) return;
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-      // The main-layout will handle profile creation.
-      // We just need to update the display name here.
-      await updateProfile(userCredential.user, { displayName: values.fullName });
-    } catch (error) {
-      console.error("Signup failed", error);
-    }
+    
+    // This is a non-blocking call. The main layout will listen for the user change.
+    createUserWithEmailAndPassword(auth, values.email, values.password)
+        .then(userCredential => {
+            // After user is created, update their profile with the full name.
+            return updateProfile(userCredential.user, { displayName: values.fullName });
+        })
+        .catch(error => {
+             console.error("Signup failed", error);
+        })
   }
 
   const handleGoogleSignIn = () => {

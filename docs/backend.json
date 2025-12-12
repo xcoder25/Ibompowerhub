@@ -1,251 +1,72 @@
 
 {
   "entities": {
-    "User": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "User",
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's public profile and settings.",
       "type": "object",
-      "description": "Represents a user of the PowerHub CRS platform.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the user.",
-          "format": "uuid"
-        },
-        "name": {
-          "type": "string",
-          "description": "The user's full name."
-        },
-        "phone": {
-          "type": "string",
-          "description": "The user's phone number."
-        },
-        "role": {
-          "type": "string",
-          "description": "The user's role within the platform (e.g., Resident, Seller, Service Provider, Driver)."
-        },
-        "rating": {
-          "type": "number",
-          "description": "User rating, if applicable (e.g., for service providers)."
-        },
-        "profileImageUrl": {
-          "type": "string",
-          "description": "URL of the user's profile image.",
-          "format": "uri"
-        },
-        "location": {
-          "type": "string",
-          "description": "The user's current location, useful for proximity based services."
-        }
+        "id": { "type": "string", "description": "The user's unique ID." },
+        "name": { "type": "string", "description": "The user's display name." },
+        "email": { "type": "string", "format": "email", "description": "The user's email address." },
+        "profileImageUrl": { "type": "string", "format": "uri", "description": "URL for the user's profile picture." },
+        "role": { "type": "string", "description": "The user's role, e.g., 'Resident' or 'Service Provider'." },
+        "rating": { "type": "number", "description": "The user's average rating, if applicable." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of when the profile was created." }
       },
-      "required": [
-        "id",
-        "name"
-      ]
+      "required": ["id", "name", "email", "createdAt"]
     },
     "Report": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Report",
       "type": "object",
       "description": "Represents a report submitted by a user regarding an issue (e.g., power outage, flood).",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the report.",
-          "format": "uuid"
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N Report)"
-        },
-        "category": {
-          "type": "string",
-          "description": "Category of the report (e.g., power, flood, waste)."
-        },
-        "coords": {
-          "type": "string",
-          "description": "Geographical coordinates of the reported issue."
-        },
-        "media": {
-          "type": "string",
-          "description": "URL of the attached media (image, video) for the report.",
-          "format": "uri"
-        },
-        "status": {
-          "type": "string",
-          "description": "Status of the report (e.g., pending, in progress, resolved)."
-        },
-        "upvotes": {
-          "type": "number",
-          "description": "Number of upvotes the report has received."
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "Timestamp of when the report was created.",
-          "format": "date-time"
-        },
-        "description": {
-          "type": "string",
-          "description": "Additional details provided by the user, such as the location or time of the incident."
-        }
+        "id": { "type": "string", "description": "Unique identifier for the report." },
+        "userId": { "type": "string", "description": "ID of the user who submitted the report." },
+        "category": { "type": "string", "description": "Category of the report (e.g., power, flood, waste)." },
+        "location": { "type": "string", "description": "Location description of the reported issue." },
+        "description": { "type": "string", "description": "Detailed description of the issue." },
+        "status": { "type": "string", "description": "Status of the report (e.g., pending, in progress, resolved)." },
+        "upvotes": { "type": "number", "description": "Number of upvotes the report has received." },
+        "commentsCount": { "type": "number", "description": "Number of comments on the report." },
+        "time": { "type": "string", "format": "date-time", "description": "Timestamp of when the report was created." }
       },
-      "required": [
-        "id",
-        "userId",
-        "category",
-        "coords",
-        "status",
-        "upvotes",
-        "timestamp"
-      ]
+      "required": ["id", "userId", "category", "location", "status", "time"]
     },
-    "Service": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Service",
-      "type": "object",
-      "description": "Represents a service offered by a user (e.g., AgroConnect, SkillsHub, LaundryHub).",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the service.",
-          "format": "uuid"
+    "Comment": {
+        "title": "Comment",
+        "description": "A comment on a report.",
+        "type": "object",
+        "properties": {
+            "text": { "type": "string" },
+            "userId": { "type": "string" },
+            "timestamp": { "type": "string", "format": "date-time" },
+            "user": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "avatarUrl": { "type": "string", "format": "uri" }
+                }
+            }
         },
-        "ownerId": {
-          "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N Service)"
-        },
-        "category": {
-          "type": "string",
-          "description": "Category of the service (e.g., AgroConnect, SkillsHub)."
-        },
-        "location": {
-          "type": "string",
-          "description": "Location where the service is offered."
-        },
-        "priceRange": {
-          "type": "string",
-          "description": "Price range for the service."
-        },
-        "contact": {
-          "type": "string",
-          "description": "Contact information for the service provider."
-        },
-        "rating": {
-          "type": "number",
-          "description": "Rating of the service."
-        },
-        "description": {
-          "type": "string",
-          "description": "A description of the service offered."
-        }
-      },
-      "required": [
-        "id",
-        "ownerId",
-        "category",
-        "location",
-        "priceRange",
-        "contact",
-        "rating"
-      ]
-    },
-    "Area": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Area",
-      "type": "object",
-      "description": "Represents an area and its aggregated stats (e.g., power status, flood score, waste score).",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the area."
-        },
-        "powerStatus": {
-          "type": "string",
-          "description": "Status of power in the area (e.g., ON, OFF)."
-        },
-        "floodScore": {
-          "type": "number",
-          "description": "Flood risk score for the area."
-        },
-        "wasteScore": {
-          "type": "number",
-          "description": "Waste overflow score for the area."
-        }
-      },
-      "required": [
-        "id"
-      ]
-    },
-    "Transaction": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Transaction",
-      "type": "object",
-      "description": "Represents a transaction (e.g., bookings, pickups) between users and service providers.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the transaction.",
-          "format": "uuid"
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N Transaction) User initiating the transaction (e.g., booking a service)."
-        },
-        "serviceId": {
-          "type": "string",
-          "description": "Reference to Service. (Relationship: Service 1:N Transaction) The service that is being transacted."
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "Timestamp of when the transaction occurred.",
-          "format": "date-time"
-        },
-        "amount": {
-          "type": "number",
-          "description": "Amount involved in the transaction."
-        },
-        "status": {
-          "type": "string",
-          "description": "Status of the transaction (e.g., pending, completed, cancelled)."
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "serviceId",
-        "timestamp",
-        "amount",
-        "status"
-      ]
+        "required": ["text", "userId", "timestamp"]
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous",
-      "google.com"
-    ]
+    "providers": ["password", "google.com"]
   },
   "firestore": {
     "/users/{userId}": {
-      "schema": "User",
-      "description": "Stores user profiles. Only the user can access their own data."
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Stores user profiles."
     },
     "/reports/{reportId}": {
-      "schema": "Report",
-      "description": "Stores reports submitted by users. Publicly readable, write-protected to authenticated users."
+      "schema": { "$ref": "#/entities/Report" },
+      "description": "Stores community-submitted reports."
     },
-    "/services/{serviceId}": {
-      "schema": "Service",
-      "description": "Stores service listings offered by users. Only the service owner can edit or delete their services."
-    },
-    "/areas/{areaId}": {
-      "schema": "Area",
-      "description": "Stores aggregated stats for different areas. Publicly readable."
-    },
-    "/transactions/{transactionId}": {
-      "schema": "Transaction",
-      "description": "Stores transactions between users and service providers."
+    "/reports/{reportId}/comments/{commentId}": {
+        "schema": { "$ref": "#/entities/Comment"},
+        "description": "Stores comments for a specific report."
     }
   }
 }
