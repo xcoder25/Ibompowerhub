@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -39,9 +40,7 @@
       },
       "required": [
         "id",
-        "name",
-        "phone",
-        "role"
+        "name"
       ]
     },
     "Report": {
@@ -223,92 +222,30 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "anonymous",
+      "google.com"
     ]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Stores user profiles. Only the user can access their own data.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/reports/{reportId}",
-        "definition": {
-          "entityName": "Report",
-          "schema": {
-            "$ref": "#/backend/entities/Report"
-          },
-          "description": "Stores reports submitted by users. Publicly readable, write-protected to authenticated users.",
-          "params": [
-            {
-              "name": "reportId",
-              "description": "The unique identifier of the report."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/services/{serviceId}",
-        "definition": {
-          "entityName": "Service",
-          "schema": {
-            "$ref": "#/backend/entities/Service"
-          },
-          "description": "Stores service listings offered by users. Only the service owner can edit or delete their services.",
-          "params": [
-            {
-              "name": "serviceId",
-              "description": "The unique identifier of the service."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/areas/{areaId}",
-        "definition": {
-          "entityName": "Area",
-          "schema": {
-            "$ref": "#/backend/entities/Area"
-          },
-          "description": "Stores aggregated stats for different areas. Publicly readable.",
-          "params": [
-            {
-              "name": "areaId",
-              "description": "The unique identifier of the area."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/transactions/{transactionId}",
-        "definition": {
-          "entityName": "Transaction",
-          "schema": {
-            "$ref": "#/backend/entities/Transaction"
-          },
-          "description": "Stores transactions between users and service providers.",
-          "params": [
-            {
-              "name": "transactionId",
-              "description": "The unique identifier of the transaction."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "This Firestore structure is designed to support the PowerHub CRS application, focusing on user management, reporting, service marketplaces, and community alerts. It prioritizes authorization independence, clarity, and scalability, aligning with the specified design principles. The structure employs path-based ownership for user-specific data and membership maps for collaborative data. It also leverages structural segregation by keeping data that requires different security posture in different collections. \n\nKey structural choices and their justifications:\n\n1.  **User Data (`/users/{userId}`):** Stores user profiles. Path-based ownership simplifies security rules, ensuring only the user can access their own data.\n\n2.  **Reports (`/reports/{reportId}`):** Stores reports submitted by users.  Each document contains the `userId` to identify who created the report.  Publicly readable (QAP: Rules are not filters) but write-protected to authenticated users only.  The `reportId` is a UUID.\n\n3.  **Services (`/services/{serviceId}`):** Stores service listings offered by users. Each service document includes the `ownerId` to denote the service provider. This path structure ensures that only the service owner can edit or delete their services.\n\n4.  **Areas (`/areas/{areaId}`):** Stores aggregated stats for different areas.  Publicly readable.\n\n5.  **Transactions (`/transactions/{transactionId}`):** Stores transactions between users and service providers.  Each transaction document contains the `userId` and `serviceId` to establish the relationship. Allows tracking transaction history and status.\n\nThis structure enables Authorization Independence by avoiding hierarchical `get()` calls. Access control is enforced directly on each document using the `request.auth.uid` and the denormalized `ownerId` or `userId` fields.  It also supports the required QAPs (Rules are not Filters). The `/reports` and `/areas` collections can be listed without filtering, as their security posture allows public read access.  Private user data is secured using path-based ownership."
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Stores user profiles. Only the user can access their own data."
+    },
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "Stores reports submitted by users. Publicly readable, write-protected to authenticated users."
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Stores service listings offered by users. Only the service owner can edit or delete their services."
+    },
+    "/areas/{areaId}": {
+      "schema": "Area",
+      "description": "Stores aggregated stats for different areas. Publicly readable."
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Stores transactions between users and service providers."
+    }
   }
 }

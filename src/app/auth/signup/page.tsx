@@ -39,6 +39,12 @@ const formSchema = z.object({
     path: ["confirmPassword"],
 });
 
+const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <title>Google</title>
+      <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.85 3.18-1.73 4.1-1.05 1.05-2.86 3.08-5.19 3.08-4.39 0-7.99-3.61-7.99-7.99s3.6-7.99 7.99-7.99c2.53 0 4.14.99 5.14 1.94l2.4-2.39C17.4.99 15.19 0 12.48 0 5.6 0 0 5.6 0 12.48s5.6 12.48 12.48 12.48c7.2 0 12.04-4.82 12.04-12.04 0-.85-.08-1.63-.22-2.34h-11.8v.01Z" />
+    </svg>
+  );
 
 export default function SignupPage() {
   const { toast } = useToast();
@@ -57,14 +63,13 @@ export default function SignupPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!auth || !firestore) return;
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
-      // Update user profile with full name
       await updateProfile(user, { displayName: values.fullName });
 
-      // Create user profile in Firestore
       const userRef = doc(firestore, 'users', user.uid);
       await setDoc(userRef, {
         id: user.uid,
@@ -90,12 +95,12 @@ export default function SignupPage() {
   }
 
   const handleGoogleSignIn = async () => {
+    if (!auth || !firestore) return;
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Create user profile in Firestore if it doesn't exist
       const userRef = doc(firestore, 'users', user.uid);
       await setDoc(userRef, {
         id: user.uid,
@@ -120,17 +125,6 @@ export default function SignupPage() {
       }
     }
   };
-
-  const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-1.5c-1.1 0-1.5.9-1.5 1.5V12h3l-.5 3h-2.5v6.8c4.56-.93 8-4.96 8-9.8z"/>
-        <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" stroke="none" fill="#4285F4"/>
-        <path d="M12 22V12h10c0 5.523-4.477 10-10 10z" stroke="none" fill="#34A853"/>
-        <path d="M2 12h10V2C6.477 2 2 6.477 2 12z" stroke="none" fill="#FBBC05"/>
-        <path d="M12 12V2C17.523 2 22 6.477 22 12H12z" stroke="none" fill="#EA4335"/>
-        <path d="M15.5 10.5h-7v3h4.2c-.2.8-.8 1.5-1.7 1.5s-2.5-1.1-2.5-2.5 1.1-2.5 2.5-2.5c.6 0 1.1.2 1.5.6l1.2-1.2c-.7-.7-1.7-1.1-2.7-1.1-2.2 0-4 1.8-4 4s1.8 4 4 4c2.5 0 3.8-1.7 3.8-3.8 0-.3 0-.5-.1-.7z" stroke="none" fill="white"/>
-    </svg>
-  );
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 bg-background">

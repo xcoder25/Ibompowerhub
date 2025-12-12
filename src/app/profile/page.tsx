@@ -13,6 +13,7 @@ import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { doc } from 'firebase/firestore';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type UserProfile = {
     name: string;
@@ -22,7 +23,7 @@ type UserProfile = {
 };
 
 export default function ProfilePage() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -33,9 +34,10 @@ export default function ProfilePage() {
     [firestore, user]
   );
   
-  const { data: userProfile, isLoading } = useDoc<UserProfile>(userDocRef);
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userDocRef);
 
   const handleSignOut = async () => {
+    if (!auth) return;
     try {
       await signOut(auth);
       toast({
@@ -53,34 +55,48 @@ export default function ProfilePage() {
     }
   };
 
+  const isLoading = isUserLoading || isProfileLoading;
+
 
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8 bg-transparent">
       <div className="max-w-4xl mx-auto space-y-8">
         <Card glassy>
           <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-                <Avatar className="h-24 w-24 border-4 border-primary">
-                  <AvatarImage src={userProfile?.profileImageUrl ?? user?.photoURL ?? undefined} alt={userProfile?.name ?? "User"} />
-                  <AvatarFallback>{userProfile?.name?.charAt(0) ?? user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
-                </Avatar>
-              <div className="flex-1">
-                <h1 className="font-headline text-3xl font-bold">{userProfile?.name ?? user?.displayName}</h1>
-                <p className="text-muted-foreground">{userProfile?.role ?? 'Resident'}</p>
-                <div className="flex items-center justify-center sm:justify-start gap-1 mt-1 text-yellow-400">
-                  <Star className="w-5 h-5 fill-current" />
-                  <Star className="w-5 h-5 fill-current" />
-                  <Star className="w-5 h-5 fill-current" />
-                  <Star className="w-5 h-5 fill-current" />
-                  <Star className="w-5 h-5" />
-                  <span className="text-muted-foreground ml-2">({userProfile?.rating ?? 4.1} Rating)</span>
+            {isLoading ? (
+                <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                    <Skeleton className="h-24 w-24 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                        <Skeleton className="h-8 w-48 mx-auto sm:mx-0" />
+                        <Skeleton className="h-5 w-24 mx-auto sm:mx-0" />
+                        <Skeleton className="h-5 w-32 mx-auto sm:mx-0" />
+                    </div>
+                    <Skeleton className="h-10 w-32" />
                 </div>
-              </div>
-              <Button className="w-full sm:w-auto">
-                <Edit className="mr-2 h-4 w-4" />
-                Edit Profile
-              </Button>
-            </div>
+            ) : (
+                <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                    <Avatar className="h-24 w-24 border-4 border-primary">
+                      <AvatarImage src={userProfile?.profileImageUrl ?? user?.photoURL ?? undefined} alt={userProfile?.name ?? "User"} />
+                      <AvatarFallback>{userProfile?.name?.charAt(0) ?? user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
+                    </Avatar>
+                  <div className="flex-1">
+                    <h1 className="font-headline text-3xl font-bold">{userProfile?.name ?? user?.displayName}</h1>
+                    <p className="text-muted-foreground">{userProfile?.role ?? 'Resident'}</p>
+                    <div className="flex items-center justify-center sm:justify-start gap-1 mt-1 text-yellow-400">
+                      <Star className="w-5 h-5 fill-current" />
+                      <Star className="w-5 h-5 fill-current" />
+                      <Star className="w-5 h-5 fill-current" />
+                      <Star className="w-5 h-5 fill-current" />
+                      <Star className="w-5 h-5" />
+                      <span className="text-muted-foreground ml-2">({userProfile?.rating ?? 4.1} Rating)</span>
+                    </div>
+                  </div>
+                  <Button className="w-full sm:w-auto">
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Profile
+                  </Button>
+                </div>
+            )}
           </CardContent>
         </Card>
 

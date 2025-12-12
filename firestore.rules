@@ -1,3 +1,4 @@
+
 /**
  * This ruleset enforces a security model for the PowerHub CRS application.
  *
@@ -89,26 +90,34 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree. Prevents user data enumeration.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
+      allow read, write: if isOwner(userId);
       allow list: if false;
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && isFieldImmutable('id');
-      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Controls access to user-submitted reports. Reports are public to read.
+     * @description Controls access to user-submitted reports and their comments.
+     * Reports are public to read.
      * @path /reports/{reportId}
      * @allow (create) An authenticated user creating a new report for themselves. `auth.uid: 'user_abc', data: { userId: 'user_abc', ... }`
      * @deny (update) A user trying to update a report they did not create. `auth.uid: 'user_xyz', doc.data.userId: 'user_abc'`
-     * @principle Public read with owner-only writes. Validates relational integrity on creation.
+     * @principle Public read with owner-only writes for reports. Comments are publicly readable, but only authenticated users can create them.
      */
     match /reports/{reportId} {
       allow get: if true;
       allow list: if true;
       allow create: if isCreatingOwnDocument('userId');
-      allow update: if isExistingOwner(resource.data.userId) && isFieldImmutable('userId');
-      allow delete: if isExistingOwner(resource.data.userId);
+      allow update: if isSignedIn() && (
+        isOwner(resource.data.userId) && isFieldImmutable('userId') ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'commentsCount'])
+      );
+      allow delete: if isOwner(resource.data.userId);
+
+      match /comments/{commentId} {
+        allow get: if true;
+        allow list: if true;
+        allow create: if isCreatingOwnDocument('userId');
+        allow update, delete: if isOwner(resource.data.userId);
+      }
     }
 
     /**
@@ -116,14 +125,14 @@ service cloud.firestore {
      * @path /services/{serviceId}
      * @allow (create) An authenticated user creating a new service listing they own. `auth.uid: 'user_abc', data: { ownerId: 'user_abc', ... }`
      * @deny (delete) A user trying to delete a service owned by someone else. `auth.uid: 'user_xyz', doc.data.ownerId: 'user_abc'`
-     * @principle Public read with owner-only writes. Validates relational integrity on creation.
+     * @principle Public read with owner-only writes.
      */
     match /services/{serviceId} {
       allow get: if true;
       allow list: if true;
       allow create: if isCreatingOwnDocument('ownerId');
-      allow update: if isExistingOwner(resource.data.ownerId) && isFieldImmutable('ownerId');
-      allow delete: if isExistingOwner(resource.data.ownerId);
+      allow update: if isOwner(resource.data.ownerId) && isFieldImmutable('ownerId');
+      allow delete: if isOwner(resource.data.ownerId);
     }
 
     /**
