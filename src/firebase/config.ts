@@ -6,36 +6,23 @@
 // NEXT_PUBLIC_FIREBASE_CONFIG={"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}
 
 export function getFirebaseConfig() {
-  const firebaseConfigStr = process.env.NEXT_PUBLIC_FIREBASE_CONFIG;
+  // The configuration is hardcoded here to prevent environment variable parsing issues.
+  const firebaseConfig = {
+    projectId: 'applaud-cf1zc',
+    appId: '1:190947417613:web:c1c1e2835105b28b31bf44',
+    apiKey: 'AIzaSyBcJWdofLf59OOgJB63IqAY3-KVMy_seaM',
+    authDomain: 'applaud-cf1zc.firebaseapp.com',
+    measurementId: '',
+    messagingSenderId: '190947417613',
+  };
 
-  if (!firebaseConfigStr) {
-    if (typeof window === 'undefined') {
-      // On the server, if the config is missing, we can't do anything.
-      // We return an empty object and let the client-side provider handle it.
-      return {};
-    }
-    // On the client, this is a critical error.
-    throw new Error(
-      'Missing NEXT_PUBLIC_FIREBASE_CONFIG environment variable.'
-    );
+  if (
+    !firebaseConfig.apiKey ||
+    !firebaseConfig.authDomain ||
+    !firebaseConfig.projectId ||
+    !firebaseConfig.appId
+  ) {
+    throw new Error('Invalid hardcoded Firebase config object.');
   }
-
-  try {
-    const config = JSON.parse(firebaseConfigStr);
-    if (
-      !config.apiKey ||
-      !config.authDomain ||
-      !config.projectId ||
-      !config.appId
-    ) {
-      throw new Error('Invalid Firebase config object.');
-    }
-    return config;
-  } catch (e) {
-    console.error('Could not parse Firebase config:', e);
-    if (typeof window !== 'undefined') {
-       throw new Error('Failed to parse Firebase configuration. Check the format of NEXT_PUBLIC_FIREBASE_CONFIG.');
-    }
-    return {};
-  }
+  return firebaseConfig;
 }
