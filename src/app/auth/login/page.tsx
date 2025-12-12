@@ -15,14 +15,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/logo';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useAuth } from '@/firebase';
-import { FirebaseError } from 'firebase/app';
-import { setDoc, doc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase/provider';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -41,10 +36,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   );
 
 export default function LoginPage() {
-  const { toast } = useToast();
-  const router = useRouter();
   const auth = useAuth();
-  const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,57 +46,17 @@ export default function LoginPage() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     if (!auth) return;
-    try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
-      toast({
-        title: 'Login Successful',
-        description: 'Welcome back!',
-      });
-      router.push('/dashboard');
-    } catch (error) {
-      if (error instanceof FirebaseError) {
-        toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: error.message,
-        });
-      }
-    }
+    // Non-blocking call
+    signInWithEmailAndPassword(auth, values.email, values.password);
   }
 
-  const handleGoogleSignIn = async () => {
-    if (!auth || !firestore) return;
+  const handleGoogleSignIn = () => {
+    if (!auth) return;
     const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      const userRef = doc(firestore, 'users', user.uid);
-      await setDoc(userRef, {
-        id: user.uid,
-        name: user.displayName,
-        email: user.email,
-        profileImageUrl: user.photoURL,
-        role: 'Resident', // Default role
-      }, { merge: true });
-
-
-      toast({
-        title: 'Login Successful',
-        description: `Welcome, ${user.displayName}!`,
-      });
-      router.push('/dashboard');
-    } catch (error) {
-      if (error instanceof FirebaseError) {
-        toast({
-          variant: 'destructive',
-          title: 'Google Sign-In Failed',
-          description: error.message,
-        });
-      }
-    }
+    // Non-blocking call
+    signInWithPopup(auth, provider);
   };
 
   return (

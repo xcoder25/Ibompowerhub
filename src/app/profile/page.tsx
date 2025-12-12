@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { useUser, useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
-import { useToast } from '@/hooks/use-toast';
 import { doc } from 'firebase/firestore';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,7 +25,6 @@ export default function ProfilePage() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
-  const { toast } = useToast();
   const firestore = useFirestore();
 
   const userDocRef = useMemoFirebase(
@@ -36,23 +34,10 @@ export default function ProfilePage() {
   
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userDocRef);
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     if (!auth) return;
-    try {
-      await signOut(auth);
-      toast({
-        title: "Signed Out",
-        description: "You have been successfully signed out.",
-      });
-      router.push('/auth/login');
-    } catch (error) {
-      console.error("Error signing out: ", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-      });
-    }
+    // Non-blocking call
+    signOut(auth);
   };
 
   const isLoading = isUserLoading || isProfileLoading;

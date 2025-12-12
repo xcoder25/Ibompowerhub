@@ -15,13 +15,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/logo';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
-import { useAuth, useFirestore } from '@/firebase';
-import { FirebaseError } from 'firebase/app';
-import { doc, setDoc } from 'firebase/firestore';
+import { useAuth } from '@/firebase';
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -47,10 +43,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   );
 
 export default function SignupPage() {
-  const { toast } = useToast();
-  const router = useRouter();
   const auth = useAuth();
-  const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,67 +56,22 @@ export default function SignupPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!auth || !firestore) return;
+    if (!auth) return;
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-      const user = userCredential.user;
-
-      await updateProfile(user, { displayName: values.fullName });
-
-      const userRef = doc(firestore, 'users', user.uid);
-      await setDoc(userRef, {
-        id: user.uid,
-        name: values.fullName,
-        email: user.email,
-        role: 'Resident', // Default role
-      }, { merge: true });
-
-      toast({
-        title: 'Account Created',
-        description: "You've successfully signed up!",
-      });
-      router.push('/dashboard');
+      // The main-layout will handle profile creation.
+      // We just need to update the display name here.
+      await updateProfile(userCredential.user, { displayName: values.fullName });
     } catch (error) {
-        if (error instanceof FirebaseError) {
-            toast({
-                variant: "destructive",
-                title: "Sign Up Failed",
-                description: error.message,
-            });
-        }
+      console.error("Signup failed", error);
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    if (!auth || !firestore) return;
+  const handleGoogleSignIn = () => {
+    if (!auth) return;
     const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      const userRef = doc(firestore, 'users', user.uid);
-      await setDoc(userRef, {
-        id: user.uid,
-        name: user.displayName,
-        email: user.email,
-        profileImageUrl: user.photoURL,
-        role: 'Resident', // Default role
-      }, { merge: true });
-
-      toast({
-        title: 'Sign Up Successful',
-        description: `Welcome, ${user.displayName}!`,
-      });
-      router.push('/dashboard');
-    } catch (error) {
-      if (error instanceof FirebaseError) {
-        toast({
-          variant: 'destructive',
-          title: 'Google Sign-In Failed',
-          description: error.message,
-        });
-      }
-    }
+    // Non-blocking call
+    signInWithPopup(auth, provider);
   };
 
   return (
