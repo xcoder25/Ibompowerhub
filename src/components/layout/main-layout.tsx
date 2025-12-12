@@ -26,7 +26,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const noNavRoutes = ['/'];
   const authRoutes = ['/auth/login', '/auth/signup'];
   
-  const showNav = !noNavRoutes.includes(pathname) && !authRoutes.includes(pathname);
   const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
 
@@ -103,25 +102,34 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }
 
   const isMapPage = pathname === '/map';
+  const showNav = !noNavRoutes.includes(pathname) && !authRoutes.includes(pathname);
+  
+  if (!isClient || !showNav) {
+    return (
+        <main className="flex-1 flex flex-col">
+            {children}
+            <Toaster />
+        </main>
+    );
+  }
+
 
   return (
     <SidebarProvider>
-        {isClient && showNav ? (
-            <div className="flex min-h-screen bg-background">
-                {!isMobile && <AppSidebar />}
-                <div className="flex flex-col flex-1">
-                    {!isMapPage && <AppHeader />}
-                    <SidebarInset>
-                        <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0", isMapPage && "md:pb-0")}>
-                           {children}
-                        </main>
-                    </SidebarInset>
-                    <AssistantWidget />
-                    {isMobile && <AppMobileNav />}
-                </div>
-                <Toaster />
+        <div className="flex min-h-screen bg-background">
+            {!isMobile && <AppSidebar />}
+            <div className="flex flex-col flex-1">
+                {!isMapPage && <AppHeader />}
+                <SidebarInset>
+                    <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0", isMapPage && "md:pb-0")}>
+                        {children}
+                    </main>
+                </SidebarInset>
+                <AssistantWidget />
+                {isMobile && <AppMobileNav />}
             </div>
-        ) : <main className="flex-1 flex flex-col">{children}</main>}
+            <Toaster />
+        </div>
     </SidebarProvider>
   );
 }
