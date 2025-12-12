@@ -1,26 +1,21 @@
+
 'use client';
 
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/firebase/provider';
+import type { Auth } from 'firebase/auth';
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
   const [isUserLoading, setUserLoading] = useState(true);
-
-  // Safely get auth only on the client
-  const [auth, setAuth] = useState<any>(null);
-  useEffect(() => {
-    // This effect runs only on the client, after hydration
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const authInstance = useAuth();
-    setAuth(authInstance);
-  }, []);
+  const auth = useAuth();
 
   useEffect(() => {
-    // If auth is not yet available (e.g., on the server or during initial client render), do nothing.
     if (!auth) {
-      setUserLoading(true);
+      // Auth is not available yet, this can happen during SSR
+      // or if the provider is not yet mounted.
+      // We'll wait for the auth instance to be available.
       return;
     }
 
@@ -30,7 +25,7 @@ export function useUser() {
     });
 
     return () => unsubscribe();
-  }, [auth]); // This now safely depends on the client-side auth instance
+  }, [auth]);
 
   return { user, isUserLoading };
 }
