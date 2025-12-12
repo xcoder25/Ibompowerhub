@@ -17,14 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { toast } = useToast();
-  
-  const noNavRoutes = ['/'];
-  const authRoutes = ['/auth/login', '/auth/signup'];
-  
-  const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
