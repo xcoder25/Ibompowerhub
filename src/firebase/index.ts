@@ -1,7 +1,7 @@
 
 'use client';
 
-import { firebaseConfig } from '@/firebase/config';
+import { getFirebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { Auth, getAuth } from 'firebase/auth';
 import { Firestore, getFirestore } from 'firebase/firestore';
@@ -12,6 +12,7 @@ export function getFirebaseInstances(): {
   auth: Auth;
   firestore: Firestore;
 } {
+  const firebaseConfig = getFirebaseConfig();
   const firebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
   const auth = getAuth(firebaseApp);
   const firestore = getFirestore(firebaseApp);

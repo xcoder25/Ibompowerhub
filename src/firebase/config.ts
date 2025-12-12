@@ -39,5 +39,3 @@ export function getFirebaseConfig() {
     return {};
   }
 }
-
-export const firebaseConfig = getFirebaseConfig();
