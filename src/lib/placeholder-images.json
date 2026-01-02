@@ -27,7 +27,7 @@
     {
       "id": "user-avatar-2",
       "description": "Avatar for another user.",
-      "imageUrl": "https://images.unsplash.com/photo-1640951613773-54706e06851d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0NzQ2Njk3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1640951613773-54706e06851d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0NzQ2Njk3fDA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "person avatar"
     },
     {
@@ -39,7 +39,7 @@
     {
       "id": "agro-connect",
       "description": "Icon for AgroConnect service.",
-      "imageUrl": "https://images.unsplash.com/photo-1568623970736-27bea63b4489?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmYXJtJTIwcHJvZHVjZXxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1568623970736-27bea63b4489?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmYXJtJTIwcHJvZHVjZXxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "farm produce"
     },
     {
@@ -73,28 +73,40 @@
       "imageHint": "shield security"
     },
     {
-      "id": "seller-1",
+      "id": "seller-vegetables",
       "description": "A farmer selling fresh vegetables.",
       "imageUrl": "https://images.unsplash.com/photo-1552825898-09a497ef3aff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx2ZWdldGFibGUlMjBzdGFsbHxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "vegetable stall"
     },
     {
-      "id": "seller-2",
+      "id": "seller-fruits",
       "description": "A person selling fresh fruits.",
-      "imageUrl": "https://images.unsplash.com/photo-1587888507982-8f7e5acb0280?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmcnVpdCUyMHN0YW5kfGVufDB8fHx8MTc2NDc3ODg1Mnww&ixlibrb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1587888507982-8f7e5acb0280?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmcnVpdCUyMHN0YW5kfGVufDB8fHx8MTc2NDc3ODg1Mnww&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "fruit stand"
     },
     {
-      "id": "seller-3",
+      "id": "seller-tubers",
       "description": "A seller with bags of grains.",
       "imageUrl": "https://images.unsplash.com/photo-1573870016550-3b9a1b42b3d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxncmFpbiUyMHNhY2tzfGVufDB8fHx8MTc2NDc5NzgxMXww&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "grain sacks"
     },
     {
-      "id": "seller-4",
+      "id": "seller-poultry",
       "description": "Poultry farmer with chickens.",
       "imageUrl": "https://images.unsplash.com/photo-1660085693363-5d6b3f459302?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjaGlja2VucyUyMGZhcm18ZW58MHx8fHwxNzY0NzA0Nzk3fDA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "chickens farm"
+    },
+    {
+      "id": "seller-seafood",
+      "description": "Fresh fish and seafood on ice at a market.",
+      "imageUrl": "https://images.unsplash.com/photo-1599107938928-a5b6146c6426?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "seafood market"
+    },
+    {
+      "id": "seller-livestock",
+      "description": "Goats at a local livestock market.",
+      "imageUrl": "https://images.unsplash.com/photo-1588600150244-6a847e31d499?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "livestock market"
     },
     {
       "id": "artisan-1",

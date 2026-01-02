@@ -1,12 +1,84 @@
+
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { sellers } from '@/lib/data';
+import { sellers as initialSellers, sellerCategories } from '@/lib/market';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { MapPin, Phone, Truck } from 'lucide-react';
+import { MapPin, Phone, Truck, Search, Bot, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { findProduct } from '@/ai/flows/agro-assistant-flow';
 
 export default function MarketPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [sellers, setSellers] = useState(initialSellers);
+  const { toast } = useToast();
+
+  const handleSearch = (term: string, category: string) => {
+    let filtered = initialSellers.filter(seller => {
+        const matchesCategory = category === 'All' || seller.category === category;
+        const matchesSearch = term === '' || 
+                              seller.name.toLowerCase().includes(term.toLowerCase()) ||
+                              seller.products.some(p => p.toLowerCase().includes(term.toLowerCase())) ||
+                              seller.category.toLowerCase().includes(term.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+    setSellers(filtered);
+  };
+  
+  const handleCategoryChange = (category: string) => {
+      setSelectedCategory(category);
+      handleSearch(searchTerm, category);
+  }
+
+  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const term = e.target.value;
+      setSearchTerm(term);
+      handleSearch(term, selectedCategory);
+  }
+
+  const handleAiSearch = async () => {
+    if (!searchTerm) return;
+    setAiLoading(true);
+    setSellers([]); // Clear current sellers
+
+    try {
+        const result = await findProduct({ query: searchTerm, availableSellers: JSON.stringify(initialSellers) });
+        if (result.foundSellers.length > 0) {
+            const foundSellerIds = result.foundSellers.map(s => s.id);
+            const newSellers = initialSellers.filter(s => foundSellerIds.includes(s.id));
+            setSellers(newSellers);
+            toast({
+                title: "AI Search Results",
+                description: `Found ${newSellers.length} sellers for "${searchTerm}".`
+            });
+        } else {
+            toast({
+                variant: 'destructive',
+                title: "No sellers found",
+                description: `The AI couldn't find any sellers for "${searchTerm}". Try a different product.`
+            });
+            setSellers(initialSellers); // Reset to all if none found
+        }
+    } catch (error) {
+        console.error("AI search failed:", error);
+        toast({
+            variant: 'destructive',
+            title: "AI Search Error",
+            description: "Something went wrong. Please try again."
+        });
+        setSellers(initialSellers); // Reset on error
+    } finally {
+        setAiLoading(false);
+    }
+  };
+
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
       <div className="mb-8">
@@ -15,8 +87,56 @@ export default function MarketPage() {
           Connect with local farmers and sellers for fresh produce.
         </p>
       </div>
+      
+       <div className="mb-8 space-y-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            placeholder="Search for a product or seller..."
+            className="pl-10 text-base bg-background/50"
+            value={searchTerm}
+            onChange={handleSearchTermChange}
+          />
+           <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-primary"
+            onClick={handleAiSearch}
+            disabled={aiLoading}
+            >
+            {aiLoading ? <Loader2 className="animate-spin" /> : <Bot />}
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {['All', ...sellerCategories].map(category => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? 'default' : 'outline'}
+              onClick={() => handleCategoryChange(category)}
+              size="sm"
+            >
+              {category}
+            </Button>
+          ))}
+        </div>
+      </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {aiLoading && (
+        <div className='text-center py-16 text-muted-foreground'>
+            <Loader2 className='mx-auto h-8 w-8 animate-spin mb-2'/>
+            <p className='font-semibold text-lg'>AI is searching for sellers...</p>
+            <p>Please wait a moment.</p>
+        </div>
+      )}
+
+      {!aiLoading && sellers.length === 0 && (
+            <div className='text-center py-16 text-muted-foreground'>
+                <p className='font-semibold text-lg'>No sellers found</p>
+                <p>Try adjusting your search or filter.</p>
+            </div>
+      )}
+
+      {!aiLoading && <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {sellers.map((seller) => {
           const image = PlaceHolderImages.find((img) => img.id === seller.imageId);
           return (
@@ -35,7 +155,7 @@ export default function MarketPage() {
               <CardHeader>
                 <CardTitle className="font-headline">{seller.name}</CardTitle>
                 <CardDescription>
-                  <Badge variant="secondary">{seller.product}</Badge>
+                  <Badge variant="secondary">{seller.category}</Badge>
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -44,6 +164,9 @@ export default function MarketPage() {
                   <span>{seller.distance} away</span>
                 </div>
                 <p className="font-semibold mt-2">{seller.priceRange}</p>
+                 <div className="mt-2 flex flex-wrap gap-1">
+                    {seller.products.slice(0, 3).map(p => <Badge key={p} variant="outline">{p}</Badge>)}
+                </div>
               </CardContent>
               <CardFooter className="flex gap-2">
                 <Button variant="outline" size="sm" className="flex-1">
@@ -58,7 +181,7 @@ export default function MarketPage() {
             </Card>
           );
         })}
-      </div>
+      </div>}
     </div>
   );
 }

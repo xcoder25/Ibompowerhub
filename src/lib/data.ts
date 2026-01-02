@@ -1,6 +1,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain, Briefcase, Building2, Vote, Phone, Palmtree } from 'lucide-react';
+import { sellers, artisans, sellerCategories } from './market';
 
 export const services = [
   { id: 'agro-connect', name: 'AgroConnect', iconId: 'agro-connect', description: 'Fresh farm produce near you', href: '/market' },
@@ -11,18 +12,7 @@ export const services = [
   { id: 'community-safety', name: 'Community Safety', iconId: 'community-safety', description: 'Stay safe and informed', href: '/alerts' },
 ];
 
-export const sellers = [
-  { id: 1, name: 'Grace Farms', product: 'Vegetables', priceRange: '₦500 - ₦5000', distance: '2.1km', imageId: 'seller-1' },
-  { id: 2, name: 'Emeka\'s Yams', product: 'Tubers & Grains', priceRange: '₦2000 - ₦20000', distance: '3.5km', imageId: 'seller-3' },
-  { id: 3, name: 'Aunty Funke\'s Fruits', product: 'Fruits', priceRange: '₦1000 - ₦7000', distance: '1.2km', imageId: 'seller-2' },
-  { id: 4, name: 'Cross River Poultry', product: 'Poultry & Eggs', priceRange: '₦3000 - ₦15000', distance: '5.8km', imageId: 'seller-4' },
-];
-
-export const artisans = [
-  { id: 1, name: 'John Doe', skill: 'Electrician', rating: 4.8, distance: '1.5km', imageId: 'artisan-1', hourlyRate: '₦5000', availability: 'Available' },
-  { id: 2, name: 'Jane Smith', skill: 'Plumber', rating: 4.5, distance: '2.3km', imageId: 'artisan-2', hourlyRate: '₦4500', availability: 'Busy' },
-  { id: 3, name: 'Samuel Green', skill: 'Carpenter', rating: 4.9, distance: '0.8km', imageId: 'artisan-3', hourlyRate: '₦6000', availability: 'Available' },
-];
+export { sellers, artisans, sellerCategories };
 
 export const alerts = [
     {
