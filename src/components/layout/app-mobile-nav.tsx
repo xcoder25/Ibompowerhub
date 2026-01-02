@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Home, Compass, CircleUser, Bell, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
+import React from 'react';
 
 const mobileNavItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
