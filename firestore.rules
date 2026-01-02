@@ -16,6 +16,12 @@ service cloud.firestore {
       allow read, write: if isOwner(userId);
     }
 
+    // Rules for the 'sellers' collection
+    match /sellers/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId);
+    }
+
     // Rules for the 'reports' collection
     match /reports/{reportId} {
       allow read: if isSignedIn();

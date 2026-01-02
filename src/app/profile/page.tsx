@@ -1,10 +1,9 @@
-
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Star, FileText, Settings, LogOut, Package, Power } from 'lucide-react';
+import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useUser, useAuth } from '@/firebase';
@@ -13,6 +12,7 @@ import { signOut } from 'firebase/auth';
 import { doc } from 'firebase/firestore';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
+import Link from 'next/link';
 
 type UserProfile = {
     name: string;
@@ -41,6 +41,7 @@ export default function ProfilePage() {
   };
 
   const isLoading = isUserLoading || isProfileLoading;
+  const isSeller = userProfile?.role === 'Seller';
 
 
   return (
@@ -123,16 +124,30 @@ export default function ProfilePage() {
             <CardDescription>Manage your services and availability.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border p-4 gap-4">
-                <div className='flex items-center gap-4'>
-                    <Package className='size-6 text-muted-foreground'/>
-                    <div>
-                        <Label htmlFor="listing-status" className='font-semibold'>My Listings</Label>
-                        <p className='text-sm text-muted-foreground'>Manage your products or services</p>
+            {!isSeller && (
+                 <div className="flex flex-col sm:flex-row items-center justify-between rounded-lg border p-4 gap-4 bg-primary/5">
+                    <div className='flex items-center gap-4'>
+                        <Package className='size-6 text-primary'/>
+                        <div>
+                            <h3 className='font-semibold'>Start Selling on AgroConnect</h3>
+                            <p className='text-sm text-muted-foreground'>Join our marketplace and reach more customers.</p>
+                        </div>
                     </div>
+                    <Button asChild className="w-full sm:w-auto shrink-0"><Link href="/market/sell">Become a Seller</Link></Button>
                 </div>
-                <Button variant="outline" className="w-full sm:w-auto shrink-0">View Listings</Button>
-            </div>
+            )}
+            {isSeller && (
+                 <div className="flex flex-col sm:flex-row items-center justify-between rounded-lg border p-4 gap-4">
+                    <div className='flex items-center gap-4'>
+                        <LayoutDashboard className='size-6 text-muted-foreground'/>
+                        <div>
+                            <Label htmlFor="listing-status" className='font-semibold'>Seller Dashboard</Label>
+                            <p className='text-sm text-muted-foreground'>Manage your products, orders, and profile</p>
+                        </div>
+                    </div>
+                    <Button variant="outline" className="w-full sm:w-auto shrink-0">View Dashboard</Button>
+                </div>
+            )}
              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border p-4 gap-4">
                 <div className='flex items-center gap-4'>
                     <Power className='size-6 text-muted-foreground'/>

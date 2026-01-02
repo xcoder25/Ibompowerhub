@@ -10,11 +10,26 @@
         "name": { "type": "string", "description": "The user's display name." },
         "email": { "type": "string", "format": "email", "description": "The user's email address." },
         "profileImageUrl": { "type": "string", "format": "uri", "description": "URL for the user's profile picture." },
-        "role": { "type": "string", "description": "The user's role, e.g., 'Resident' or 'Service Provider'." },
+        "role": { "type": "string", "description": "The user's role, e.g., 'Resident' or 'Seller'." },
         "rating": { "type": "number", "description": "The user's average rating, if applicable." },
         "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of when the profile was created." }
       },
       "required": ["id", "name", "email", "createdAt"]
+    },
+    "SellerProfile": {
+      "title": "Seller Profile",
+      "description": "Represents a seller's profile on the AgroConnect Market.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The seller's unique ID (same as user ID)." },
+        "name": { "type": "string", "description": "The business name of the seller." },
+        "category": { "type": "string", "description": "The category of products sold." },
+        "products": { "type": "array", "items": { "type": "string" }, "description": "A list of products the seller offers." },
+        "priceRange": { "type": "string", "description": "A string representing the price range, e.g., '₦1000 - ₦5000'."},
+        "distance": {"type": "string", "description": "The distance from the user."},
+        "imageId": {"type": "string", "description": "The ID for the placeholder image."}
+      },
+      "required": ["id", "name", "category", "products"]
     },
     "Report": {
       "title": "Report",
@@ -59,6 +74,10 @@
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
       "description": "Stores user profiles."
+    },
+    "/sellers/{userId}": {
+      "schema": { "$ref": "#/entities/SellerProfile" },
+      "description": "Stores seller profiles for the marketplace."
     },
     "/reports/{reportId}": {
       "schema": { "$ref": "#/entities/Report" },
