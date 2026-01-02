@@ -121,7 +121,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
             <div className={cn("flex min-h-screen", isDashboard ? "bg-slate-50" : "bg-background")}>
                 {!isMobile && <AppSidebar />}
                 <div className="flex flex-col flex-1">
-                    {!isMapPage && <AppHeader />}
+                    <AppHeader />
                     <SidebarInset>
                         <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0", isMapPage && "md:pb-0")}>
                             {children}
@@ -134,5 +134,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
         </SidebarProvider>
     );
 }
+
+    
 
     

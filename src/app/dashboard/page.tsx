@@ -24,6 +24,8 @@ import {
   HeartPulse,
   HardHat,
   Sparkles,
+  Vote,
+  Home,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,6 +72,9 @@ export default function DashboardPage() {
   const mapPreviewImage = PlaceHolderImages.find((img) => img.id === 'map-preview');
   const agroMarketImage = PlaceHolderImages.find((img) => img.id === 'seller-1');
   const forumsImage = PlaceHolderImages.find((img) => img.id === 'forum-townhall');
+  const skillsHubImage = PlaceHolderImages.find((img) => img.id === 'artisan-3');
+  const directoryImage = PlaceHolderImages.find((img) => img.id === 'directory-restaurant-2');
+  const propertyImage = PlaceHolderImages.find((img) => img.id === 'property-house');
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 bg-slate-50">
@@ -189,6 +194,33 @@ export default function DashboardPage() {
                         </Card>
                     </Link>
                 )}
+                 {skillsHubImage && (
+                    <Link href="/skills" className="block">
+                        <Card className="shadow-lg h-full overflow-hidden">
+                             <div className="relative h-24 w-full">
+                                <Image src={skillsHubImage.imageUrl} alt="Skills Hub" fill className="object-cover" data-ai-hint={skillsHubImage.imageHint} />
+                            </div>
+                            <CardHeader className='p-3'>
+                                <CardTitle className='text-base font-semibold flex items-center gap-2'><Wrench className='size-4 text-primary'/>SkillsHub</CardTitle>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+                )}
+             </div>
+
+             <div className='grid grid-cols-2 gap-4'>
+                {directoryImage && (
+                    <Link href="/directory" className="block">
+                        <Card className="shadow-lg h-full overflow-hidden">
+                             <div className="relative h-24 w-full">
+                                <Image src={directoryImage.imageUrl} alt="Local Directory" fill className="object-cover" data-ai-hint={directoryImage.imageHint}/>
+                            </div>
+                            <CardHeader className='p-3'>
+                                <CardTitle className='text-base font-semibold flex items-center gap-2'><Building2 className='size-4 text-primary'/>Directory</CardTitle>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+                )}
                  {forumsImage && (
                     <Link href="/forums" className="block">
                         <Card className="shadow-lg h-full overflow-hidden">
@@ -203,27 +235,31 @@ export default function DashboardPage() {
                 )}
              </div>
 
-              <div className='grid grid-cols-2 gap-4'>
-                <Card className="shadow-lg">
-                    <CardHeader className='pb-2'>
-                        <CardTitle className='text-base font-semibold flex items-center gap-2'>
-                            <HeartPulse className='size-4 text-primary'/> Health Hub
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className='text-xs text-muted-foreground'>26 new centers</p>
-                    </CardContent>
-                </Card>
+             <div className='grid grid-cols-2 gap-4'>
+                <Link href="/voting">
+                    <Card className="shadow-lg">
+                        <CardHeader className='pb-2'>
+                            <CardTitle className='text-base font-semibold flex items-center gap-2'>
+                                <Vote className='size-4 text-primary'/> Community Polls
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className='text-xs text-muted-foreground'>2 active polls</p>
+                        </CardContent>
+                    </Card>
+                </Link>
+                 {propertyImage && <Link href="/property">
                  <Card className="shadow-lg">
                     <CardHeader className='pb-2'>
                         <CardTitle className='text-base font-semibold flex items-center gap-2'>
-                            <Briefcase className='size-4 text-primary'/> Job Board
+                            <Home className='size-4 text-primary'/> Property Listings
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className='text-xs text-muted-foreground'>1 local events</p>
+                        <p className='text-xs text-muted-foreground'>5 new listings</p>
                     </CardContent>
                 </Card>
+                 </Link>}
              </div>
 
 
@@ -281,16 +317,16 @@ export default function DashboardPage() {
                             </div>
                         </div>
                     </Link>
-                    <Link href="/directory">
+                    <Link href="/transport">
                         <div className='flex items-center justify-between p-3 hover:bg-slate-100 rounded-lg'>
                             <div className='flex items-center gap-3'>
                                 <div className='p-2 rounded-full bg-green-100'>
-                                    <Building2 className='size-5 text-green-600'/>
+                                    <Bus className='size-5 text-green-600'/>
                                 </div>
-                                <p className='font-semibold'>Local Directory</p>
+                                <p className='font-semibold'>Transport Guide</p>
                             </div>
                             <div className='flex items-center gap-2'>
-                                <p className='text-sm text-muted-foreground'>3 new places</p>
+                                <p className='text-sm text-muted-foreground'>Check fares</p>
                                 <ArrowRight className='size-4 text-muted-foreground'/>
                             </div>
                         </div>
@@ -302,5 +338,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
