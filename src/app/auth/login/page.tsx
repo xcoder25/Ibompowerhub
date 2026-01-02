@@ -61,7 +61,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-4 bg-background">
+    <div className="flex-1 flex flex-col items-center justify-center p-4 bg-background min-h-screen">
       <Card glassy className="w-full max-w-sm">
         <CardHeader className="text-center">
             <Logo withText={true} className="text-3xl justify-center mb-2" />
