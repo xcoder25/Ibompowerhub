@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Map, Bell, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '../ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const mobileNavItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
@@ -23,25 +23,35 @@ export function AppMobileNav() {
   }
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-20 bg-background/95 backdrop-blur-sm border-t">
-      <div className="w-full h-full flex items-center justify-around text-muted-foreground">
-        {mobileNavItems.map((item) => {
-          const isActive = pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard');
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center justify-center text-center p-2 transition-colors duration-200 w-16 relative",
-                isActive ? "text-primary" : "hover:text-primary"
-              )}
-            >
-              <item.icon className="h-6 w-6" />
-              <span className="text-xs mt-1 font-medium">{item.label}</span>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+    <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+      <nav className="flex items-center gap-2 rounded-full bg-sidebar p-2 shadow-lg">
+        <TooltipProvider>
+          {mobileNavItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+                <Tooltip key={item.href}>
+                    <TooltipTrigger asChild>
+                        <Link
+                            href={item.href}
+                            className={cn(
+                                "flex items-center justify-center rounded-full p-3 transition-colors duration-200",
+                                isActive
+                                ? "bg-primary text-primary-foreground"
+                                : "text-sidebar-foreground/70 hover:bg-sidebar-accent"
+                            )}
+                            >
+                            <item.icon className="h-6 w-6" />
+                            <span className="sr-only">{item.label}</span>
+                        </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                        <p>{item.label}</p>
+                    </TooltipContent>
+                </Tooltip>
+            );
+          })}
+        </TooltipProvider>
+      </nav>
+    </div>
   );
 }
