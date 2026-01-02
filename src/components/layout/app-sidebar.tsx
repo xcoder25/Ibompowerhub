@@ -28,6 +28,7 @@ import {
   Power,
   MessageSquare,
   Trash2,
+  Palmtree,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -82,6 +83,7 @@ const resourcesNav = [
     { href: '/health', icon: HeartPulse, label: 'Health' },
     { href: '/education', icon: BookOpen, label: 'Education' },
     { href: '/property', icon: Building2, label: 'Property' },
+    { href: '/tourism', icon: Palmtree, label: 'Tourism' },
 ]
 
 export function AppSidebar() {

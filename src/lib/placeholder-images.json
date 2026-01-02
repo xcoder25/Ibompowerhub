@@ -27,7 +27,7 @@
     {
       "id": "user-avatar-2",
       "description": "Avatar for another user.",
-      "imageUrl": "https://images.unsplash.com/photo-1640951613773-54706e06851d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0NzQ2Njk3fDA&ixlib-rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1640951613773-54706e06851d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0NzQ2Njk3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person avatar"
     },
     {
@@ -45,7 +45,7 @@
     {
       "id": "skills-hub",
       "description": "Icon for SkillsHub service.",
-      "imageUrl": "https://images.unsplash.com/photo-1641428318914-2371f8bcd282?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0b29scyUyMGhhbW1lcnxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1641428318914-2371f8bcd282?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0b29scyUyMGhhbW1lcnxlbnwwfHx8fDE3NjQ3OTc4MTF8MA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "tools hammer"
     },
     {
@@ -261,13 +261,13 @@
     {
       "id": "safety-emergency-services",
       "description": "An ambulance with its lights on.",
-      "imageUrl": "https://images.unsplash.com/photo-1580920469499-4a4781c53b24?q=80&w=2070&auto=format&fit=crop&ixlib-rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1580920469499-4a4781c53b24?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "ambulance emergency"
     },
     {
       "id": "waste-management-hero",
       "description": "A clean city street with recycling bins.",
-      "imageUrl": "https://images.unsplash.com/photo-1582456784142-d21262f0c13b?q=80&w=2070&auto=format&fit=crop&ixlib-rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1582456784142-d21262f0c13b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "clean city"
     },
     {
@@ -279,7 +279,7 @@
     {
       "id": "waste-collector-2",
       "description": "A worker in uniform collecting trash.",
-      "imageUrl": "https://images.unsplash.com/photo-1583501037373-b31525a72037?q=80&w=1974&auto=format&fit=crop&ixlib-rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1583501037373-b31525a72037?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "waste worker"
     },
     {
@@ -287,6 +287,30 @@
       "description": "A map pin indicating the user's current location.",
       "imageUrl": "https://images.unsplash.com/photo-1614949523271-9f93504856d3?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "location pin"
+    },
+    {
+      "id": "tourism-obudu",
+      "description": "Breathtaking view of Obudu Mountain Resort.",
+      "imageUrl": "https://images.unsplash.com/photo-1600242698246-8d8243164a3d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "mountain resort"
+    },
+    {
+      "id": "tourism-tinapa",
+      "description": "The impressive entrance of Tinapa Business Resort.",
+      "imageUrl": "https://images.unsplash.com/photo-1581456495146-65a71b2c8e52?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "modern architecture"
+    },
+    {
+      "id": "tourism-kwa",
+      "description": "The beautiful and serene Kwa Waterfalls.",
+      "imageUrl": "https://images.unsplash.com/photo-1501769752-991de9e62ee2?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "serene waterfall"
+    },
+    {
+      "id": "tourism-carnival",
+      "description": "A vibrant and colorful Calabar Carnival parade.",
+      "imageUrl": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "carnival parade"
     }
   ]
 }

@@ -110,7 +110,7 @@ export function AppHeader() {
 
 
   return (
-    <header className={cn("flex h-16 items-center gap-4 border-b bg-transparent px-4 md:px-6", isMapPage ? "absolute top-0 left-0 right-0 z-20 border-none" : "sticky top-0 z-30 backdrop-blur-sm bg-background/80 md:bg-transparent md:backdrop-blur-none")}>
+    <header className={cn("flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 sticky top-0 z-30", isMapPage && "absolute top-0 left-0 right-0 z-20 border-none bg-transparent backdrop-blur-none")}>
         <HeaderLogo />
      
       <div className={cn("flex w-full items-center gap-4", isMapPage && "md:hidden", "md:ml-auto")}>
@@ -174,5 +174,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    

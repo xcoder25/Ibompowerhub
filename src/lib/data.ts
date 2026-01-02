@@ -1,6 +1,6 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain, Briefcase, Building2, Vote, Phone } from 'lucide-react';
+import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain, Briefcase, Building2, Vote, Phone, Palmtree } from 'lucide-react';
 
 export const services = [
   { id: 'agro-connect', name: 'AgroConnect', iconId: 'agro-connect', description: 'Fresh farm produce near you', href: '/market' },
@@ -149,4 +149,11 @@ export const alerts = [
     { area: 'Federal Housing', group: 'A', 'in': '6 hours', out: '12 hours' },
     { area: 'Etta Agbor', group: 'B', 'in': '12 hours', out: '6 hours' },
     { area: 'MCC Road', group: 'C', 'in': '8 hours', out: '8 hours' },
+  ];
+
+  export const tourismSpots = [
+    { id: 1, name: 'Obudu Mountain Resort', description: 'Famous for its temperate climate, breathtaking views, and the longest cable car in Africa.', imageId: 'tourism-obudu' },
+    { id: 2, name: 'Tinapa Business Resort', description: 'A unique blend of business and leisure, featuring retail outlets, an eight-screen cinema, and an artificial tidal lake.', imageId: 'tourism-tinapa' },
+    { id: 3, name: 'Kwa Waterfalls', description: 'A spectacular waterfall located in a narrow, steep gorge, surrounded by a tropical rainforest.', imageId: 'tourism-kwa' },
+    { id: 4, name: 'Calabar Carnival', description: 'Known as Africa\'s Biggest Street Party, a month-long celebration of culture and creativity.', imageId: 'tourism-carnival' },
   ];
