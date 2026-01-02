@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -6,15 +5,67 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { artisans as initialArtisans } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Star, MapPin, Phone, Search } from 'lucide-react';
+import { Star, MapPin, Phone, Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { RequestQuoteDialog } from '@/components/request-quote-dialog';
+import { useGeolocation } from '@/hooks/use-geolocation';
+import { sortArtisansByDistance } from '@/ai/flows/sort-by-distance-flow';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SkillsPage() {
   const [artisans, setArtisans] = useState(initialArtisans);
+  const [isLoading, setIsLoading] = useState(false);
+  const { location, error: geoError, getLocation } = useGeolocation();
+  const { toast } = useToast();
+
+  const handleSortByDistance = async () => {
+    setIsLoading(true);
+    await getLocation();
+
+    if (geoError) {
+      toast({
+        variant: 'destructive',
+        title: 'Location Error',
+        description: geoError,
+      });
+      setIsLoading(false);
+      return;
+    }
+    
+    // The getLocation will update the location state, which we can then use.
+    // The actual sorting logic will be in an effect that watches for location changes.
+  };
+
+  useState(() => {
+    if (location && artisans) {
+      sortArtisansByDistance({
+        userLocation: { latitude: location.latitude, longitude: location.longitude },
+        artisans: artisans,
+      })
+        .then((sortedArtisans) => {
+          setArtisans(sortedArtisans.sortedArtisans);
+          toast({
+            title: 'Artisans Sorted',
+            description: 'Showing the closest artisans first.',
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+          toast({
+            variant: 'destructive',
+            title: 'AI Sort Error',
+            description: 'Could not sort artisans by distance.',
+          });
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
 
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
@@ -25,14 +76,22 @@ export default function SkillsPage() {
         </p>
       </div>
 
-      <div className="mb-8">
-        <div className="relative">
+      <div className="mb-8 flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             placeholder="Search by category (e.g., electrician, plumber...)"
             className="pl-10 text-base bg-background/50"
           />
         </div>
+        <Button variant="outline" onClick={handleSortByDistance} disabled={isLoading}>
+          {isLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <MapPin className="mr-2 h-4 w-4" />
+          )}
+          Sort by Distance
+        </Button>
       </div>
 
       <div className="space-y-4">

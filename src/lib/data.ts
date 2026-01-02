@@ -1,7 +1,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain, Briefcase, Building2, Vote, Phone, Palmtree } from 'lucide-react';
-import { sellers, artisans, sellerCategories } from './market';
+import { sellers, sellerCategories } from './market';
 
 export const services = [
   { id: 'agro-connect', name: 'AgroConnect', iconId: 'agro-connect', description: 'Fresh farm produce near you', href: '/market' },
@@ -12,7 +12,13 @@ export const services = [
   { id: 'community-safety', name: 'Community Safety', iconId: 'community-safety', description: 'Stay safe and informed', href: '/alerts' },
 ];
 
-export { sellers, artisans, sellerCategories };
+export const artisans = [
+  { id: 1, name: 'John Doe', skill: 'Electrician', rating: 4.8, distance: '1.5km', imageId: 'artisan-1', hourlyRate: '₦5000', availability: 'Available', coords: { latitude: 4.975, longitude: 8.333 } },
+  { id: 2, name: 'Jane Smith', skill: 'Plumber', rating: 4.5, distance: '2.3km', imageId: 'artisan-2', hourlyRate: '₦4500', availability: 'Busy', coords: { latitude: 4.98, longitude: 8.35 } },
+  { id: 3, name: 'Samuel Green', skill: 'Carpenter', rating: 4.9, distance: '0.8km', imageId: 'artisan-3', hourlyRate: '₦6000', availability: 'Available', coords: { latitude: 4.96, longitude: 8.32 } },
+];
+
+export { sellers, sellerCategories };
 
 export const alerts = [
     {
