@@ -3,55 +3,53 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Map, Bell, User } from 'lucide-react';
+import { Home, Compass, CircleUser, Bell, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '../ui/button';
 
 const mobileNavItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
-  { href: '/map', icon: Map, label: 'Map' },
+  { href: '/map', icon: Compass, label: 'Discover' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
-  { href: '/profile', icon: User, label: 'Profile' },
+  { href: '/profile', icon: CircleUser, label: 'Profile' },
 ];
 
 export function AppMobileNav() {
   const pathname = usePathname();
 
-  // Do not render the mobile nav on the map page, as it has its own header controls.
-  if (pathname === '/map') {
-    return null;
-  }
-
   return (
-    <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
-      <nav className="flex items-center gap-2 rounded-full bg-sidebar p-2 shadow-lg">
-        <TooltipProvider>
-          {mobileNavItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-                <Tooltip key={item.href}>
-                    <TooltipTrigger asChild>
-                        <Link
-                            href={item.href}
-                            className={cn(
-                                "flex items-center justify-center rounded-full p-3 transition-colors duration-200",
-                                isActive
-                                ? "bg-primary text-primary-foreground"
-                                : "text-sidebar-foreground/70 hover:bg-sidebar-accent"
-                            )}
-                            >
-                            <item.icon className="h-6 w-6" />
-                            <span className="sr-only">{item.label}</span>
-                        </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                        <p>{item.label}</p>
-                    </TooltipContent>
-                </Tooltip>
-            );
-          })}
-        </TooltipProvider>
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/70 backdrop-blur-lg border-t">
+      <nav className="flex items-center justify-around h-16">
+        {mobileNavItems.map((item, index) => {
+          const isActive = pathname === item.href;
+          return (
+            <>
+              {index === 2 && (
+                 <Link href="/report" passHref>
+                    <Button size="icon" className='rounded-full size-12 -mt-8 shadow-lg'>
+                        <Plus className="size-6"/>
+                    </Button>
+                 </Link>
+              )}
+              <Link
+                  href={item.href}
+                  key={item.href}
+                  className={cn(
+                      "flex flex-col items-center justify-center gap-1 transition-colors duration-200 w-16",
+                      isActive
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  )}
+                  >
+                  <item.icon className="h-6 w-6" />
+                  <span className="text-xs font-medium">{item.label}</span>
+              </Link>
+            </>
+          );
+        })}
       </nav>
     </div>
   );
 }
+
+    

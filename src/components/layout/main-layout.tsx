@@ -91,6 +91,8 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
         return <SplashScreen />;
     }
 
+    const isDashboard = pathname.startsWith('/dashboard');
+
     if (authRoutes.includes(pathname) || pathname === '/') {
         return (
             <main className="flex-1 flex flex-col">
@@ -116,7 +118,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
 
     return (
         <SidebarProvider>
-            <div className="flex min-h-screen bg-background">
+            <div className={cn("flex min-h-screen", isDashboard ? "bg-slate-50" : "bg-background")}>
                 {!isMobile && <AppSidebar />}
                 <div className="flex flex-col flex-1">
                     {!isMapPage && <AppHeader />}
@@ -125,7 +127,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
                             {children}
                         </main>
                     </SidebarInset>
-                    <AssistantWidget />
+                    {!isDashboard && <AssistantWidget />}
                     {isMobile && <AppMobileNav />}
                 </div>
             </div>
@@ -133,3 +135,4 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
     );
 }
 
+    
