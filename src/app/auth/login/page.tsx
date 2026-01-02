@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Logo } from '@/components/logo';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useAuth } from '@/firebase';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -61,70 +62,72 @@ export default function LoginPage() {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 bg-background">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center space-y-2">
-            <Logo withText={true} className="text-3xl justify-center" />
-            <h1 className="text-2xl font-headline">Welcome Back</h1>
-            <p className="text-muted-foreground">Enter your credentials to access your account</p>
-        </div>
-        
-        <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-            <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-            <Button type="submit" className="w-full mt-2">
-            Login
+      <Card glassy className="w-full max-w-sm">
+        <CardHeader className="text-center">
+            <Logo withText={true} className="text-3xl justify-center mb-2" />
+            <CardTitle className="font-headline text-2xl">Welcome Back</CardTitle>
+            <CardDescription>Enter your credentials to access your account</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                            <Input placeholder="name@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                            <Input type="password" placeholder="••••••••" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <Button type="submit" className="w-full mt-2">
+                    Login
+                    </Button>
+                </form>
+            </Form>
+
+            <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                    Or continue with
+                    </span>
+                </div>
+            </div>
+
+            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
+                <GoogleIcon className="mr-2 h-5 w-5" />
+                Sign in with Google
             </Button>
-        </form>
-        </Form>
-
-         <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-                </span>
-            </div>
-        </div>
-
-        <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
-            <GoogleIcon className="mr-2 h-5 w-5" />
-            Sign in with Google
-        </Button>
-
-        <div className="mt-4 text-center text-sm">
-        Don&apos;t have an account?{' '}
-        <Link href="/auth/signup" className="underline font-semibold">
-            Sign up
-        </Link>
-        </div>
-      </div>
+        </CardContent>
+        <CardFooter className="justify-center">
+             <p className="text-center text-sm text-muted-foreground">
+                Don&apos;t have an account?{' '}
+                <Link href="/auth/signup" className="underline font-semibold text-primary">
+                    Sign up
+                </Link>
+            </p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
