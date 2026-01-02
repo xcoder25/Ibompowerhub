@@ -23,7 +23,7 @@ export function AppMobileNav() {
         {mobileNavItems.map((item, index) => {
           const isActive = pathname === item.href;
           return (
-            <>
+            <React.Fragment key={item.href}>
               {index === 2 && (
                  <Link href="/report" passHref>
                     <Button size="icon" className='rounded-full size-12 -mt-8 shadow-lg'>
@@ -33,7 +33,6 @@ export function AppMobileNav() {
               )}
               <Link
                   href={item.href}
-                  key={item.href}
                   className={cn(
                       "flex flex-col items-center justify-center gap-1 transition-colors duration-200 w-16",
                       isActive
@@ -44,7 +43,7 @@ export function AppMobileNav() {
                   <item.icon className="h-6 w-6" />
                   <span className="text-xs font-medium">{item.label}</span>
               </Link>
-            </>
+            </React.Fragment>
           );
         })}
       </nav>
