@@ -70,7 +70,7 @@ const communityAlerts = [
 export default function DashboardPage() {
   const { user } = useUser();
   const mapPreviewImage = PlaceHolderImages.find((img) => img.id === 'map-preview');
-  const agroMarketImage = PlaceHolderImages.find((img) => img.id === 'seller-1');
+  const agroMarketImage = PlaceHolderImages.find((img) => img.id === 'agro-connect');
   const forumsImage = PlaceHolderImages.find((img) => img.id === 'forum-townhall');
   const skillsHubImage = PlaceHolderImages.find((img) => img.id === 'artisan-3');
   const directoryImage = PlaceHolderImages.find((img) => img.id === 'directory-restaurant-2');
