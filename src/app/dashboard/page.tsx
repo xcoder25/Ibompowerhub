@@ -121,33 +121,39 @@ export default function DashboardPage() {
           <div className='w-full'>
             <p className='text-sm font-medium text-muted-foreground mb-3'>Live community alerts in your area</p>
             <div className='grid grid-cols-3 gap-2 text-center'>
-                <div className='flex items-center gap-2 p-2 rounded-lg bg-white shadow-sm'>
-                    <div className='p-2 rounded-full bg-red-100'>
-                        <Zap className='size-5 text-red-600' />
+                <Link href="/power" className='block'>
+                    <div className='flex items-center gap-2 p-2 rounded-lg bg-white shadow-sm hover:bg-slate-100 transition-colors'>
+                        <div className='p-2 rounded-full bg-red-100'>
+                            <Zap className='size-5 text-red-600' />
+                        </div>
+                        <div>
+                            <p className='font-bold text-lg'>9</p>
+                            <p className='text-xs text-muted-foreground -mt-1'>Power</p>
+                        </div>
                     </div>
-                    <div>
-                        <p className='font-bold text-lg'>9</p>
-                        <p className='text-xs text-muted-foreground -mt-1'>Power</p>
+                </Link>
+                 <Link href="/water" className='block'>
+                    <div className='flex items-center gap-2 p-2 rounded-lg bg-white shadow-sm hover:bg-slate-100 transition-colors'>
+                        <div className='p-2 rounded-full bg-blue-100'>
+                            <Droplets className='size-5 text-blue-600' />
+                        </div>
+                        <div>
+                            <p className='font-bold text-lg'>5</p>
+                            <p className='text-xs text-muted-foreground -mt-1'>Water</p>
+                        </div>
                     </div>
-                </div>
-                 <div className='flex items-center gap-2 p-2 rounded-lg bg-white shadow-sm'>
-                    <div className='p-2 rounded-full bg-blue-100'>
-                        <Droplets className='size-5 text-blue-600' />
+                 </Link>
+                 <Link href="/waste" className='block'>
+                    <div className='flex items-center gap-2 p-2 rounded-lg bg-white shadow-sm hover:bg-slate-100 transition-colors'>
+                        <div className='p-2 rounded-full bg-yellow-100'>
+                            <Trash2 className='size-5 text-yellow-600' />
+                        </div>
+                        <div>
+                            <p className='font-bold text-lg'>2</p>
+                            <p className='text-xs text-muted-foreground -mt-1'>Waste</p>
+                        </div>
                     </div>
-                    <div>
-                        <p className='font-bold text-lg'>5</p>
-                        <p className='text-xs text-muted-foreground -mt-1'>Water</p>
-                    </div>
-                </div>
-                 <div className='flex items-center gap-2 p-2 rounded-lg bg-white shadow-sm'>
-                    <div className='p-2 rounded-full bg-yellow-100'>
-                        <Trash2 className='size-5 text-yellow-600' />
-                    </div>
-                    <div>
-                        <p className='font-bold text-lg'>2</p>
-                        <p className='text-xs text-muted-foreground -mt-1'>Waste</p>
-                    </div>
-                </div>
+                 </Link>
             </div>
           </div>
         </CardFooter>
