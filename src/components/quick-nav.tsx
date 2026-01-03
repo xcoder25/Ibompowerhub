@@ -33,6 +33,7 @@ import {
   } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { DialogClose } from '@radix-ui/react-dialog';
 
 const allNavItems = [
     { href: '/dashboard', icon: Home, label: 'Home' },
@@ -74,12 +75,14 @@ export function QuickNav({ children }: { children: React.ReactNode }) {
                 </DialogHeader>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 py-4">
                     {allNavItems.map(item => (
-                        <Link href={item.href} key={item.href} onClick={() => setOpen(false)}>
-                            <div className="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-background hover:bg-accent text-center aspect-square transition-colors">
-                                <item.icon className="w-7 h-7 text-primary" />
-                                <span className="text-xs font-medium text-muted-foreground">{item.label}</span>
-                            </div>
-                        </Link>
+                         <DialogClose asChild key={item.href}>
+                            <Link href={item.href}>
+                                <div className="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-background hover:bg-accent text-center aspect-square transition-colors">
+                                    <item.icon className="w-7 h-7 text-primary" />
+                                    <span className="text-xs font-medium text-muted-foreground">{item.label}</span>
+                                </div>
+                            </Link>
+                        </DialogClose>
                     ))}
                 </div>
             </DialogContent>
