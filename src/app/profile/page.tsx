@@ -4,7 +4,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard, Moon, Sun } from 'lucide-react';
+import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard, Moon, Sun, Languages } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useUser, useAuth } from '@/firebase';
@@ -15,6 +15,8 @@ import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 type UserProfile = {
     name: string;
@@ -29,6 +31,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const firestore = useFirestore();
   const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
 
   const userDocRef = useMemoFirebase(
     () => (user && firestore ? doc(firestore, 'users', user.uid) : null),
@@ -42,6 +45,15 @@ export default function ProfilePage() {
     // Non-blocking call
     signOut(auth);
   };
+
+  const handleLanguageChange = (language: string) => {
+      if (language === 'efik') {
+          toast({
+              title: 'Coming Soon!',
+              description: 'Full Efik language support will be added in a future update.'
+          })
+      }
+  }
 
   const isLoading = isUserLoading || isProfileLoading;
   const isSeller = userProfile?.role === 'Seller';
@@ -108,6 +120,24 @@ export default function ProfilePage() {
                         onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
                         className="ml-auto sm:ml-0"
                     />
+                </div>
+                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border p-4 gap-4">
+                    <div className='flex items-center gap-4'>
+                        <Languages className='size-6 text-muted-foreground'/>
+                        <div>
+                            <Label htmlFor="language" className='font-semibold'>Language</Label>
+                            <p className='text-sm text-muted-foreground'>Choose your preferred language for the app.</p>
+                        </div>
+                    </div>
+                     <Select defaultValue="english" onValueChange={handleLanguageChange}>
+                        <SelectTrigger className="w-full sm:w-[180px] ml-auto sm:ml-0">
+                            <SelectValue placeholder="Select language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="english">English</SelectItem>
+                            <SelectItem value="efik">Efik (Coming Soon)</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </CardContent>
         </Card>
