@@ -1,9 +1,10 @@
+
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard } from 'lucide-react';
+import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard, Moon, Sun } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useUser, useAuth } from '@/firebase';
@@ -13,6 +14,7 @@ import { doc } from 'firebase/firestore';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 
 type UserProfile = {
     name: string;
@@ -26,6 +28,7 @@ export default function ProfilePage() {
   const auth = useAuth();
   const router = useRouter();
   const firestore = useFirestore();
+  const { theme, setTheme } = useTheme();
 
   const userDocRef = useMemoFirebase(
     () => (user && firestore ? doc(firestore, 'users', user.uid) : null),
@@ -86,37 +89,29 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <div className="grid md:grid-cols-3 gap-6">
-            <Card glassy>
-                <CardHeader className='flex-row items-center gap-4 space-y-0'>
-                    <FileText className='size-6 text-primary' />
-                    <CardTitle className='font-headline'>My Reports</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className='text-3xl font-bold'>12</p>
-                    <p className='text-xs text-muted-foreground'>Total reports submitted</p>
-                </CardContent>
-            </Card>
-             <Card glassy>
-                <CardHeader className='flex-row items-center gap-4 space-y-0'>
-                    <Star className='size-6 text-primary' />
-                    <CardTitle className='font-headline'>Favorites</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className='text-3xl font-bold'>5</p>
-                    <p className='text-xs text-muted-foreground'>Saved sellers & artisans</p>
-                </CardContent>
-            </Card>
-             <Card glassy>
-                <CardHeader className='flex-row items-center gap-4 space-y-0'>
-                    <Settings className='size-6 text-primary' />
-                    <CardTitle className='font-headline'>Settings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Button variant="secondary" className='w-full justify-start'>Account & Security</Button>
-                </CardContent>
-            </Card>
-        </div>
+        <Card glassy>
+            <CardHeader>
+                <CardTitle className="font-headline">Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border p-4 gap-4">
+                    <div className='flex items-center gap-4'>
+                        {theme === 'dark' ? <Moon className='size-6 text-muted-foreground'/> : <Sun className='size-6 text-muted-foreground'/>}
+                        <div>
+                            <Label htmlFor="dark-mode" className='font-semibold'>Dark Mode</Label>
+                            <p className='text-sm text-muted-foreground'>Toggle between light and dark themes.</p>
+                        </div>
+                    </div>
+                    <Switch
+                        id="dark-mode"
+                        checked={theme === 'dark'}
+                        onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                        className="ml-auto sm:ml-0"
+                    />
+                </div>
+            </CardContent>
+        </Card>
+
 
         <Card glassy>
           <CardHeader>
