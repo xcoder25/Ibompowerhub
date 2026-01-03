@@ -4,7 +4,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard, Moon, Sun, Languages } from 'lucide-react';
+import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard, Moon, Sun, Languages, HardHat } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useUser, useAuth } from '@/firebase';
@@ -57,6 +57,7 @@ export default function ProfilePage() {
 
   const isLoading = isUserLoading || isProfileLoading;
   const isSeller = userProfile?.role === 'Seller';
+  const isArtisan = userProfile?.role === 'Artisan';
 
 
   return (
@@ -161,6 +162,18 @@ export default function ProfilePage() {
                     <Button asChild className="w-full sm:w-auto shrink-0"><Link href="/market/sell">Become a Seller</Link></Button>
                 </div>
             )}
+             {!isArtisan && (
+                 <div className="flex flex-col sm:flex-row items-center justify-between rounded-lg border p-4 gap-4 bg-sky-500/5">
+                    <div className='flex items-center gap-4'>
+                        <HardHat className='size-6 text-sky-600'/>
+                        <div>
+                            <h3 className='font-semibold'>Offer Your Skills on SkillsHub</h3>
+                            <p className='text-sm text-muted-foreground'>Join our platform and connect with clients.</p>
+                        </div>
+                    </div>
+                    <Button asChild className="w-full sm:w-auto shrink-0" variant="secondary"><Link href="/skills/register">Become an Artisan</Link></Button>
+                </div>
+            )}
             {isSeller && (
                  <div className="flex flex-col sm:flex-row items-center justify-between rounded-lg border p-4 gap-4">
                     <div className='flex items-center gap-4'>
@@ -173,16 +186,18 @@ export default function ProfilePage() {
                     <Button variant="outline" className="w-full sm:w-auto shrink-0">View Dashboard</Button>
                 </div>
             )}
-             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border p-4 gap-4">
-                <div className='flex items-center gap-4'>
-                    <Power className='size-6 text-muted-foreground'/>
-                    <div>
-                        <Label htmlFor="availability-status" className='font-semibold'>Availability</Label>
-                        <p className='text-sm text-muted-foreground'>Set your status to available for requests</p>
+             {isArtisan && (
+                 <div className="flex flex-col sm:flex-row items-center justify-between rounded-lg border p-4 gap-4">
+                    <div className='flex items-center gap-4'>
+                        <LayoutDashboard className='size-6 text-muted-foreground'/>
+                        <div>
+                            <Label htmlFor="listing-status" className='font-semibold'>Artisan Dashboard</Label>
+                            <p className='text-sm text-muted-foreground'>Manage your profile, availability, and quotes.</p>
+                        </div>
                     </div>
+                    <Button variant="outline" className="w-full sm:w-auto shrink-0">View Dashboard</Button>
                 </div>
-              <Switch id="availability-status" defaultChecked className="ml-auto sm:ml-0"/>
-            </div>
+            )}
           </CardContent>
         </Card>
         

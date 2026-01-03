@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { artisans as initialArtisans } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Star, MapPin, Phone, Search, Loader2 } from 'lucide-react';
+import { Star, MapPin, Phone, Search, Loader2, HardHat } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
@@ -15,6 +15,7 @@ import { RequestQuoteDialog } from '@/components/request-quote-dialog';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { sortArtisansByDistance } from '@/ai/flows/sort-by-distance-flow';
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 export default function SkillsPage() {
   const [artisans, setArtisans] = useState(initialArtisans);
@@ -66,11 +67,19 @@ export default function SkillsPage() {
 
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="font-headline text-3xl font-bold tracking-tight">SkillsHub</h1>
-        <p className="text-muted-foreground">
-          Find trusted and verified artisans for your home and office needs.
-        </p>
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h1 className="font-headline text-3xl font-bold tracking-tight">SkillsHub</h1>
+            <p className="text-muted-foreground">
+            Find trusted and verified artisans for your home and office needs.
+            </p>
+        </div>
+         <Button asChild>
+          <Link href="/skills/register">
+            <HardHat className="mr-2" />
+            Become an Artisan
+          </Link>
+        </Button>
       </div>
 
       <div className="mb-8 flex flex-col sm:flex-row gap-4">
