@@ -19,12 +19,13 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Logo } from '../logo';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth, useUser, useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '../ui/badge';
 import { ReportIssueDialog } from '../report-issue-dialog';
 import { DialogTrigger } from '../ui/dialog';
+import { collection } from 'firebase/firestore';
 
 export function AppHeader() {
   const { user } = useUser();
@@ -36,9 +37,15 @@ export function AppHeader() {
   const pathname = usePathname();
   const isMapPage = pathname === '/map';
   const isDashboard = pathname.startsWith('/dashboard');
+  
+  const firestore = useFirestore();
+  const reportsRef = useMemoFirebase(() => firestore ? collection(firestore, 'reports') : null, [firestore]);
+  const { data: reports } = useCollection(reportsRef);
+  const notificationCount = reports?.length ?? 0;
 
   const handleSignOut = async () => {
     try {
+      if (!auth) return;
       await signOut(auth);
       toast({
         title: "Signed Out",
@@ -67,7 +74,9 @@ export function AppHeader() {
         <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
-                <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">3</Badge>
+                {notificationCount > 0 && (
+                    <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">{notificationCount}</Badge>
+                )}
             </Button>
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -120,7 +129,9 @@ export function AppHeader() {
                     </Button>
                     <Button variant="ghost" size="icon" className="relative rounded-full">
                         <Bell className="h-5 w-5" />
-                        <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">3</Badge>
+                        {notificationCount > 0 && (
+                          <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">{notificationCount}</Badge>
+                        )}
                         <span className="sr-only">Toggle notifications</span>
                     </Button>
                     <DropdownMenu>
@@ -180,7 +191,9 @@ export function AppHeader() {
         </Button>
         <Button variant="ghost" size="icon" className="rounded-full relative">
           <Bell className="h-5 w-5" />
-          <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">3</Badge>
+          {notificationCount > 0 && (
+            <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">{notificationCount}</Badge>
+          )}
           <span className="sr-only">Toggle notifications</span>
         </Button>
         <DropdownMenu>
