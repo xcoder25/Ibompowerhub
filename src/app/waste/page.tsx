@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -5,7 +6,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Trash2, Calendar, Phone, Search, SlidersHorizontal, MapPin } from 'lucide-react';
+import { Trash2, Calendar, Phone, Search, SlidersHorizontal, MapPin, Building } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ReportIssueDialog } from '@/components/report-issue-dialog';
 import { DialogTrigger } from '@/components/ui/dialog';
@@ -28,6 +29,8 @@ const collectionSchedule = [
 
 export default function WastePage() {
   const heroImage = PlaceHolderImages.find((img) => img.id === 'waste-management-hero');
+  const cudaImage = PlaceHolderImages.find((img) => img.id === 'cuda-logo');
+
 
   return (
     <div className="flex-1 space-y-8 p-4 sm:p-6 md:p-8">
@@ -57,6 +60,25 @@ export default function WastePage() {
             </ReportIssueDialog>
              <Button variant="outline" className="w-full">
                 <Calendar className="mr-2" /> View Collection Schedule
+            </Button>
+        </CardFooter>
+      </Card>
+
+      <Card glassy>
+        <CardHeader className="flex-row items-center gap-4">
+           {cudaImage && (
+             <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                <Image src={cudaImage.imageUrl} alt="CUDA Logo" fill className="object-cover" data-ai-hint={cudaImage.imageHint}/>
+             </div>
+           )}
+          <div>
+            <CardTitle className="font-headline">Calabar Urban Development Authority (CUDA)</CardTitle>
+            <CardDescription>The official government body for waste management in Calabar.</CardDescription>
+          </div>
+        </CardHeader>
+        <CardFooter>
+            <Button asChild variant='secondary' className='w-full'>
+                <a href="tel:07033445566"><Phone className='mr-2'/>Contact CUDA</a>
             </Button>
         </CardFooter>
       </Card>
