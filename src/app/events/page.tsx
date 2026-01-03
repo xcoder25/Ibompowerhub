@@ -7,8 +7,18 @@ import { Button } from '@/components/ui/button';
 import { events } from '@/lib/events';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Calendar, MapPin } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function EventsPage() {
+  const { toast } = useToast();
+
+  const handleViewDetails = (eventTitle: string) => {
+    toast({
+      title: 'Coming Soon!',
+      description: `Full details for "${eventTitle}" will be available shortly.`,
+    });
+  };
+
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
       <div className="mb-8">
@@ -49,7 +59,11 @@ export default function EventsPage() {
                 <p className="text-sm text-muted-foreground">{event.description}</p>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => handleViewDetails(event.title)}
+                >
                     View Details
                 </Button>
               </CardFooter>
