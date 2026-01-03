@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -18,6 +17,7 @@ import {
   Lightbulb,
   Shield,
   Bot,
+  Building,
   Building2,
   Calendar,
   HeartPulse,
@@ -81,7 +81,8 @@ const reportNav = [
     { href: '/power', icon: Power, label: 'Power' },
 ]
 
-const resourcesNav = [
+const publicServicesNav = [
+    { href: '/government', icon: Building, label: 'Government' },
     { href: '/health', icon: HeartPulse, label: 'Health' },
     { href: '/education', icon: BookOpen, label: 'Education' },
     { href: '/property', icon: Building2, label: 'Property' },
@@ -150,7 +151,7 @@ export function AppSidebar() {
            <SidebarSeparator />
           {renderNavGroup(reportNav, 'Reports')}
            <SidebarSeparator />
-          {renderNavGroup(resourcesNav, 'Resources')}
+          {renderNavGroup(publicServicesNav, 'Public Services')}
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>
