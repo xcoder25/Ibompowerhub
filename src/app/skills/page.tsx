@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -8,7 +9,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Star, MapPin, Phone, Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { RequestQuoteDialog } from '@/components/request-quote-dialog';
 import { useGeolocation } from '@/hooks/use-geolocation';
@@ -23,30 +24,20 @@ export default function SkillsPage() {
 
   const handleSortByDistance = async () => {
     setIsLoading(true);
-    await getLocation();
-
-    if (geoError) {
-      toast({
-        variant: 'destructive',
-        title: 'Location Error',
-        description: geoError,
-      });
-      setIsLoading(false);
-      return;
-    }
-    
-    // The getLocation will update the location state, which we can then use.
-    // The actual sorting logic will be in an effect that watches for location changes.
+    // Request location. The sorting logic will be triggered by the useEffect below
+    // once the location is successfully retrieved.
+    getLocation();
   };
 
-  useState(() => {
-    if (location && artisans) {
+  useEffect(() => {
+    if (location) {
       sortArtisansByDistance({
         userLocation: { latitude: location.latitude, longitude: location.longitude },
-        artisans: artisans,
+        // Pass a version of initialArtisans that includes the coords property
+        artisans: initialArtisans.map(a => ({...a, coords: a.coords || {latitude: 0, longitude: 0}})),
       })
-        .then((sortedArtisans) => {
-          setArtisans(sortedArtisans.sortedArtisans);
+        .then((result) => {
+          setArtisans(result.sortedArtisans);
           toast({
             title: 'Artisans Sorted',
             description: 'Showing the closest artisans first.',
@@ -63,9 +54,15 @@ export default function SkillsPage() {
         .finally(() => {
           setIsLoading(false);
         });
+    } else if (geoError) {
+        toast({
+            variant: 'destructive',
+            title: 'Location Error',
+            description: geoError,
+        });
+        setIsLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location]);
+  }, [location, geoError, toast]);
 
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">

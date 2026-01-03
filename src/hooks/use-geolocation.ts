@@ -15,8 +15,14 @@ export const useGeolocation = () => {
       return;
     }
 
+    // Set a timeout to handle cases where the user doesn't respond to the permission prompt
+    const timeoutId = setTimeout(() => {
+        setError('The request to get user location timed out. Please allow location access.');
+    }, 10000); // 10 seconds timeout
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        clearTimeout(timeoutId);
         setLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -24,6 +30,7 @@ export const useGeolocation = () => {
         setError(null);
       },
       (err) => {
+        clearTimeout(timeoutId);
         switch (err.code) {
           case err.PERMISSION_DENIED:
             setError('You denied the request for Geolocation.');
