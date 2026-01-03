@@ -102,7 +102,7 @@ export function AppHeader() {
 
   if (isDashboard) {
       return (
-        <header className='flex h-16 items-center gap-4 bg-transparent px-4 md:px-6 z-10'>
+        <header className='sticky top-0 flex h-16 items-center gap-4 bg-background/80 backdrop-blur-sm px-4 md:px-6 z-30'>
             <MobileHeader />
         </header>
       )
