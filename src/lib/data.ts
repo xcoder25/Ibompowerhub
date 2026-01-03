@@ -179,3 +179,17 @@ export const alerts = [
       imageId: 'waste-management-hero' 
     },
   ];
+
+  export const popularRoutes = [
+    { from: '8 Miles', to: 'Watt Market', fare: '₦300' },
+    { from: 'Marian', to: 'Unical', fare: '₦200' },
+    { from: 'Housing Estate', to: 'Akpabuyo', fare: '₦500' },
+    { from: 'Airport', to: 'Tinapa', fare: '₦400' },
+  ];
+  
+  export const fareEstimates: { [key: string]: string } = {
+    '8 miles-watt market': '₦300',
+    'marian-unical': '₦200',
+    'housing estate-akpabuyo': '₦500',
+    'airport-tinapa': '₦400',
+  };
