@@ -27,9 +27,17 @@ export default function MapPage() {
     preventGoogleFontsLoading: true,
   });
 
+  if (!isLoaded) {
+    return (
+        <div className="flex-1 flex items-center justify-center bg-muted-foreground/10">
+            <p className="text-muted-foreground">Loading Map...</p>
+        </div>
+    )
+  }
+
   return (
     <div className="flex-1 flex flex-col md:flex-row h-full">
-        <div className='relative w-full h-64 md:h-full md:w-1/3 order-2 md:order-1 p-4 overflow-y-auto'>
+        <div className='relative w-full md:w-1/3 p-4 space-y-4 overflow-y-auto'>
             <MapNavigator
               origin={origin}
               destination={destination}
@@ -41,15 +49,9 @@ export default function MapPage() {
               setTravelMode={setTravelMode}
             />
         </div>
-        <div className="relative flex-1 h-full order-1 md:order-2">
-            {!isLoaded ? (
-                <div className="flex items-center justify-center h-full bg-muted-foreground/10">
-                    <p className="text-muted-foreground">Loading Map...</p>
-                </div>
-            ) : (
-                <GoogleMap origin={origin} destination={destination} directions={directions} />
-            )}
-      </div>
+        <div className="relative flex-1 h-full">
+             <GoogleMap origin={origin} destination={destination} directions={directions} />
+        </div>
     </div>
   );
 }
