@@ -127,7 +127,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
                             {children}
                         </main>
                     </SidebarInset>
-                    {!isDashboard && <AssistantWidget />}
+                    <AssistantWidget />
                     {isMobile && <AppMobileNav />}
                 </div>
             </div>

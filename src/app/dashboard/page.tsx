@@ -68,14 +68,9 @@ export default function DashboardPage() {
         <h1 className="font-headline text-3xl font-bold tracking-tight">
           Welcome back, {user?.displayName?.split(' ')[0] || 'User'}!
         </h1>
-        <div className="relative flex-1 max-w-xl">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-                type="search"
-                placeholder="Search for services, alerts, or community posts..."
-                className="pl-9 w-full bg-background/80"
-            />
-        </div>
+        <p className="text-muted-foreground">
+          Here's a snapshot of your community's activities and services.
+        </p>
       </div>
 
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -241,24 +236,38 @@ export default function DashboardPage() {
 
          {/* Right Column */}
         <div className="space-y-6">
-            <Card className="shadow-lg bg-blue-50 border-blue-200">
+             <Card className="shadow-lg bg-primary text-primary-foreground">
                 <CardHeader>
-                    <div className='flex items-center gap-3'>
-                        <Avatar>
-                            <AvatarFallback className='bg-primary text-primary-foreground'><Bot/></AvatarFallback>
-                        </Avatar>
-                        <CardTitle className='font-headline'>AI Assistant</CardTitle>
-                    </div>
+                    <CardTitle className='font-headline'>Report an Issue</CardTitle>
+                    <CardDescription className="text-primary-foreground/80">Help improve your community by reporting power outages, waste, or water issues.</CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <p className='text-sm text-muted-foreground'>Ask me anything, {user?.displayName?.split(' ')[0] || 'User'}. I'm here to help!</p>
-                    <div className='mt-4 p-3 bg-white/60 rounded-lg text-sm'>
-                        <p className='font-medium'>"How do I report a power outage?"</p>
-                    </div>
-                </CardContent>
                 <CardFooter>
-                    <Button className='w-full rounded-full'>Chat now</Button>
+                    <Button asChild variant="secondary" className="w-full">
+                        <Link href="/report">
+                            <Plus className="mr-2" /> Report Now
+                        </Link>
+                    </Button>
                 </CardFooter>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Recent Activity</CardTitle>
+                </CardHeader>
+                 <CardContent className="space-y-4">
+                    {alerts.slice(0, 4).map((alert) => (
+                        <div key={alert.id} className="flex items-center gap-3">
+                            <Avatar className="h-9 w-9">
+                                <AvatarImage src={PlaceHolderImages.find(p => p.id === alert.user.avatarId)?.imageUrl} alt={alert.user.name} />
+                                <AvatarFallback>{alert.user.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 text-sm">
+                                <p><span className="font-semibold">{alert.user.name}</span> reported an issue.</p>
+                                <p className="text-xs text-muted-foreground">{alert.time}</p>
+                            </div>
+                        </div>
+                    ))}
+                 </CardContent>
             </Card>
         </div>
       </div>
