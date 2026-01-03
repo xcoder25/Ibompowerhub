@@ -146,7 +146,7 @@ export function MapNavigator({ origin, destination, directions, setOrigin, setDe
 
   return (
     <div className='flex flex-col gap-4'>
-        <Card glassy className="max-w-md w-full">
+        <Card glassy className="w-full">
             <CardHeader>
                 <CardTitle className="font-headline flex items-center"><MapPin className="mr-2" /> CRS Navigator</CardTitle>
                 <CardDescription>Find the best route anywhere in Cross River State.</CardDescription>
@@ -207,7 +207,7 @@ export function MapNavigator({ origin, destination, directions, setOrigin, setDe
         </Card>
 
         {directions && (
-        <Card glassy className="max-w-md w-full">
+        <Card glassy className="w-full">
             <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => setShowSteps(s => !s)}>
                 <div className='flex items-center gap-4'>
                     <div className='text-center'>

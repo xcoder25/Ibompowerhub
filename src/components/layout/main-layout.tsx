@@ -123,7 +123,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
                 <div className="flex flex-col flex-1">
                     <AppHeader />
                     <SidebarInset>
-                        <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0", isMapPage && "md:pb-0")}>
+                        <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0")}>
                             {children}
                         </main>
                     </SidebarInset>
