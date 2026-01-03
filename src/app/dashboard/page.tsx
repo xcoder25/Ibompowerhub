@@ -27,6 +27,7 @@ import {
   Vote,
   Home,
   Plus,
+  CloudRain,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,7 +38,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { communityAlerts } from '@/lib/data';
+import { alerts } from '@/lib/data';
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -47,14 +48,34 @@ export default function DashboardPage() {
   const skillsHubImage = PlaceHolderImages.find((img) => img.id === 'artisan-3');
   const directoryImage = PlaceHolderImages.find((img) => img.id === 'directory-restaurant-2');
 
+  const getAlertIcon = (type: string) => {
+    switch (type) {
+      case 'Power Outage':
+        return <Power className="size-5 text-yellow-500" />;
+      case 'Flood Alert':
+        return <CloudRain className="size-5 text-blue-500" />;
+      case 'Waste Overflow':
+        return <Trash2 className="size-5 text-gray-500" />;
+      default:
+        return <Bell className="size-5 text-muted-foreground" />;
+    }
+  };
+
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 bg-slate-50/50 pb-24">
       {/* Welcome Header */}
-      <div className="space-y-1">
+      <div className="space-y-2">
         <h1 className="font-headline text-3xl font-bold tracking-tight">
           Welcome back, {user?.displayName?.split(' ')[0] || 'User'}!
         </h1>
-        <p className="text-muted-foreground">Here&apos;s your community dashboard.</p>
+        <div className="relative flex-1 max-w-xl">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+                type="search"
+                placeholder="Search for services, alerts, or community posts..."
+                className="pl-9 w-full bg-background/80"
+            />
+        </div>
       </div>
 
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -124,28 +145,98 @@ export default function DashboardPage() {
                 </CardFooter>
             </Card>
 
-            <Card className="shadow-lg">
-                <CardHeader className='flex-row items-center justify-between'>
-                    <CardTitle className='font-headline'>Community Alerts</CardTitle>
-                    <Link href="/alerts" className='text-sm font-medium text-primary hover:underline flex items-center gap-1'>
-                        View all <ArrowRight className='size-4'/>
-                    </Link>
-                </CardHeader>
-                <CardContent className='space-y-4'>
-                    {communityAlerts.slice(0, 2).map(alert => (
-                        <div key={alert.id} className='flex items-start gap-3'>
-                            <div className={cn('p-2 rounded-full', alert.iconBg)}>
-                                <alert.Icon className={cn('size-5', alert.iconColor)} />
+            <div className="space-y-6">
+                <Card className="shadow-lg">
+                    <CardHeader className='flex-row items-center justify-between'>
+                        <CardTitle className='font-headline'>Community Alerts</CardTitle>
+                        <Link href="/alerts" className='text-sm font-medium text-primary hover:underline flex items-center gap-1'>
+                            View all <ArrowRight className='size-4'/>
+                        </Link>
+                    </CardHeader>
+                    <CardContent className='space-y-4'>
+                        {alerts.slice(0, 3).map(alert => (
+                            <div key={alert.id} className='flex items-start gap-3 p-3 rounded-lg hover:bg-slate-100/80'>
+                                <div className={cn('p-2 rounded-full bg-white')}>
+                                    {getAlertIcon(alert.type)}
+                                </div>
+                                <div className='flex-1'>
+                                    <p className='font-semibold'>{alert.type}</p>
+                                    <p className='text-sm text-muted-foreground'>{alert.description}</p>
+                                </div>
+                                <p className='text-xs text-muted-foreground whitespace-nowrap'>{alert.time}</p>
                             </div>
-                            <div className='flex-1'>
-                                <p className='font-semibold'>{alert.type}</p>
-                                <p className='text-sm text-muted-foreground'>{alert.description}</p>
+                        ))}
+                    </CardContent>
+                </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {agroMarketImage && (
+                        <Card className="shadow-lg flex flex-col">
+                            <CardHeader>
+                                <CardTitle className='font-headline'>AgroConnect</CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex-1">
+                                <Image src={agroMarketImage.imageUrl} alt="AgroConnect Market" width={400} height={200} className='rounded-lg object-cover' data-ai-hint={agroMarketImage.imageHint} />
+                            </CardContent>
+                            <CardFooter>
+                                 <Button asChild className='w-full'><Link href="/market">Go to Market</Link></Button>
+                            </CardFooter>
+                        </Card>
+                    )}
+                     <div className="space-y-6">
+                        <Card className="shadow-lg">
+                            <CardHeader className="flex-row items-center gap-4">
+                                <div className="p-3 bg-sky-100 rounded-lg"><Wrench className="text-sky-600" /></div>
+                                <div>
+                                    <CardTitle className="text-lg font-semibold">SkillsHub</CardTitle>
+                                    <p className="text-sm text-muted-foreground">Find local artisans.</p>
+                                </div>
+                            </CardHeader>
+                            <CardFooter>
+                                <Button asChild variant="outline" className="w-full"><Link href="/skills">Browse Artisans</Link></Button>
+                            </CardFooter>
+                        </Card>
+                         <Card className="shadow-lg">
+                            <CardHeader className="flex-row items-center gap-4">
+                                <div className="p-3 bg-orange-100 rounded-lg"><Building2 className="text-orange-600" /></div>
+                                <div>
+                                    <CardTitle className="text-lg font-semibold">Directory</CardTitle>
+                                    <p className="text-sm text-muted-foreground">Find local businesses.</p>
+                                </div>
+                            </CardHeader>
+                            <CardFooter>
+                                <Button asChild variant="outline" className="w-full"><Link href="/directory">View Directory</Link></Button>
+                            </CardFooter>
+                        </Card>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <Card className="shadow-lg">
+                        <CardHeader className="flex-row items-center gap-4">
+                            <div className="p-3 bg-blue-100 rounded-lg"><Vote className="text-blue-600" /></div>
+                            <div>
+                                <CardTitle className="text-lg font-semibold">Community Voting</CardTitle>
+                                <p className="text-sm text-muted-foreground">Make your voice heard.</p>
                             </div>
-                            <p className='text-xs text-muted-foreground whitespace-nowrap'>{alert.time}</p>
-                        </div>
-                    ))}
-                </CardContent>
-            </Card>
+                        </CardHeader>
+                        <CardFooter>
+                            <Button asChild variant="outline" className="w-full"><Link href="/voting">View Polls</Link></Button>
+                        </CardFooter>
+                    </Card>
+                    <Card className="shadow-lg">
+                        <CardHeader className="flex-row items-center gap-4">
+                            <div className="p-3 bg-purple-100 rounded-lg"><Briefcase className="text-purple-600" /></div>
+                            <div>
+                                <CardTitle className="text-lg font-semibold">Property Listings</CardTitle>
+                                <p className="text-sm text-muted-foreground">Rent or buy property.</p>
+                            </div>
+                        </CardHeader>
+                        <CardFooter>
+                            <Button asChild variant="outline" className="w-full"><Link href="/property">Browse Properties</Link></Button>
+                        </CardFooter>
+                    </Card>
+                </div>
+            </div>
         </div>
 
          {/* Right Column */}
@@ -161,54 +252,14 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <p className='text-sm text-muted-foreground'>Ask me anything, {user?.displayName?.split(' ')[0] || 'User'}. I'm here to help!</p>
+                    <div className='mt-4 p-3 bg-white/60 rounded-lg text-sm'>
+                        <p className='font-medium'>"How do I report a power outage?"</p>
+                    </div>
                 </CardContent>
                 <CardFooter>
                     <Button className='w-full rounded-full'>Chat now</Button>
                 </CardFooter>
             </Card>
-            
-            <div className='grid grid-cols-2 gap-4'>
-                <Link href="/market" className="block">
-                    <Card className="shadow-lg h-full overflow-hidden hover:bg-slate-100 transition-colors">
-                        <CardHeader className='p-4 text-center items-center'>
-                            <div className='p-3 rounded-full bg-green-100 mb-2'>
-                                <ShoppingBag className='size-6 text-green-600'/>
-                            </div>
-                            <CardTitle className='text-base font-semibold'>AgroConnect</CardTitle>
-                        </CardHeader>
-                    </Card>
-                </Link>
-                <Link href="/skills" className="block">
-                    <Card className="shadow-lg h-full overflow-hidden hover:bg-slate-100 transition-colors">
-                        <CardHeader className='p-4 text-center items-center'>
-                            <div className='p-3 rounded-full bg-sky-100 mb-2'>
-                                <Wrench className='size-6 text-sky-600'/>
-                            </div>
-                            <CardTitle className='text-base font-semibold'>SkillsHub</CardTitle>
-                        </CardHeader>
-                    </Card>
-                </Link>
-                <Link href="/directory" className="block">
-                    <Card className="shadow-lg h-full overflow-hidden hover:bg-slate-100 transition-colors">
-                        <CardHeader className='p-4 text-center items-center'>
-                            <div className='p-3 rounded-full bg-orange-100 mb-2'>
-                                <Building2 className='size-6 text-orange-600'/>
-                            </div>
-                            <CardTitle className='text-base font-semibold'>Directory</CardTitle>
-                        </CardHeader>
-                    </Card>
-                </Link>
-                 <Link href="/transport" className="block">
-                    <Card className="shadow-lg h-full overflow-hidden hover:bg-slate-100 transition-colors">
-                        <CardHeader className='p-4 text-center items-center'>
-                            <div className='p-3 rounded-full bg-purple-100 mb-2'>
-                                <Bus className='size-6 text-purple-600'/>
-                            </div>
-                            <CardTitle className='text-base font-semibold'>Transport</CardTitle>
-                        </CardHeader>
-                    </Card>
-                </Link>
-            </div>
         </div>
       </div>
     </div>
