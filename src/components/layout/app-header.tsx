@@ -130,16 +130,6 @@ export function AppHeader() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-             {isMapPage && (
-              <div className='md:hidden'>
-                    <Button variant="outline" size="icon" asChild>
-                        <Link href="/dashboard">
-                            <Home />
-                        </Link>
-                    </Button>
-              </div>
-            )}
         </div>
       </div>
     </header>
