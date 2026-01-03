@@ -27,25 +27,6 @@ export default function MapPage() {
     preventGoogleFontsLoading: true,
   });
 
-  if (!apiKey || apiKey === 'YOUR_API_KEY') {
-    return (
-      <div className="flex-1 flex items-center justify-center h-full bg-muted-foreground/10 p-4">
-        <div className="max-w-md text-center">
-          <h2 className="text-2xl font-bold mb-2">Google Maps API Key is Missing</h2>
-          <p className="text-muted-foreground">
-            To display the map, you need a valid Google Maps API key. Please create a key in the Google Cloud Console, enable the "Maps JavaScript API" and "Places API", and add it to a new file named <code className="bg-muted px-1.5 py-1 rounded-sm font-mono text-sm">.env.local</code> in the root of your project with the following content:
-          </p>
-          <pre className="mt-4 p-4 bg-muted rounded-md text-left text-sm overflow-x-auto">
-            <code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=YOUR_API_KEY_HERE</code>
-          </pre>
-          <p className="text-muted-foreground mt-4">
-            After adding the key, please restart your development server.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   if (!isLoaded) {
     return (
         <div className="flex-1 flex items-center justify-center h-full bg-muted-foreground/10">
