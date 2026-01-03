@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Search, Bell, User as UserIcon, Settings, LogOut, Home, Bus, Building2, Plus } from 'lucide-react';
+import { Search, Bell, User as UserIcon, Settings, LogOut, Home, Bus, Building2, Plus, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ import { Badge } from '../ui/badge';
 import { ReportIssueDialog } from '../report-issue-dialog';
 import { DialogTrigger } from '../ui/dialog';
 import { collection } from 'firebase/firestore';
+import { QuickNav } from '../quick-nav';
 
 export function AppHeader() {
   const { user } = useUser();
@@ -72,6 +73,11 @@ export function AppHeader() {
      <div className="flex w-full items-center justify-between md:hidden">
         <Logo withText={true} className="text-xl" />
         <div className="flex items-center gap-1">
+            <QuickNav>
+                <Button variant="ghost" size="icon">
+                    <LayoutGrid className="h-5 w-5" />
+                </Button>
+            </QuickNav>
             <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
                 {notificationCount > 0 && (
@@ -124,6 +130,11 @@ export function AppHeader() {
                     />
                 </div>
                  <div className="flex items-center gap-2">
+                    <QuickNav>
+                        <Button variant="ghost" size="icon">
+                            <LayoutGrid className="h-5 w-5" />
+                        </Button>
+                    </QuickNav>
                     <Button asChild>
                         <Link href="/report"><Plus className='mr-2'/>Report an Issue</Link>
                     </Button>
@@ -189,6 +200,11 @@ export function AppHeader() {
           <Search className="h-5 w-5" />
           <span className="sr-only">Search</span>
         </Button>
+        <QuickNav>
+            <Button variant="ghost" size="icon" className="rounded-full">
+                <LayoutGrid className="h-5 w-5" />
+            </Button>
+        </QuickNav>
         <Button variant="ghost" size="icon" className="rounded-full relative">
           <Bell className="h-5 w-5" />
           {notificationCount > 0 && (
