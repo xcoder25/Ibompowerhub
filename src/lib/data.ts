@@ -1,6 +1,5 @@
-
 import type { LucideIcon } from 'lucide-react';
-import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain, Briefcase, Building2, Vote, Phone, Palmtree } from 'lucide-react';
+import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain, Briefcase, Building2, Vote, Phone, Palmtree, Newspaper } from 'lucide-react';
 import { sellers, sellerCategories } from './market';
 
 export const services = [
@@ -152,4 +151,31 @@ export const alerts = [
     { id: 2, name: 'Tinapa Business Resort', description: 'A unique blend of business and leisure, featuring retail outlets, an eight-screen cinema, and an artificial tidal lake.', imageId: 'tourism-tinapa' },
     { id: 3, name: 'Kwa Waterfalls', description: 'A spectacular waterfall located in a narrow, steep gorge, surrounded by a tropical rainforest.', imageId: 'tourism-kwa' },
     { id: 4, name: 'Calabar Carnival', description: 'Known as Africa\'s Biggest Street Party, a month-long celebration of culture and creativity.', imageId: 'tourism-carnival' },
+  ];
+
+  export const newsArticles = [
+    { 
+      id: 1, 
+      title: 'State Government Announces Plans for New Ring Road', 
+      summary: 'The Cross River State government has unveiled an ambitious plan to construct a new ring road aimed at easing traffic congestion in Calabar.',
+      category: 'Government',
+      date: 'October 28, 2024',
+      imageId: 'news-road' 
+    },
+    { 
+      id: 2, 
+      title: 'Calabar Carnival Preparations in Full Swing', 
+      summary: 'With the annual Calabar Carnival just weeks away, bands are putting the final touches on their costumes and routines.',
+      category: 'Culture',
+      date: 'October 27, 2024',
+      imageId: 'event-carnival' 
+    },
+      { 
+      id: 3, 
+      title: 'Waste Management Agency Announces New Pickup Schedule', 
+      summary: 'The Cross River State Waste Management Agency has released a new schedule for waste pickup in several key areas of Calabar.',
+      category: 'Community',
+      date: 'October 26, 2024',
+      imageId: 'waste-management-hero' 
+    },
   ];
