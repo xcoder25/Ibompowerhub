@@ -7,6 +7,8 @@ import { Home, Compass, CircleUser, Bell, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import React from 'react';
+import { ReportIssueDialog } from '../report-issue-dialog';
+import { DialogTrigger } from '../ui/dialog';
 
 const mobileNavItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
@@ -51,5 +53,3 @@ export function AppMobileNav() {
     </div>
   );
 }
-
-    

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Search, Bell, User as UserIcon, Settings, LogOut, Home, Bus, Building2 } from 'lucide-react';
+import { Search, Bell, User as UserIcon, Settings, LogOut, Home, Bus, Building2, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,8 @@ import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '../ui/badge';
+import { ReportIssueDialog } from '../report-issue-dialog';
+import { DialogTrigger } from '../ui/dialog';
 
 export function AppHeader() {
   const { user } = useUser();
@@ -103,6 +105,56 @@ export function AppHeader() {
   if (isDashboard) {
       return (
         <header className='sticky top-0 flex h-16 items-center gap-4 bg-background/80 backdrop-blur-sm px-4 md:px-6 z-30'>
+             <div className="hidden w-full items-center justify-between md:flex">
+                <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        type="search"
+                        placeholder="Search for services, alerts, or community posts..."
+                        className="pl-9 w-full bg-background/50"
+                    />
+                </div>
+                 <div className="flex items-center gap-2">
+                    <Button asChild>
+                        <Link href="/report"><Plus className='mr-2'/>Report an Issue</Link>
+                    </Button>
+                    <Button variant="ghost" size="icon" className="relative rounded-full">
+                        <Bell className="h-5 w-5" />
+                        <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">3</Badge>
+                        <span className="sr-only">Toggle notifications</span>
+                    </Button>
+                    <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="rounded-full">
+                        <Avatar className="h-8 w-8">
+                            <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
+                            <AvatarFallback>{user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
+                        </Avatar>
+                        <span className="sr-only">Toggle user menu</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                        <Link href="/profile">
+                            <UserIcon className='mr-2' />
+                            Profile
+                        </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Settings className='mr-2' />
+                            Settings
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleSignOut}>
+                            <LogOut className='mr-2' />
+                            Logout
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+             </div>
             <MobileHeader />
         </header>
       )
@@ -174,5 +226,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    
