@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -97,6 +98,7 @@ export function AppSidebar() {
 
   const handleSignOut = async () => {
     try {
+      if (!auth) return;
       await signOut(auth);
       toast({
         title: "Signed Out",
