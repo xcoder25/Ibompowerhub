@@ -36,9 +36,11 @@ export default function MapPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col relative">
-      <GoogleMap origin={origin} destination={destination} directions={directions} />
-      <div className="absolute top-0 left-0 right-0 z-10 p-4 w-full h-full pointer-events-none">
+    <div className="flex-1 flex flex-col relative h-full">
+      <div className="absolute inset-0">
+        <GoogleMap origin={origin} destination={destination} directions={directions} />
+      </div>
+      <div className="absolute top-16 left-0 right-0 z-10 p-4 w-full h-full pointer-events-none">
         <div className='pointer-events-auto'>
             <MapNavigator
               origin={origin}
