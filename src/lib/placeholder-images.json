@@ -201,7 +201,7 @@
     {
       "id": "job-tech",
       "description": "A person working on a laptop in a modern office.",
-      "imageUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D",
       "imageHint": "office work"
     },
     {
@@ -335,12 +335,6 @@
       "description": "A grand government building with pillars.",
       "imageUrl": "https://images.unsplash.com/photo-1563837589943-e125865239a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxnb3Zlcm5tZW50JTIwYnVpbGRpbmd8ZW58MHx8fHwxNzY1MzUwMTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "government building"
-    },
-    {
-      "id": "cuda-logo",
-      "description": "Logo for Calabar Urban Development Authority.",
-      "imageUrl": "https://images.unsplash.com/photo-1563837589943-e125865239a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxnb3Zlcm5tZW50JTIwYnVpbGRpbmd8ZW58MHx8fHwxNzY1MzUwMTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "government logo"
     }
   ]
 }

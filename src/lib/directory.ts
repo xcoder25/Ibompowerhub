@@ -1,4 +1,3 @@
-
 export const businessCategories = [
     "Food & Drink",
     "Auto Services",
