@@ -1,7 +1,8 @@
 
 'use client';
-import { GoogleMap as GoogleMapApi, MarkerF, DirectionsRenderer } from '@react-google-maps/api';
+import { GoogleMap as GoogleMapApi, MarkerF, DirectionsRenderer, InfoWindow } from '@react-google-maps/api';
 import { type MapLocation } from '@/app/map/page';
+import { useState } from 'react';
 
 const containerStyle = {
   width: '100%',
@@ -23,18 +24,24 @@ type GoogleMapProps = {
     origin: MapLocation | null;
     destination: MapLocation | null;
     directions: google.maps.DirectionsResult | null;
+    places: google.maps.places.PlaceResult[] | null;
+    setMap: (map: google.maps.Map | null) => void;
 }
 
-export function GoogleMap({ origin, destination, directions }: GoogleMapProps) {
+export function GoogleMap({ origin, destination, directions, places, setMap }: GoogleMapProps) {
+  const [selectedPlace, setSelectedPlace] = useState<google.maps.places.PlaceResult | null>(null);
+
   return (
       <GoogleMapApi
         mapContainerStyle={containerStyle}
         center={center}
         zoom={13}
         options={mapOptions}
+        onLoad={setMap}
       >
         {origin && !directions && <MarkerF position={origin} />}
         {destination && !directions && <MarkerF position={destination} />}
+        
         {directions && (
             <DirectionsRenderer 
                 directions={directions} 
@@ -48,6 +55,29 @@ export function GoogleMap({ origin, destination, directions }: GoogleMapProps) {
                 }}
             />
         )}
+        
+        {places?.map((place, index) => (
+            place.geometry?.location && (
+                <MarkerF 
+                    key={place.place_id || index} 
+                    position={place.geometry.location} 
+                    onClick={() => setSelectedPlace(place)}
+                />
+            )
+        ))}
+
+        {selectedPlace && selectedPlace.geometry?.location && (
+            <InfoWindow
+                position={selectedPlace.geometry.location}
+                onCloseClick={() => setSelectedPlace(null)}
+            >
+                <div>
+                    <p className='font-bold'>{selectedPlace.name}</p>
+                    <p>{selectedPlace.formatted_address}</p>
+                </div>
+            </InfoWindow>
+        )}
+
       </GoogleMapApi>
   )
 }

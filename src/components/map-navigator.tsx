@@ -5,7 +5,7 @@ import { Autocomplete } from '@react-google-maps/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { MapPin, ArrowRight, X, User, Car, Bus, Bot, Mic, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, ArrowRight, X, User, Car, Bus, Bot, Mic, Loader2, ChevronDown, ChevronUp, Hospital } from 'lucide-react';
 import { type MapLocation } from '@/app/map/page';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { getNavigationRoute } from '@/ai/flows/map-navigation-flow';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Separator } from './ui/separator';
+import { findPlace } from '@/ai/flows/find-place-flow';
 
 type MapNavigatorProps = {
   origin: MapLocation | null;
@@ -23,12 +24,26 @@ type MapNavigatorProps = {
   setDirections: (directions: google.maps.DirectionsResult | null) => void;
   travelMode: google.maps.TravelMode;
   setTravelMode: (mode: google.maps.TravelMode) => void;
+  setPlaces: (places: google.maps.places.PlaceResult[] | null) => void;
+  map: google.maps.Map | null;
 };
 
-export function MapNavigator({ origin, destination, directions, setOrigin, setDestination, setDirections, travelMode, setTravelMode }: MapNavigatorProps) {
+export function MapNavigator({ 
+    origin, 
+    destination, 
+    directions, 
+    setOrigin, 
+    setDestination, 
+    setDirections, 
+    travelMode, 
+    setTravelMode,
+    setPlaces,
+    map
+}: MapNavigatorProps) {
   const originRef = useRef<HTMLInputElement>(null);
   const destinationRef = useRef<HTMLInputElement>(null);
   const aiQueryRef = useRef<HTMLInputElement>(null);
+  const findPlaceQueryRef = useRef<HTMLInputElement>(null);
 
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
@@ -45,7 +60,7 @@ export function MapNavigator({ origin, destination, directions, setOrigin, setDe
   const speechRecognition = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
-    if ('webkitSpeechRecognition' in window) {
+    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
         const recognition = new webkitSpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
@@ -71,7 +86,7 @@ export function MapNavigator({ origin, destination, directions, setOrigin, setDe
 
   const calculateRoute = async (org: string, dest: string) => {
     if (!org || !dest) return;
-
+    setPlaces(null);
     const directionsService = new google.maps.DirectionsService();
     try {
       const results = await directionsService.route({
@@ -110,6 +125,46 @@ export function MapNavigator({ origin, destination, directions, setOrigin, setDe
     }
   };
 
+   const handleFindPlace = async () => {
+    if (!findPlaceQueryRef.current?.value || !map) return;
+    setAiLoading(true);
+    setDirections(null);
+
+    try {
+        const result = await findPlace({ query: findPlaceQueryRef.current.value });
+        const request = {
+            query: `${result.placeType} in Calabar`,
+            fields: ['name', 'geometry', 'formatted_address', 'place_id'],
+        };
+        const service = new google.maps.places.PlacesService(map);
+        service.findPlaceFromQuery(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                setPlaces(results);
+                const bounds = new google.maps.LatLngBounds();
+                 results.forEach(place => {
+                    if (place.geometry?.location) {
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+
+                toast({
+                    title: `Found ${result.placeType}s`,
+                    description: 'Showing results on the map.'
+                })
+            } else {
+                 toast({ variant: 'destructive', title: 'Not Found', description: `Could not find any ${result.placeType}s.` });
+            }
+        });
+        
+    } catch (error) {
+        console.error("AI find place error:", error);
+        toast({ variant: 'destructive', title: 'AI Error', description: 'Could not understand the place.' });
+    } finally {
+        setAiLoading(false);
+    }
+  };
+
   const clearRoute = () => {
     setDirections(null);
     setDistance('');
@@ -118,8 +173,10 @@ export function MapNavigator({ origin, destination, directions, setOrigin, setDe
     if (originRef.current) originRef.current.value = '';
     if (destinationRef.current) destinationRef.current.value = '';
     if(aiQueryRef.current) aiQueryRef.current.value = '';
+    if(findPlaceQueryRef.current) findPlaceQueryRef.current.value = '';
     setOrigin(null);
     setDestination(null);
+    setPlaces(null);
   };
 
   const onPlaceChanged = (setter: (location: MapLocation | null) => void, autocomplete: google.maps.places.Autocomplete | null, inputRef: React.RefObject<HTMLInputElement>) => {
@@ -149,15 +206,36 @@ export function MapNavigator({ origin, destination, directions, setOrigin, setDe
         <Card glassy className="w-full">
             <CardHeader>
                 <CardTitle className="font-headline flex items-center"><MapPin className="mr-2" /> CRS Navigator</CardTitle>
-                <CardDescription>Find the best route anywhere in Cross River State.</CardDescription>
+                <CardDescription>Find routes and places in Cross River State.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Tabs defaultValue="drive" className="w-full">
+                <Tabs defaultValue="find" className="w-full">
                     <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="drive"><Car className="mr-2"/>Drive</TabsTrigger>
+                        <TabsTrigger value="find"><Bot className="mr-2"/>Find</TabsTrigger>
+                        <TabsTrigger value="drive"><Car className="mr-2"/>Route</TabsTrigger>
                         <TabsTrigger value="transit"><Bus className="mr-2"/>Transit</TabsTrigger>
-                        <TabsTrigger value="ai"><Bot className="mr-2"/>AI Nav</TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="find" className="space-y-4 pt-4">
+                        <div className="relative">
+                            <Bot className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input
+                            type="text"
+                            placeholder="e.g., find nearest hospital"
+                            ref={findPlaceQueryRef}
+                            className="pl-10"
+                            onKeyDown={(e) => e.key === 'Enter' && handleFindPlace()}
+                            />
+                            <Button size="icon" variant="ghost" onClick={startListening} disabled={isListening} className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
+                               {isListening ? <Loader2 className='animate-spin'/> : <Mic />}
+                            </Button>
+                        </div>
+                        <Button onClick={handleFindPlace} className="w-full" disabled={aiLoading}>
+                            {aiLoading && <Loader2 className="mr-2 animate-spin" />}
+                            Find Places <ArrowRight className="ml-2" />
+                        </Button>
+                    </TabsContent>
+                    
                     <TabsContent value="drive" className="space-y-4 pt-4">
                         <div className="relative">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -177,25 +255,6 @@ export function MapNavigator({ origin, destination, directions, setOrigin, setDe
                     </TabsContent>
                     <TabsContent value="transit" className="pt-4 text-center text-muted-foreground">
                         <p>Transit directions are coming soon!</p>
-                    </TabsContent>
-                    <TabsContent value="ai" className="space-y-4 pt-4">
-                        <div className="relative">
-                            <Bot className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input
-                            type="text"
-                            placeholder="e.g., Directions to Tinapa from Watt Market"
-                            ref={aiQueryRef}
-                            className="pl-10"
-                            onKeyDown={(e) => e.key === 'Enter' && handleAiNavigation()}
-                            />
-                            <Button size="icon" variant="ghost" onClick={startListening} disabled={isListening} className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                               {isListening ? <Loader2 className='animate-spin'/> : <Mic />}
-                            </Button>
-                        </div>
-                        <Button onClick={handleAiNavigation} className="w-full" disabled={aiLoading}>
-                            {aiLoading && <Loader2 className="mr-2 animate-spin" />}
-                            Find Route with AI <ArrowRight className="ml-2" />
-                        </Button>
                     </TabsContent>
                 </Tabs>
                 {(distance || duration || steps.length > 0) && (
