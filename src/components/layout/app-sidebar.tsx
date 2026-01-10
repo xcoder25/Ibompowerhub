@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -31,7 +30,6 @@ import {
   Trash2,
   Palmtree,
   Newspaper,
-  Wallet,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -66,7 +64,11 @@ const servicesNav = [
 ];
 
 const communityNav = [
+  { href: '/news', icon: Newspaper, label: 'News' },
+  { href: '/events', icon: Calendar, label: 'Events' },
   { href: '/forums', icon: MessageSquare, label: 'Forums' },
+  { href: '/voting', icon: Vote, label: 'Voting' },
+  { href: '/tourism', icon: Palmtree, label: 'Tourism' },
 ];
 
 const reportNav = [

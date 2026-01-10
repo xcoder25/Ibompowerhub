@@ -1,4 +1,3 @@
-
 'use client';
 import {
   Dialog,
@@ -30,7 +29,6 @@ import {
     Trash2,
     Palmtree,
     Newspaper,
-    Wallet,
   } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -40,7 +38,6 @@ const allNavItems = [
     { href: '/dashboard', icon: Home, label: 'Home' },
     { href: '/map', icon: Map, label: 'Map View' },
     { href: '/alerts', icon: Bell, label: 'Alerts' },
-    { href: '/transactions', icon: Wallet, label: 'Wallet' },
     { href: '/services', icon: GanttChartSquare, label: 'All Services' },
     { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
     { href: '/skills', icon: Wrench, label: 'SkillsHub' },

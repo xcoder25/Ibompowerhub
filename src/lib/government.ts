@@ -1,4 +1,3 @@
-
 export const governmentOffices = [
     { 
       id: 1, 
@@ -29,11 +28,5 @@ export const governmentOffices = [
       name: 'Cross River State Internal Revenue Service (CRIRS)',
       address: '100 Marian Road, Calabar',
       phone: '09098765432',
-    },
-    {
-      id: 6,
-      name: 'Calabar Urban Development Authority (CUDA)',
-      address: 'CUDA Complex, MCC Road, Calabar',
-      phone: '07033445566',
     }
 ];

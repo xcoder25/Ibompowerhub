@@ -207,79 +207,79 @@
     {
       "id": "job-retail",
       "description": "A friendly cashier smiling at a checkout counter.",
-      "imageUrl": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "retail store"
     },
     {
       "id": "job-construction",
       "description": "Construction workers on a building site.",
-      "imageUrl": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "construction site"
     },
     {
       "id": "property-apartment",
       "description": "A modern apartment building exterior.",
-      "imageUrl": "https://images.unsplash.com/photo-1570129477492-45c003edd2e0?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1570129477492-45c003edd2e0?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "apartment building"
     },
     {
       "id": "property-house",
       "description": "A beautiful suburban house with a green lawn.",
-      "imageUrl": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "suburban house"
     },
     {
       "id": "property-land",
       "description": "A vast expanse of open land for sale.",
-      "imageUrl": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "open land"
     },
     {
       "id": "education-school",
       "description": "A classic brick school building.",
-      "imageUrl": "https://images.unsplash.com/photo-1580582932707-520aed93a94d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1580582932707-520aed93a94d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "school building"
     },
     {
       "id": "education-university",
       "description": "A grand university campus building.",
-      "imageUrl": "https://images.unsplash.com/photo-1498092651296-641e88c3b057?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1498092651296-641e88c3b057?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "university campus"
     },
     {
       "id": "education-library",
       "description": "A public library with shelves full of books.",
-      "imageUrl": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "library books"
     },
     {
       "id": "forum-discussion",
       "description": "People having a lively discussion.",
-      "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "group discussion"
     },
     {
       "id": "forum-townhall",
       "description": "A community town hall meeting.",
-      "imageUrl": "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "community meeting"
     },
     {
       "id": "safety-alert",
       "description": "An emergency alert notification on a phone.",
-      "imageUrl": "https://images.unsplash.com/photo-1618042164217-64c7a6500586?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1618042164217-64c7a6500586?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "emergency alert"
     },
     {
       "id": "safety-emergency-services",
       "description": "An ambulance with its lights on.",
-      "imageUrl": "https://images.unsplash.com/photo-1580920469499-4a4781c53b24?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1580920469499-4a4781c53b24?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "ambulance emergency"
     },
     {
       "id": "waste-management-hero",
       "description": "A clean city street with recycling bins.",
-      "imageUrl": "https://images.unsplash.com/photo-1582456784142-d21262f0c13b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1582456784142-d21262f0c13b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "clean city"
     },
     {
@@ -291,56 +291,44 @@
     {
       "id": "waste-collector-2",
       "description": "A worker in uniform collecting trash.",
-      "imageUrl": "https://images.unsplash.com/photo-1583501037373-b31525a72037?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1583501037373-b31525a72037?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "waste worker"
     },
     {
       "id": "user-location-pin",
       "description": "A map pin indicating the user's current location.",
-      "imageUrl": "https://images.unsplash.com/photo-1614949523271-9f93504856d3?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1614949523271-9f93504856d3?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "location pin"
     },
     {
       "id": "tourism-obudu",
       "description": "Breathtaking view of Obudu Mountain Resort.",
-      "imageUrl": "https://images.unsplash.com/photo-1600242698246-8d8243164a3d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1600242698246-8d8243164a3d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "mountain resort"
     },
     {
       "id": "tourism-tinapa",
       "description": "The impressive entrance of Tinapa Business Resort.",
-      "imageUrl": "https://images.unsplash.com/photo-1581456495146-65a71b2c8e52?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1581456495146-65a71b2c8e52?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "modern architecture"
     },
     {
       "id": "tourism-kwa",
       "description": "The beautiful and serene Kwa Waterfalls.",
-      "imageUrl": "https://images.unsplash.com/photo-1501769752-991de9e62ee2?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1501769752-991de9e62ee2?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "serene waterfall"
     },
     {
       "id": "tourism-carnival",
       "description": "A vibrant and colorful Calabar Carnival parade.",
-      "imageUrl": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "carnival parade"
     },
     {
       "id": "news-road",
       "description": "A newly constructed road.",
-      "imageUrl": "https://images.unsplash.com/photo-1517581177682-a085bb7ffb14?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1517581177682-a085bb7ffb14?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "new road"
-    },
-    {
-      "id": "government-building",
-      "description": "A grand government building with pillars.",
-      "imageUrl": "https://images.unsplash.com/photo-1563837589943-e125865239a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxnb3Zlcm5tZW50JTIwYnVpbGRpbmd8ZW58MHx8fHwxNzY1MzUwMTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "government building"
-    },
-    {
-      "id": "cuda-logo",
-      "description": "The logo for the Calabar Urban Development Authority.",
-      "imageUrl": "https://images.unsplash.com/photo-1563837589943-e125865239a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxnb3Zlcm5tZW50JTIwYnVpbGRpbmd8ZW58MHx8fHwxNzY1MzUwMTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "government building"
     }
   ]
 }

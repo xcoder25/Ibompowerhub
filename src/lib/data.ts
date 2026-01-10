@@ -13,9 +13,9 @@ export const services = [
 ];
 
 export const artisans = [
-  { id: 1, name: 'John Doe', skill: 'Electrician', rating: 4.8, distance: '1.5km', imageId: 'artisan-1', hourlyRate: '₦5000', availability: 'Available', coords: { latitude: 4.975, longitude: 8.333 } },
-  { id: 2, name: 'Jane Smith', skill: 'Plumber', rating: 4.5, distance: '2.3km', imageId: 'artisan-2', hourlyRate: '₦4500', availability: 'Busy', coords: { latitude: 4.98, longitude: 8.35 } },
-  { id: 3, name: 'Samuel Green', skill: 'Carpenter', rating: 4.9, distance: '0.8km', imageId: 'artisan-3', hourlyRate: '₦6000', availability: 'Available', coords: { latitude: 4.96, longitude: 8.32 } },
+  { id: 1, name: 'John Doe', skill: 'Electrician', rating: 4.8, distance: '1.5km', imageId: 'artisan-1', hourlyRate: '₦5000', availability: 'Available' },
+  { id: 2, name: 'Jane Smith', skill: 'Plumber', rating: 4.5, distance: '2.3km', imageId: 'artisan-2', hourlyRate: '₦4500', availability: 'Busy' },
+  { id: 3, name: 'Samuel Green', skill: 'Carpenter', rating: 4.9, distance: '0.8km', imageId: 'artisan-3', hourlyRate: '₦6000', availability: 'Available' },
 ];
 
 export { sellers, sellerCategories };
@@ -30,13 +30,8 @@ export const alerts = [
       time: "2h ago",
       description: "Power just went out around the MTN office. Anyone else experiencing this?",
       upvotes: 12,
-      commentsCount: 3,
+      comments: 3,
       user: { name: "David U.", avatarId: "user-avatar-1" },
-      status: 'Verified',
-      comments: [
-        { id: 1, user: { name: "Sarah B.", avatarId: "user-avatar-2" }, text: "Yes, same here. It's been 30 minutes.", time: "1h ago" },
-        { id: 2, user: { name: "Esther H.", avatarId: "user-avatar-1" }, text: "I've reported it to the power company.", time: "30m ago" },
-      ]
     },
     {
       id: 2,
@@ -47,10 +42,8 @@ export const alerts = [
       time: "5h ago",
       description: "Heavy flooding on the highway, please be careful if you're driving.",
       upvotes: 25,
-      commentsCount: 8,
+      comments: 8,
       user: { name: "Sarah B.", avatarId: "user-avatar-2" },
-      status: 'New',
-      comments: []
     },
     {
         id: 3,
@@ -61,10 +54,8 @@ export const alerts = [
         time: "1 day ago",
         description: "The bins near the main entrance are overflowing. Requesting pickup.",
         upvotes: 8,
-        commentsCount: 1,
+        comments: 1,
         user: { name: "Mike E.", avatarId: "user-avatar-3" },
-        status: 'Resolved',
-        comments: []
       },
   ];
 
@@ -194,10 +185,3 @@ export const alerts = [
     'housing estate-akpabuyo': '₦500',
     'airport-tinapa': '₦400',
   };
-
-  export const transactions = [
-    { id: '1', type: 'credit', amount: 50000, description: 'Sale of Garri (5 bags)', date: '2024-10-28' },
-    { id: '2', type: 'debit', amount: 5000, description: 'Waste Bill Payment (Sept)', date: '2024-10-27' },
-    { id: '3', type: 'debit', amount: 10000, description: 'Electrician Service (J. Doe)', date: '2024-10-25' },
-    { id: '4', type: 'credit', amount: 25000, description: 'Sale of Ugu & Waterleaf', date: '2024-10-24' },
-  ]
