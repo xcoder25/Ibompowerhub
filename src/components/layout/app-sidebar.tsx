@@ -56,7 +56,7 @@ const mainNav = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/map', icon: Map, label: 'Map View' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
-  { href: '/transactions', icon: Wallet, label: 'Transactions' },
+  { href: '/transactions', icon: Wallet, label: 'Wallet' },
 ];
 
 const servicesNav = [
