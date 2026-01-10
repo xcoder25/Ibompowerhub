@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from 'lucide-react';
 import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain, Briefcase, Building2, Vote, Phone, Palmtree, Newspaper } from 'lucide-react';
 import { sellers, sellerCategories } from './market';
@@ -193,3 +194,10 @@ export const alerts = [
     'housing estate-akpabuyo': '₦500',
     'airport-tinapa': '₦400',
   };
+
+  export const transactions = [
+    { id: '1', type: 'credit', amount: 50000, description: 'Sale of Garri (5 bags)', date: '2024-10-28' },
+    { id: '2', type: 'debit', amount: 5000, description: 'Waste Bill Payment (Sept)', date: '2024-10-27' },
+    { id: '3', type: 'debit', amount: 10000, description: 'Electrician Service (J. Doe)', date: '2024-10-25' },
+    { id: '4', type: 'credit', amount: 25000, description: 'Sale of Ugu & Waterleaf', date: '2024-10-24' },
+  ]

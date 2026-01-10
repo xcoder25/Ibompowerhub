@@ -65,6 +65,20 @@
             }
         },
         "required": ["text", "userId", "timestamp"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Represents a financial transaction in a user's wallet.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["credit", "debit"] },
+        "amount": { "type": "number" },
+        "description": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "type", "amount", "description", "date"]
     }
   },
   "auth": {
@@ -86,6 +100,10 @@
     "/reports/{reportId}/comments/{commentId}": {
         "schema": { "$ref": "#/entities/Comment"},
         "description": "Stores comments for a specific report."
+    },
+    "/transactions/{transactionId}": {
+        "schema": { "$ref": "#/entities/Transaction" },
+        "description": "Stores user transaction history."
     }
   }
 }
