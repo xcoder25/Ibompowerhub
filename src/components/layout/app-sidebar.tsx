@@ -56,7 +56,6 @@ const mainNav = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/map', icon: Map, label: 'Map View' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
-  { href: '/transactions', icon: Wallet, label: 'Wallet' },
 ];
 
 const servicesNav = [
@@ -64,16 +63,10 @@ const servicesNav = [
   { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
   { href: '/transport', icon: Bus, label: 'Transport Guide' },
-  { href: '/directory', icon: Building2, label: 'Directory' },
 ];
 
 const communityNav = [
-  { href: '/news', icon: Newspaper, label: 'News' },
-  { href: '/events', icon: Calendar, label: 'Events' },
   { href: '/forums', icon: MessageSquare, label: 'Forums' },
-  { href: '/voting', icon: Vote, label: 'Voting' },
-  { href: '/jobs', icon: Briefcase, label: 'Jobs' },
-  
 ];
 
 const reportNav = [
@@ -82,14 +75,6 @@ const reportNav = [
     { href: '/waste', icon: Trash2, label: 'Waste' },
     { href: '/water', icon: Droplets, label: 'Water' },
     { href: '/power', icon: Power, label: 'Power' },
-]
-
-const publicServicesNav = [
-    { href: '/government', icon: Building, label: 'Government' },
-    { href: '/health', icon: HeartPulse, label: 'Health' },
-    { href: '/education', icon: BookOpen, label: 'Education' },
-    { href: '/property', icon: Building2, label: 'Property' },
-    { href: '/tourism', icon: Palmtree, label: 'Tourism' },
 ]
 
 export function AppSidebar() {
@@ -153,8 +138,6 @@ export function AppSidebar() {
           {renderNavGroup(communityNav, 'Community')}
            <SidebarSeparator />
           {renderNavGroup(reportNav, 'Reports')}
-           <SidebarSeparator />
-          {renderNavGroup(publicServicesNav, 'Public Services')}
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>
