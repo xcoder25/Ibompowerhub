@@ -4,20 +4,20 @@
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ThumbsUp, MessageSquare, LucideIcon } from 'lucide-react';
+import { ThumbsUp, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, addDoc, doc, updateDoc, increment, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, increment, serverTimestamp, Timestamp, query, orderBy } from 'firebase/firestore';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Alert = {
+  id: string;
   type: string;
-  Icon: LucideIcon;
-  iconColor: string;
   location: string;
   time: Timestamp;
   description: string;
@@ -32,6 +32,7 @@ type Alert = {
 };
 
 type Comment = {
+    id: string;
     text: string;
     userId: string;
     timestamp: Timestamp;
@@ -51,13 +52,15 @@ const statusColors: { [key: string]: string } = {
 export default function AlertsPage() {
   const mapPreviewImage = PlaceHolderImages.find((img) => img.id === 'map-preview');
   const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
-  const [newComment, setNewComment] = useState('');
   
   const firestore = useFirestore();
   const { user } = useUser();
 
-  const alertsRef = useMemoFirebase(() => firestore ? collection(firestore, 'reports') : null, [firestore]);
-  const { data: alerts, isLoading: alertsLoading } = useCollection<Alert>(alertsRef);
+  const alertsQuery = useMemoFirebase(() => 
+    firestore ? query(collection(firestore, 'reports'), orderBy('time', 'desc')) : null, 
+    [firestore]
+  );
+  const { data: alerts, isLoading: alertsLoading } = useCollection<Alert>(alertsQuery);
   
   const handleUpvote = async (alertId: string) => {
     if (!user || !firestore) return;
@@ -67,42 +70,56 @@ export default function AlertsPage() {
     });
   };
 
-  const handleAddComment = async (alertId: string) => {
-    if (!user || !newComment.trim() || !firestore) return;
-
-    const commentsRef = collection(firestore, 'reports', alertId, 'comments');
-    await addDoc(commentsRef, {
-        text: newComment,
-        userId: user.uid,
-        timestamp: serverTimestamp(),
-        user: {
-            name: user.displayName,
-            avatarUrl: user.photoURL
-        }
-    });
-
-    const alertRef = doc(firestore, 'reports', alertId);
-    await updateDoc(alertRef, {
-      commentsCount: increment(1)
-    });
-
-    setNewComment('');
-  }
-
   const toggleComments = (alertId: string) => {
     setExpandedComments((prev) => ({ ...prev, [alertId]: !prev[alertId] }));
   };
   
   function CommentSection({ alertId }: { alertId: string}) {
-      const commentsRef = useMemoFirebase(() => firestore ? collection(firestore, 'reports', alertId, 'comments') : null, [firestore, alertId]);
-      const { data: comments, isLoading: commentsLoading } = useCollection<Comment>(commentsRef);
+      const [newComment, setNewComment] = useState('');
+      const firestore = useFirestore();
       const { user } = useUser();
+      
+      const commentsQuery = useMemoFirebase(() => 
+        firestore ? query(collection(firestore, 'reports', alertId, 'comments'), orderBy('timestamp', 'asc')) : null, 
+        [firestore, alertId]
+      );
+      const { data: comments, isLoading: commentsLoading } = useCollection<Comment>(commentsQuery);
+
+      const handleAddComment = async () => {
+        if (!user || !newComment.trim() || !firestore) return;
+
+        const commentsRef = collection(firestore, 'reports', alertId, 'comments');
+        await addDoc(commentsRef, {
+            text: newComment,
+            userId: user.uid,
+            timestamp: serverTimestamp(),
+            user: {
+                name: user.displayName,
+                avatarUrl: user.photoURL
+            }
+        });
+
+        const alertRef = doc(firestore, 'reports', alertId);
+        await updateDoc(alertRef, {
+        commentsCount: increment(1)
+        });
+
+        setNewComment('');
+    }
 
       return (
         <div className="p-4 border-t bg-muted/50">
             <h4 className='text-sm font-semibold mb-3'>Comments</h4>
             <div className='space-y-4'>
-                {commentsLoading && <p>Loading comments...</p>}
+                {commentsLoading && Array.from({length: 2}).map((_, i) => (
+                    <div key={i} className='flex items-start gap-3'>
+                        <Skeleton className='size-8 rounded-full'/>
+                        <div className='space-y-2'>
+                            <Skeleton className='h-4 w-24'/>
+                            <Skeleton className='h-4 w-48'/>
+                        </div>
+                    </div>
+                ))}
                 {comments?.map(comment => {
                       return (
                         <div key={comment.id} className='flex items-start gap-3'>
@@ -131,9 +148,10 @@ export default function AlertsPage() {
                             className='bg-background flex-1'
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
                         />
                     </div>
-                    <Button size='sm' className='w-full sm:w-auto' onClick={() => handleAddComment(alertId)}>Post</Button>
+                    <Button size='sm' className='w-full sm:w-auto' onClick={handleAddComment}>Post</Button>
                 </div>
             </div>
         </div>
@@ -150,14 +168,34 @@ export default function AlertsPage() {
       </div>
 
       <div className="max-w-2xl mx-auto space-y-6">
-        {alertsLoading && <p>Loading alerts...</p>}
+        {alertsLoading && Array.from({length: 3}).map((_, i) => (
+            <Card key={i} glassy>
+                 <CardHeader className="p-4">
+                     <div className="flex items-start gap-4">
+                        <Skeleton className='size-12 rounded-full'/>
+                        <div className='flex-1 space-y-2'>
+                            <Skeleton className='h-5 w-32'/>
+                            <Skeleton className='h-4 w-24'/>
+                        </div>
+                     </div>
+                </CardHeader>
+                <CardContent className='px-4 space-y-3'>
+                    <Skeleton className='h-5 w-4/5' />
+                    <Skeleton className='h-36 w-full rounded-lg' />
+                </CardContent>
+                <CardFooter className='p-4 flex justify-end gap-2 border-t'>
+                    <Skeleton className='h-9 w-20' />
+                    <Skeleton className='h-9 w-20' />
+                </CardFooter>
+            </Card>
+        ))}
         {alerts?.map((alert) => {
           const isExpanded = expandedComments[alert.id];
           return (
             <Card key={alert.id} glassy className="overflow-hidden">
               <CardHeader className="p-4">
                 <div className="flex items-start gap-4">
-                    <Avatar>
+                    <Avatar className='size-12'>
                       <AvatarImage src={alert.user?.avatarUrl} alt={alert.user?.name} />
                       <AvatarFallback>{alert.user?.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
@@ -173,8 +211,7 @@ export default function AlertsPage() {
               <CardContent className="px-4 space-y-3">
                  <div className='flex items-center gap-2 flex-wrap'>
                     <Badge variant="outline" className='border-2'>
-                        {/* <alert.Icon className={cn("mr-2 h-4 w-4", alert.iconColor)} /> */}
-                        {alert.type}
+                        {alert.category}
                     </Badge>
                     <Badge className={cn('border', statusColors[alert.status])}>{alert.status}</Badge>
                  </div>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -13,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, Timestamp } from 'firebase/firestore';
+import { collection, Timestamp, query, orderBy } from 'firebase/firestore';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -43,8 +44,8 @@ const statusColors: { [key: string]: string } = {
 
 export default function CudaDashboardPage() {
   const firestore = useFirestore();
-  const reportsRef = useMemoFirebase(() => (firestore ? collection(firestore, 'reports') : null), [firestore]);
-  const { data: reports, isLoading } = useCollection<Report>(reportsRef);
+  const reportsQuery = useMemoFirebase(() => (firestore ? query(collection(firestore, 'reports'), orderBy('time', 'desc')) : null), [firestore]);
+  const { data: reports, isLoading } = useCollection<Report>(reportsQuery);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -52,7 +53,9 @@ export default function CudaDashboardPage() {
   const filteredReports = reports?.filter(report => {
       const matchesSearch = report.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             report.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            report.location.toLowerCase().includes(searchTerm.toLowerCase());
+                            report.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            report.user.name.toLowerCase().includes(searchTerm.toLowerCase());
+
       const matchesStatus = statusFilter === 'All' || report.status === statusFilter;
       return matchesSearch && matchesStatus;
   }) || [];

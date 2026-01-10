@@ -335,6 +335,12 @@
       "description": "A grand government building with pillars.",
       "imageUrl": "https://images.unsplash.com/photo-1563837589943-e125865239a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxnb3Zlcm5tZW50JTIwYnVpbGRpbmd8ZW58MHx8fHwxNzY1MzUwMTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "government building"
+    },
+    {
+      "id": "cuda-logo",
+      "description": "The logo for the Calabar Urban Development Authority.",
+      "imageUrl": "https://images.unsplash.com/photo-1563837589943-e125865239a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxnb3Zlcm5tZW50JTIwYnVpbGRpbmd8ZW58MHx8fHwxNzY1MzUwMTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "government building"
     }
   ]
 }
