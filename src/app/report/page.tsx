@@ -1,154 +1,79 @@
+"use client";
 
-'use client';
-
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Paperclip, Loader2 } from 'lucide-react';
-import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useUser, useFirestore } from '@/firebase';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
-import * as z from 'zod';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
-const reportSchema = z.object({
-    category: z.string({ required_error: 'Please select a category.' }),
-    description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
-});
-
-export default function ReportIssuePage() {
-    const { toast } = useToast();
-    const { user } = useUser();
-    const firestore = useFirestore();
-    const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
-
-    const form = useForm<z.infer<typeof reportSchema>>({
-        resolver: zodResolver(reportSchema),
-    });
-
-    const onSubmit = async (data: z.infer<typeof reportSchema>) => {
-        if (!user || !firestore) {
-            toast({ variant: 'destructive', title: 'Authentication Error', description: 'You must be logged in to report an issue.' });
-            return;
-        }
-
-        setIsLoading(true);
-
-        try {
-            const reportsRef = collection(firestore, 'reports');
-            await addDoc(reportsRef, {
-                userId: user.uid,
-                category: data.category,
-                description: data.description,
-                location: "Calabar, CRS", // This would be dynamic in a real app
-                status: 'New',
-                time: serverTimestamp(),
-                upvotes: 0,
-                commentsCount: 0,
-                user: {
-                    name: user.displayName,
-                    avatarUrl: user.photoURL
-                }
-            });
-
-            toast({
-                title: "Report Submitted",
-                description: "Thank you for helping improve our community!",
-            });
-            router.push('/alerts');
-        } catch (error) {
-            console.error("Error submitting report: ", error);
-            toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit report. Please try again.' });
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
+export default function ReportPage() {
   return (
-    <div className="flex-1 p-4 sm:p-6 md:p-8">
-        <Card className="max-w-2xl mx-auto" glassy>
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">Report a New Issue</CardTitle>
-                <CardDescription>
-                    Help us improve our community by reporting issues. Your location will be automatically filled if permissions are granted.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-                        <FormField
-                            control={form.control}
-                            name="category"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <Label>Category</Label>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value} required>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a category" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="Power">Power Outage</SelectItem>
-                                            <SelectItem value="Flood">Flooding</SelectItem>
-                                            <SelectItem value="Waste">Waste Management</SelectItem>
-                                            <SelectItem value="Transport">Transport Issue</SelectItem>
-                                            <SelectItem value="Other">Other</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <Label>Description</Label>
-                                    <FormControl>
-                                        <Textarea
-                                            placeholder="Provide a detailed description of the issue"
-                                            className="min-h-28"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                       
-                        <div className="grid gap-2">
-                            <Label htmlFor="photo">Attach a Photo (Optional)</Label>
-                            <Button asChild variant="outline" className='w-full cursor-pointer'>
-                                <label htmlFor="photo-upload">
-                                    <Paperclip className="mr-2 h-4 w-4" /> Attach Photo
-                                </label>
-                            </Button>
-                            <Input id="photo-upload" name="photo" type="file" className="sr-only" />
-                        </div>
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Submit Report
-                        </Button>
-                    </form>
-                </Form>
-            </CardContent>
-        </Card>
+    <div className="flex justify-center items-center h-full">
+      <Card className="w-full max-w-lg">
+        <CardHeader>
+          <CardTitle>Submit a Report</CardTitle>
+          <CardDescription>
+            Found an issue? Let us know and we'll get right on it.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form>
+            <div className="grid w-full items-center gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="framework">Ministry/Department/Agency</Label>
+                <Select>
+                  <SelectTrigger id="framework">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="next">
+                      Ministry of Works and Housing
+                    </SelectItem>
+                    <SelectItem value="sveltekit">
+                      Ministry of Health
+                    </SelectItem>
+                    <SelectItem value="astro">
+                      Ministry of Education
+                    </SelectItem>
+                    <SelectItem value="nuxt">
+                      Ministry of Transport
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="name">Title</Label>
+                <Input id="name" placeholder="Enter a title for your report" />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Describe the issue in detail"
+                />
+              </div>
+            </div>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline">Cancel</Button>
+          <Button>Submit</Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
