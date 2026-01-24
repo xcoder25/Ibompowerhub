@@ -2,10 +2,12 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "./app-sidebar";
-import { AppMobileNav } from "./app-mobile-nav";
-import { AppHeader } from "./app-header";
+
+const AppSidebar = dynamic(() => import('./app-sidebar').then(mod => mod.AppSidebar));
+const AppMobileNav = dynamic(() => import('./app-mobile-nav').then(mod => mod.AppMobileNav));
+const AppHeader = dynamic(() => import('./app-header').then(mod => mod.AppHeader));
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState, useRef } from 'react';
@@ -17,23 +19,23 @@ import { useToast } from '@/hooks/use-toast';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const [isClient, setIsClient] = useState(false);
+    const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  
-  if (!isClient) {
-    return <SplashScreen />;
-  }
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
-  // Auth logic is now in a separate component that is only rendered on the client
-  return (
-    <>
-        <AuthHandler>{children}</AuthHandler>
-        <Toaster />
-    </>
-  );
+    if (!isClient) {
+        return <SplashScreen />;
+    }
+
+    // Auth logic is now in a separate component that is only rendered on the client
+    return (
+        <>
+            <AuthHandler>{children}</AuthHandler>
+            <Toaster />
+        </>
+    );
 }
 
 
@@ -53,37 +55,37 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
         if (isUserLoading || !firestore) return;
 
         if (user) {
-        const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
+            const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
 
-        const userDocRef = doc(firestore, 'users', user.uid);
-        getDoc(userDocRef).then(docSnap => {
-            if (!docSnap.exists()) {
-            setDoc(userDocRef, {
-                id: user.uid,
-                name: user.displayName,
-                email: user.email,
-                profileImageUrl: user.photoURL,
-                role: 'Resident',
-                createdAt: serverTimestamp()
-            }, { merge: true });
+            const userDocRef = doc(firestore, 'users', user.uid);
+            getDoc(userDocRef).then(docSnap => {
+                if (!docSnap.exists()) {
+                    setDoc(userDocRef, {
+                        id: user.uid,
+                        name: user.displayName,
+                        email: user.email,
+                        profileImageUrl: user.photoURL,
+                        role: 'Resident',
+                        createdAt: serverTimestamp()
+                    }, { merge: true });
+                }
+            });
+
+            if (authRoutes.includes(pathname)) {
+                if (!welcomeToastShown.current) {
+                    toast({
+                        title: isNewUser ? 'Account Created!' : 'Login Successful!',
+                        description: `Welcome, ${user.displayName || 'User'}!`,
+                    });
+                    welcomeToastShown.current = true;
+                }
+                router.push('/dashboard');
             }
-        });
-        
-        if (authRoutes.includes(pathname)) {
-            if (!welcomeToastShown.current) {
-                toast({
-                title: isNewUser ? 'Account Created!' : 'Login Successful!',
-                description: `Welcome, ${user.displayName || 'User'}!`,
-                });
-                welcomeToastShown.current = true;
-            }
-            router.push('/dashboard');
-        }
         } else {
-        if (!authRoutes.includes(pathname) && pathname !== '/') {
-            router.push('/auth/login');
-        }
-        welcomeToastShown.current = false;
+            if (!authRoutes.includes(pathname) && pathname !== '/') {
+                router.push('/auth/login');
+            }
+            welcomeToastShown.current = false;
         }
     }, [user, isUserLoading, pathname, router, firestore, toast]);
 
@@ -100,14 +102,14 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
             </main>
         );
     }
-    
+
     if (!user) {
         return <SplashScreen />;
     }
 
     const isMapPage = pathname === '/map';
     const showNav = !noNavRoutes.includes(pathname) && !authRoutes.includes(pathname);
-    
+
     if (!showNav) {
         return (
             <main className="flex-1 flex flex-col">
@@ -135,8 +137,8 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
     );
 }
 
-    
 
-    
 
-    
+
+
+
