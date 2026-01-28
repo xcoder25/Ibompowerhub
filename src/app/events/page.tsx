@@ -23,7 +23,7 @@ export default function EventsPage() {
       <div className="mb-8">
         <h1 className="font-headline text-3xl font-bold tracking-tight">Community Events</h1>
         <p className="text-muted-foreground">
-          Discover what's happening in your local area.
+          Discover what&apos;s happening in your local area.
         </p>
       </div>
 
@@ -49,7 +49,7 @@ export default function EventsPage() {
                   <Calendar className="mr-2 h-4 w-4" />
                   <span>{event.date}</span>
                 </CardDescription>
-                 <CardDescription className="flex items-center">
+                <CardDescription className="flex items-center">
                   <MapPin className="mr-2 h-4 w-4" />
                   <span>{event.location}</span>
                 </CardDescription>
@@ -58,12 +58,12 @@ export default function EventsPage() {
                 <p className="text-sm text-muted-foreground">{event.description}</p>
               </CardContent>
               <CardFooter>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full"
                   onClick={() => handleViewDetails(event.title)}
                 >
-                    View Details
+                  View Details
                 </Button>
               </CardFooter>
             </Card>

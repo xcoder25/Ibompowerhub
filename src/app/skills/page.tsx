@@ -35,7 +35,7 @@ export default function SkillsPage() {
       sortArtisansByDistance({
         userLocation: { latitude: location.latitude, longitude: location.longitude },
         // Pass a version of initialArtisans that includes the coords property
-        artisans: initialArtisans.map(a => ({...a, coords: a.coords || {latitude: 0, longitude: 0}})),
+        artisans: initialArtisans.map(a => ({ ...a, coords: { latitude: 0, longitude: 0 } })),
       })
         .then((result) => {
           setArtisans(result.sortedArtisans);
@@ -56,12 +56,12 @@ export default function SkillsPage() {
           setIsLoading(false);
         });
     } else if (geoError) {
-        toast({
-            variant: 'destructive',
-            title: 'Location Error',
-            description: geoError,
-        });
-        setIsLoading(false);
+      toast({
+        variant: 'destructive',
+        title: 'Location Error',
+        description: geoError,
+      });
+      setIsLoading(false);
     }
   }, [location, geoError, toast]);
 
@@ -69,12 +69,12 @@ export default function SkillsPage() {
     <div className="flex-1 p-4 sm:p-6 md:p-8">
       <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-            <h1 className="font-headline text-3xl font-bold tracking-tight">SkillsHub</h1>
-            <p className="text-muted-foreground">
+          <h1 className="font-headline text-3xl font-bold tracking-tight">SkillsHub</h1>
+          <p className="text-muted-foreground">
             Find trusted and verified artisans for your home and office needs.
-            </p>
+          </p>
         </div>
-         <Button asChild>
+        <Button asChild>
           <Link href="/skills/register">
             <HardHat className="mr-2" />
             Become an Artisan
@@ -122,7 +122,7 @@ export default function SkillsPage() {
                       <h3 className="font-headline text-lg font-semibold">{artisan.name}</h3>
                       <div className='flex items-center flex-wrap gap-2 mt-1'>
                         <Badge>{artisan.skill}</Badge>
-                         <Badge
+                        <Badge
                           variant='outline'
                           className={cn(
                             artisan.availability === 'Available'
@@ -134,13 +134,13 @@ export default function SkillsPage() {
                         </Badge>
                       </div>
                     </div>
-                     <div className="mt-4 sm:mt-0 w-full sm:w-auto">
-                        <RequestQuoteDialog artisan={artisan}>
-                            <Button className="w-full sm:w-auto">
-                              <Phone className="mr-2 h-4 w-4" />
-                              Request Quote
-                            </Button>
-                        </RequestQuoteDialog>
+                    <div className="mt-4 sm:mt-0 w-full sm:w-auto">
+                      <RequestQuoteDialog artisan={artisan}>
+                        <Button className="w-full sm:w-auto">
+                          <Phone className="mr-2 h-4 w-4" />
+                          Request Quote
+                        </Button>
+                      </RequestQuoteDialog>
                     </div>
                   </div>
                   <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mt-3 pt-3 border-t sm:border-none sm:pt-0 sm:mt-2">
@@ -153,7 +153,7 @@ export default function SkillsPage() {
                       <span>{artisan.distance}</span>
                     </div>
                     <div>
-                        <span className="font-semibold text-foreground">{artisan.hourlyRate}/hr</span>
+                      <span className="font-semibold text-foreground">{artisan.hourlyRate}/hr</span>
                     </div>
                   </div>
                 </div>
