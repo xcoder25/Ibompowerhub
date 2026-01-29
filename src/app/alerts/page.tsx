@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 type Alert = {
   id: string;
   type: string;
+  category: string;
   location: string;
   time: Timestamp;
   description: string;
@@ -26,20 +27,20 @@ type Alert = {
   userId: string;
   status: string;
   user: {
-      name: string;
-      avatarUrl: string;
+    name: string;
+    avatarUrl: string;
   }
 };
 
 type Comment = {
-    id: string;
-    text: string;
-    userId: string;
-    timestamp: Timestamp;
-    user: {
-        name: string;
-        avatarUrl: string;
-    }
+  id: string;
+  text: string;
+  userId: string;
+  timestamp: Timestamp;
+  user: {
+    name: string;
+    avatarUrl: string;
+  }
 }
 
 const statusColors: { [key: string]: string } = {
@@ -52,16 +53,16 @@ const statusColors: { [key: string]: string } = {
 export default function AlertsPage() {
   const mapPreviewImage = PlaceHolderImages.find((img) => img.id === 'map-preview');
   const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
-  
+
   const firestore = useFirestore();
   const { user } = useUser();
 
-  const alertsQuery = useMemoFirebase(() => 
-    firestore ? query(collection(firestore, 'reports'), orderBy('time', 'desc')) : null, 
+  const alertsQuery = useMemoFirebase(() =>
+    firestore ? query(collection(firestore, 'reports'), orderBy('time', 'desc')) : null,
     [firestore]
   );
   const { data: alerts, isLoading: alertsLoading } = useCollection<Alert>(alertsQuery);
-  
+
   const handleUpvote = async (alertId: string) => {
     if (!user || !firestore) return;
     const alertRef = doc(firestore, 'reports', alertId);
@@ -73,89 +74,89 @@ export default function AlertsPage() {
   const toggleComments = (alertId: string) => {
     setExpandedComments((prev) => ({ ...prev, [alertId]: !prev[alertId] }));
   };
-  
-  function CommentSection({ alertId }: { alertId: string}) {
-      const [newComment, setNewComment] = useState('');
-      const firestore = useFirestore();
-      const { user } = useUser();
-      
-      const commentsQuery = useMemoFirebase(() => 
-        firestore ? query(collection(firestore, 'reports', alertId, 'comments'), orderBy('timestamp', 'asc')) : null, 
-        [firestore, alertId]
-      );
-      const { data: comments, isLoading: commentsLoading } = useCollection<Comment>(commentsQuery);
 
-      const handleAddComment = async () => {
-        if (!user || !newComment.trim() || !firestore) return;
+  function CommentSection({ alertId }: { alertId: string }) {
+    const [newComment, setNewComment] = useState('');
+    const firestore = useFirestore();
+    const { user } = useUser();
 
-        const commentsRef = collection(firestore, 'reports', alertId, 'comments');
-        await addDoc(commentsRef, {
-            text: newComment,
-            userId: user.uid,
-            timestamp: serverTimestamp(),
-            user: {
-                name: user.displayName,
-                avatarUrl: user.photoURL
-            }
-        });
+    const commentsQuery = useMemoFirebase(() =>
+      firestore ? query(collection(firestore, 'reports', alertId, 'comments'), orderBy('timestamp', 'asc')) : null,
+      [firestore, alertId]
+    );
+    const { data: comments, isLoading: commentsLoading } = useCollection<Comment>(commentsQuery);
 
-        const alertRef = doc(firestore, 'reports', alertId);
-        await updateDoc(alertRef, {
+    const handleAddComment = async () => {
+      if (!user || !newComment.trim() || !firestore) return;
+
+      const commentsRef = collection(firestore, 'reports', alertId, 'comments');
+      await addDoc(commentsRef, {
+        text: newComment,
+        userId: user.uid,
+        timestamp: serverTimestamp(),
+        user: {
+          name: user.displayName,
+          avatarUrl: user.photoURL
+        }
+      });
+
+      const alertRef = doc(firestore, 'reports', alertId);
+      await updateDoc(alertRef, {
         commentsCount: increment(1)
-        });
+      });
 
-        setNewComment('');
+      setNewComment('');
     }
 
-      return (
-        <div className="p-4 border-t bg-muted/50">
-            <h4 className='text-sm font-semibold mb-3'>Comments</h4>
-            <div className='space-y-4'>
-                {commentsLoading && Array.from({length: 2}).map((_, i) => (
-                    <div key={i} className='flex items-start gap-3'>
-                        <Skeleton className='size-8 rounded-full'/>
-                        <div className='space-y-2'>
-                            <Skeleton className='h-4 w-24'/>
-                            <Skeleton className='h-4 w-48'/>
-                        </div>
-                    </div>
-                ))}
-                {comments?.map(comment => {
-                      return (
-                        <div key={comment.id} className='flex items-start gap-3'>
-                            <Avatar className='size-8'>
-                                <AvatarImage src={comment.user.avatarUrl} alt={comment.user.name} />
-                                <AvatarFallback>{comment.user.name?.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <div className='flex items-center gap-2'>
-                                    <p className='font-semibold text-sm'>{comment.user.name}</p>
-                                    <p className='text-xs text-muted-foreground'>{comment.timestamp ? new Date(comment.timestamp?.toDate()).toLocaleTimeString() : ''}</p>
-                                </div>
-                                <p className='text-sm'>{comment.text}</p>
-                            </div>
-                        </div>
-                      )
-                })}
-                 <div className='flex flex-col sm:flex-row items-center gap-2 pt-2'>
-                    <div className='flex items-center gap-2 w-full'>
-                        <Avatar className='size-8'>
-                            <AvatarImage src={user?.photoURL ?? undefined} alt="You" />
-                            <AvatarFallback>Y</AvatarFallback>
-                        </Avatar>
-                        <Input 
-                            placeholder='Add a comment...' 
-                            className='bg-background flex-1'
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
-                        />
-                    </div>
-                    <Button size='sm' className='w-full sm:w-auto' onClick={handleAddComment}>Post</Button>
-                </div>
+    return (
+      <div className="p-4 border-t bg-muted/50">
+        <h4 className='text-sm font-semibold mb-3'>Comments</h4>
+        <div className='space-y-4'>
+          {commentsLoading && Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className='flex items-start gap-3'>
+              <Skeleton className='size-8 rounded-full' />
+              <div className='space-y-2'>
+                <Skeleton className='h-4 w-24' />
+                <Skeleton className='h-4 w-48' />
+              </div>
             </div>
+          ))}
+          {comments?.map(comment => {
+            return (
+              <div key={comment.id} className='flex items-start gap-3'>
+                <Avatar className='size-8'>
+                  <AvatarImage src={comment.user.avatarUrl} alt={comment.user.name} />
+                  <AvatarFallback>{comment.user.name?.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className='flex items-center gap-2'>
+                    <p className='font-semibold text-sm'>{comment.user.name}</p>
+                    <p className='text-xs text-muted-foreground'>{comment.timestamp ? new Date(comment.timestamp?.toDate()).toLocaleTimeString() : ''}</p>
+                  </div>
+                  <p className='text-sm'>{comment.text}</p>
+                </div>
+              </div>
+            )
+          })}
+          <div className='flex flex-col sm:flex-row items-center gap-2 pt-2'>
+            <div className='flex items-center gap-2 w-full'>
+              <Avatar className='size-8'>
+                <AvatarImage src={user?.photoURL ?? undefined} alt="You" />
+                <AvatarFallback>Y</AvatarFallback>
+              </Avatar>
+              <Input
+                placeholder='Add a comment...'
+                className='bg-background flex-1'
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
+              />
+            </div>
+            <Button size='sm' className='w-full sm:w-auto' onClick={handleAddComment}>Post</Button>
+          </div>
         </div>
-      )
+      </div>
+    )
   }
 
   return (
@@ -168,26 +169,26 @@ export default function AlertsPage() {
       </div>
 
       <div className="max-w-2xl mx-auto space-y-6">
-        {alertsLoading && Array.from({length: 3}).map((_, i) => (
-            <Card key={i} glassy>
-                 <CardHeader className="p-4">
-                     <div className="flex items-start gap-4">
-                        <Skeleton className='size-12 rounded-full'/>
-                        <div className='flex-1 space-y-2'>
-                            <Skeleton className='h-5 w-32'/>
-                            <Skeleton className='h-4 w-24'/>
-                        </div>
-                     </div>
-                </CardHeader>
-                <CardContent className='px-4 space-y-3'>
-                    <Skeleton className='h-5 w-4/5' />
-                    <Skeleton className='h-36 w-full rounded-lg' />
-                </CardContent>
-                <CardFooter className='p-4 flex justify-end gap-2 border-t'>
-                    <Skeleton className='h-9 w-20' />
-                    <Skeleton className='h-9 w-20' />
-                </CardFooter>
-            </Card>
+        {alertsLoading && Array.from({ length: 3 }).map((_, i) => (
+          <Card key={i} glassy>
+            <CardHeader className="p-4">
+              <div className="flex items-start gap-4">
+                <Skeleton className='size-12 rounded-full' />
+                <div className='flex-1 space-y-2'>
+                  <Skeleton className='h-5 w-32' />
+                  <Skeleton className='h-4 w-24' />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className='px-4 space-y-3'>
+              <Skeleton className='h-5 w-4/5' />
+              <Skeleton className='h-36 w-full rounded-lg' />
+            </CardContent>
+            <CardFooter className='p-4 flex justify-end gap-2 border-t'>
+              <Skeleton className='h-9 w-20' />
+              <Skeleton className='h-9 w-20' />
+            </CardFooter>
+          </Card>
         ))}
         {alerts?.map((alert) => {
           const isExpanded = expandedComments[alert.id];
@@ -195,10 +196,10 @@ export default function AlertsPage() {
             <Card key={alert.id} glassy className="overflow-hidden">
               <CardHeader className="p-4">
                 <div className="flex items-start gap-4">
-                    <Avatar className='size-12'>
-                      <AvatarImage src={alert.user?.avatarUrl} alt={alert.user?.name} />
-                      <AvatarFallback>{alert.user?.name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
+                  <Avatar className='size-12'>
+                    <AvatarImage src={alert.user?.avatarUrl} alt={alert.user?.name} />
+                    <AvatarFallback>{alert.user?.name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <p className="font-semibold">{alert.user?.name}</p>
@@ -209,12 +210,12 @@ export default function AlertsPage() {
                 </div>
               </CardHeader>
               <CardContent className="px-4 space-y-3">
-                 <div className='flex items-center gap-2 flex-wrap'>
-                    <Badge variant="outline" className='border-2'>
-                        {alert.category}
-                    </Badge>
-                    <Badge className={cn('border', statusColors[alert.status])}>{alert.status}</Badge>
-                 </div>
+                <div className='flex items-center gap-2 flex-wrap'>
+                  <Badge variant="outline" className='border-2'>
+                    {alert.category}
+                  </Badge>
+                  <Badge className={cn('border', statusColors[alert.status])}>{alert.status}</Badge>
+                </div>
                 <p>{alert.description}</p>
                 {mapPreviewImage && (
                   <div className="rounded-lg overflow-hidden border">

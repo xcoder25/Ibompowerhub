@@ -27,7 +27,7 @@ export default function ReportPage() {
         <CardHeader>
           <CardTitle>Submit a Report</CardTitle>
           <CardDescription>
-            Found an issue? Let us know and we'll get right on it.
+            Found an issue? Let us know and we&apos;ll get right on it.
           </CardDescription>
         </CardHeader>
         <CardContent>

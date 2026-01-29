@@ -13,7 +13,7 @@ export default function TourismPage() {
       <div className="mb-8">
         <h1 className="font-headline text-3xl font-bold tracking-tight">Tourism & Culture Hub</h1>
         <p className="text-muted-foreground">
-          Discover the unique attractions of Cross River State, "The People's Paradise".
+          Discover the unique attractions of Cross River State, &quot;The People&apos;s Paradise&quot;.
         </p>
       </div>
 
@@ -37,7 +37,7 @@ export default function TourismPage() {
                   </CardTitle>
                 </div>
               )}
-              
+
               <CardContent className="pt-6 flex-grow">
                 <p className="text-sm text-muted-foreground">{spot.description}</p>
               </CardContent>

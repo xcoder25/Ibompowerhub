@@ -3,6 +3,37 @@ import type { LucideIcon } from 'lucide-react';
 import { Leaf, Wrench, Droplets, Trash2, Bus, Shield, Star, ThumbsUp, MessageSquare, Power, CloudRain, Briefcase, Building2, Vote, Phone, Palmtree, Newspaper } from 'lucide-react';
 import { sellers, sellerCategories } from './market';
 
+export const transactions = [
+  {
+    id: 'tx-1',
+    description: 'Top up',
+    amount: 5000,
+    date: new Date('2024-01-20').toISOString(),
+    type: 'credit'
+  },
+  {
+    id: 'tx-2',
+    description: 'Electric Bill',
+    amount: 2500,
+    date: new Date('2024-01-18').toISOString(),
+    type: 'debit'
+  },
+  {
+    id: 'tx-3',
+    description: 'Waste Management Fee',
+    amount: 1000,
+    date: new Date('2024-01-15').toISOString(),
+    type: 'debit'
+  },
+  {
+    id: 'tx-4',
+    description: 'Salary Deposit',
+    amount: 150000,
+    date: new Date('2024-01-01').toISOString(),
+    type: 'credit'
+  }
+];
+
 export const services = [
   { id: 'agro-connect', name: 'AgroConnect', iconId: 'agro-connect', description: 'Fresh farm produce near you', href: '/market' },
   { id: 'skills-hub', name: 'SkillsHub', iconId: 'skills-hub', description: 'Find reliable artisans', href: '/skills' },

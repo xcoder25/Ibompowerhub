@@ -34,7 +34,7 @@ export default function PowerPage() {
               <Zap className="size-6" />
             </div>
             <div>
-              <CardTitle>Today's Runtime</CardTitle>
+              <CardTitle>Today&apos;s Runtime</CardTitle>
               <CardDescription>Total hours with power</CardDescription>
             </div>
           </CardHeader>

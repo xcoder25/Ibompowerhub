@@ -1,10 +1,10 @@
 
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 require('dotenv').config({ path: './.env' });
 
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  // output: 'export',
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
