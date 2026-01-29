@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { findProduct } from '@/ai/flows/agro-assistant-flow';
+import { useLoading } from '@/context/loading-context';
 
 export default function MarketPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,7 +20,7 @@ export default function MarketPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [sellers, setSellers] = useState(initialSellers);
   const { toast } = useToast();
-  const [loadingButton, setLoadingButton] = useState<string | null>(null);
+  const { showLoader, isLoading } = useLoading();
 
   const handleSearch = (term: string, category: string) => {
     let filtered = initialSellers.filter(seller => {
@@ -45,16 +46,11 @@ export default function MarketPage() {
   }
   
   const handleActionClick = (sellerId: number, action: 'whatsapp' | 'delivery') => {
-    const buttonId = `${sellerId}-${action}`;
-    setLoadingButton(buttonId);
-
-    setTimeout(() => {
-        setLoadingButton(null);
-        toast({
-            title: `${action === 'whatsapp' ? 'Opening WhatsApp...' : 'Processing Delivery...'}`,
-            description: `Connecting with ${sellers.find(s => s.id === sellerId)?.name}.`,
-        });
-    }, 3000);
+    showLoader(3000);
+    toast({
+        title: `${action === 'whatsapp' ? 'Opening WhatsApp...' : 'Processing Delivery...'}`,
+        description: `Connecting with ${sellers.find(s => s.id === sellerId)?.name}.`,
+    });
   };
 
   const handleAiSearch = async () => {
@@ -153,8 +149,6 @@ export default function MarketPage() {
       {!aiLoading && <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {sellers.map((seller) => {
           const image = PlaceHolderImages.find((img) => img.id === seller.imageId);
-          const isWhatsAppLoading = loadingButton === `${seller.id}-whatsapp`;
-          const isDeliveryLoading = loadingButton === `${seller.id}-delivery`;
           return (
             <Card key={seller.id} glassy className="overflow-hidden">
               {image && (
@@ -190,26 +184,18 @@ export default function MarketPage() {
                     size="sm" 
                     className="flex-1"
                     onClick={() => handleActionClick(seller.id, 'whatsapp')}
-                    disabled={!!loadingButton}
+                    disabled={isLoading}
                 >
-                    {isWhatsAppLoading ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                        <Phone className="mr-2 h-4 w-4" />
-                    )}
+                    <Phone className="mr-2 h-4 w-4" />
                     WhatsApp
                 </Button>
                 <Button 
                     size="sm" 
                     className="flex-1"
                     onClick={() => handleActionClick(seller.id, 'delivery')}
-                    disabled={!!loadingButton}
+                    disabled={isLoading}
                 >
-                    {isDeliveryLoading ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                        <Truck className="mr-2 h-4 w-4" />
-                    )}
+                    <Truck className="mr-2 h-4 w-4" />
                     Delivery
                 </Button>
               </CardFooter>

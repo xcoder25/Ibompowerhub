@@ -20,12 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLoading } from "@/context/loading-context";
 
 export default function ReportPage() {
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, setIsLoading } = useLoading();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -94,7 +93,6 @@ export default function ReportPage() {
           <CardFooter className="flex justify-between">
             <Button variant="outline" type="button">Cancel</Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Submit
             </Button>
           </CardFooter>

@@ -16,13 +16,13 @@ import { Textarea } from './ui/textarea';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { type artisans } from '@/lib/data';
-import { Loader2 } from 'lucide-react';
+import { useLoading } from '@/context/loading-context';
 
 type Artisan = (typeof artisans)[number];
 
 export function RequestQuoteDialog({ children, artisan }: { children: React.ReactNode, artisan: Artisan }) {
     const [open, setOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const { isLoading, setIsLoading } = useLoading();
     const { toast } = useToast();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -65,7 +65,6 @@ export function RequestQuoteDialog({ children, artisan }: { children: React.Reac
           </div>
         <DialogFooter>
           <Button type="submit" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Send Request
           </Button>
         </DialogFooter>

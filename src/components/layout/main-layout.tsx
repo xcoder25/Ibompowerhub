@@ -17,6 +17,7 @@ import { useUser, useFirestore } from '@/firebase';
 import { SplashScreen } from '../splash-screen';
 import { useToast } from '@/hooks/use-toast';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { LoadingProvider } from '@/context/loading-context';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const [isClient, setIsClient] = useState(false);
@@ -119,23 +120,26 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <SidebarProvider>
-            <div className={cn("flex min-h-screen", isDashboard ? "bg-slate-50" : "bg-background")}>
-                {!isMobile && <AppSidebar />}
-                <div className="flex flex-col flex-1">
-                    <AppHeader />
-                    <SidebarInset>
-                        <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0")}>
-                            {children}
-                        </main>
-                    </SidebarInset>
-                    <AssistantWidget />
-                    {isMobile && <AppMobileNav />}
+        <LoadingProvider>
+            <SidebarProvider>
+                <div className={cn("flex min-h-screen", isDashboard ? "bg-slate-50" : "bg-background")}>
+                    {!isMobile && <AppSidebar />}
+                    <div className="flex flex-col flex-1">
+                        <AppHeader />
+                        <SidebarInset>
+                            <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0")}>
+                                {children}
+                            </main>
+                        </SidebarInset>
+                        <AssistantWidget />
+                        {isMobile && <AppMobileNav />}
+                    </div>
                 </div>
-            </div>
-        </SidebarProvider>
+            </SidebarProvider>
+        </LoadingProvider>
     );
 }
+
 
 
 
