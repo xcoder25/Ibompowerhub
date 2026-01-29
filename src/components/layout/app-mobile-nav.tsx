@@ -12,7 +12,7 @@ import { DialogTrigger } from '../ui/dialog';
 
 const mobileNavItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
-  { href: '/map', icon: Compass, label: 'Discover' },
+  { href: '/discover', icon: Compass, label: 'Discover' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
   { href: '/profile', icon: CircleUser, label: 'Profile' },
 ];
