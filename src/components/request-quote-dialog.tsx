@@ -16,20 +16,28 @@ import { Textarea } from './ui/textarea';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { type artisans } from '@/lib/data';
+import { Loader2 } from 'lucide-react';
 
 type Artisan = (typeof artisans)[number];
 
 export function RequestQuoteDialog({ children, artisan }: { children: React.ReactNode, artisan: Artisan }) {
     const [open, setOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        toast({
-            title: "Quote Request Sent",
-            description: `Your request has been sent to ${artisan.name}.`,
-        });
-        setOpen(false);
+        if(isLoading) return;
+        setIsLoading(true);
+
+        setTimeout(() => {
+            toast({
+                title: "Quote Request Sent",
+                description: `Your request has been sent to ${artisan.name}.`,
+            });
+            setIsLoading(false);
+            setOpen(false);
+        }, 3000);
     }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -56,7 +64,10 @@ export function RequestQuoteDialog({ children, artisan }: { children: React.Reac
             />
           </div>
         <DialogFooter>
-          <Button type="submit">Send Request</Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Send Request
+          </Button>
         </DialogFooter>
         </form>
       </DialogContent>

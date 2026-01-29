@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -19,19 +20,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ReportPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isLoading) return;
+    setIsLoading(true);
+
+    setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Report Submitted",
+        description: "Thank you for helping improve our community!",
+      });
+      // Here you would typically reset form fields
+    }, 3000);
+  };
+
   return (
-    <div className="flex justify-center items-center h-full">
+    <div className="flex justify-center items-center h-full p-4">
       <Card className="w-full max-w-lg">
-        <CardHeader>
-          <CardTitle>Submit a Report</CardTitle>
-          <CardDescription>
-            Found an issue? Let us know and we&apos;ll get right on it.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form>
+        <form onSubmit={handleSubmit}>
+          <CardHeader>
+            <CardTitle>Submit a Report</CardTitle>
+            <CardDescription>
+              Found an issue? Let us know and we&apos;ll get right on it.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="framework">Ministry/Department/Agency</Label>
@@ -57,22 +79,26 @@ export default function ReportPage() {
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Title</Label>
-                <Input id="name" placeholder="Enter a title for your report" />
+                <Input id="name" placeholder="Enter a title for your report" required />
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
                   placeholder="Describe the issue in detail"
+                  required
                 />
               </div>
             </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline">Cancel</Button>
-          <Button>Submit</Button>
-        </CardFooter>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" type="button">Cancel</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Submit
+            </Button>
+          </CardFooter>
+        </form>
       </Card>
     </div>
   );
