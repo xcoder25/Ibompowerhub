@@ -7,8 +7,21 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { useLoading } from '@/context/loading-context';
+import { useToast } from '@/hooks/use-toast';
 
 export default function JobsPage() {
+  const { isLoading, showLoader } = useLoading();
+  const { toast } = useToast();
+
+  const handleApply = () => {
+    showLoader(3000);
+    toast({
+        title: 'Application Sent!',
+        description: 'Your application has been submitted successfully.'
+    })
+  }
+
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
       <div className="mb-8">
@@ -44,7 +57,7 @@ export default function JobsPage() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button className="w-full">Apply Now</Button>
+                <Button className="w-full" onClick={handleApply} disabled={isLoading}>Apply Now</Button>
               </CardFooter>
             </Card>
           );

@@ -1,14 +1,14 @@
-
 "use client";
 
 import { useState } from 'react';
-import { Loader2, Zap, AlertTriangle, CheckCircle, Trash2 } from 'lucide-react';
+import { Zap, AlertTriangle, CheckCircle, Trash2 } from 'lucide-react';
 import { getNeighborhoodStatus, type NeighborhoodStatusOutput } from '@/ai/flows/neighborhood-status-tool';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from './ui/badge';
 import { cn } from '@/lib/utils';
+import { useLoading } from '@/context/loading-context';
 
 const statusConfig = {
     power: {
@@ -34,10 +34,10 @@ export default function NeighborhoodStatus() {
     'Power outage reported on Marian Road. Flash flood near 8 Miles. Waste bin at Watt Market is full.'
   );
   const [status, setStatus] = useState<NeighborhoodStatusOutput | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { isLoading, setIsLoading } = useLoading();
 
   const handleAnalysis = async () => {
-    setLoading(true);
+    setIsLoading(true);
     setStatus(null);
     try {
       const result = await getNeighborhoodStatus({ reportSummaries });
@@ -45,7 +45,7 @@ export default function NeighborhoodStatus() {
     } catch (error) {
       console.error('Error getting neighborhood status:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -64,8 +64,6 @@ export default function NeighborhoodStatus() {
             className="h-24 bg-background/50"
             />
         </div>
-
-        {loading && <div className="flex items-center justify-center p-4"><Loader2 className="animate-spin" /></div>}
 
         {status && (
             <div className='space-y-3'>
@@ -98,8 +96,8 @@ export default function NeighborhoodStatus() {
 
       </CardContent>
       <CardFooter>
-        <Button onClick={handleAnalysis} disabled={loading} className="w-full">
-          {loading ? 'Analyzing...' : 'Analyze Reports'}
+        <Button onClick={handleAnalysis} disabled={isLoading} className="w-full">
+          Analyze Reports
         </Button>
       </CardFooter>
     </Card>

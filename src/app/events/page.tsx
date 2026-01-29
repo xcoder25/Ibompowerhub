@@ -7,11 +7,14 @@ import { events } from '@/lib/events';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Calendar, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLoading } from '@/context/loading-context';
 
 export default function EventsPage() {
   const { toast } = useToast();
+  const { isLoading, showLoader } = useLoading();
 
   const handleViewDetails = (eventTitle: string) => {
+    showLoader(3000);
     toast({
       title: 'Coming Soon!',
       description: `Full details for "${eventTitle}" will be available shortly.`,
@@ -62,6 +65,7 @@ export default function EventsPage() {
                   variant="outline"
                   className="w-full"
                   onClick={() => handleViewDetails(event.title)}
+                  disabled={isLoading}
                 >
                   View Details
                 </Button>

@@ -14,8 +14,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Edit } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLoading } from '@/context/loading-context';
 
 interface EditProfileDialogProps {
     user: {
@@ -29,8 +30,8 @@ interface EditProfileDialogProps {
 
 export function EditProfileDialog({ user, onUpdateProfile }: EditProfileDialogProps) {
     const [open, setOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
+    const { isLoading, showLoader } = useLoading();
 
     const [name, setName] = useState(user.name || '');
     const [bio, setBio] = useState(user.bio || '');
@@ -45,16 +46,12 @@ export function EditProfileDialog({ user, onUpdateProfile }: EditProfileDialogPr
         }
     }, [open, user]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        showLoader(3000);
 
         onUpdateProfile({ name, bio, location });
 
-        setIsLoading(false);
         setOpen(false);
         toast({
             title: 'Profile Updated',
@@ -108,7 +105,6 @@ export function EditProfileDialog({ user, onUpdateProfile }: EditProfileDialogPr
                     </div>
                     <DialogFooter>
                         <Button type="submit" disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Save changes
                         </Button>
                     </DialogFooter>

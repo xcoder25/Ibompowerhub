@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { sellers as initialSellers, sellerCategories } from '@/lib/market';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { MapPin, Phone, Truck, Search, Bot, Loader2 } from 'lucide-react';
+import { MapPin, Phone, Truck, Search, Bot } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -17,10 +16,9 @@ import { useLoading } from '@/context/loading-context';
 export default function MarketPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [aiLoading, setAiLoading] = useState(false);
   const [sellers, setSellers] = useState(initialSellers);
   const { toast } = useToast();
-  const { showLoader, isLoading } = useLoading();
+  const { showLoader, isLoading, setIsLoading } = useLoading();
 
   const handleSearch = (term: string, category: string) => {
     let filtered = initialSellers.filter(seller => {
@@ -55,7 +53,7 @@ export default function MarketPage() {
 
   const handleAiSearch = async () => {
     if (!searchTerm) return;
-    setAiLoading(true);
+    setIsLoading(true);
     setSellers([]); // Clear current sellers
 
     try {
@@ -85,7 +83,7 @@ export default function MarketPage() {
         });
         setSellers(initialSellers); // Reset on error
     } finally {
-        setAiLoading(false);
+        setIsLoading(false);
     }
   };
 
@@ -112,9 +110,9 @@ export default function MarketPage() {
             size="icon" 
             className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-primary"
             onClick={handleAiSearch}
-            disabled={aiLoading}
+            disabled={isLoading}
             >
-            {aiLoading ? <Loader2 className="animate-spin" /> : <Bot />}
+            <Bot />
           </Button>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -131,22 +129,14 @@ export default function MarketPage() {
         </div>
       </div>
 
-      {aiLoading && (
-        <div className='text-center py-16 text-muted-foreground'>
-            <Loader2 className='mx-auto h-8 w-8 animate-spin mb-2'/>
-            <p className='font-semibold text-lg'>AI is searching for sellers...</p>
-            <p>Please wait a moment.</p>
-        </div>
-      )}
-
-      {!aiLoading && sellers.length === 0 && (
+      {sellers.length === 0 && !isLoading && (
             <div className='text-center py-16 text-muted-foreground'>
                 <p className='font-semibold text-lg'>No sellers found</p>
                 <p>Try adjusting your search or filter.</p>
             </div>
       )}
 
-      {!aiLoading && <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {sellers.map((seller) => {
           const image = PlaceHolderImages.find((img) => img.id === seller.imageId);
           return (
@@ -202,7 +192,7 @@ export default function MarketPage() {
             </Card>
           );
         })}
-      </div>}
+      </div>
     </div>
   );
 }

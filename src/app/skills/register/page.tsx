@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,13 +15,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { artisanSkills, availabilityOptions } from '@/lib/skills';
+import { useLoading } from '@/context/loading-context';
 
 const formSchema = z.object({
   skill: z.string({
@@ -40,6 +40,7 @@ export default function BecomeArtisanPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const router = useRouter();
+  const { isLoading, setIsLoading } = useLoading();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,6 +56,7 @@ export default function BecomeArtisanPage() {
         return;
     }
 
+    setIsLoading(true);
     try {
       const artisanDocRef = doc(firestore, 'artisans', user.uid);
       const userDocRef = doc(firestore, 'users', user.uid);
@@ -83,6 +85,8 @@ export default function BecomeArtisanPage() {
     } catch (error) {
         console.error("Failed to create artisan profile:", error);
         toast({ variant: 'destructive', title: 'Error', description: 'Could not create artisan profile.' });
+    } finally {
+        setIsLoading(false);
     }
   }
 
@@ -166,7 +170,7 @@ export default function BecomeArtisanPage() {
                             )}
                         />
                         
-                        <Button type="submit" className="w-full">
+                        <Button type="submit" className="w-full" disabled={isLoading}>
                             Complete Registration
                         </Button>
                     </form>
@@ -176,4 +180,3 @@ export default function BecomeArtisanPage() {
     </div>
   );
 }
-

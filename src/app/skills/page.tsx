@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -6,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { artisans as initialArtisans } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Star, MapPin, Phone, Search, Loader2, HardHat } from 'lucide-react';
+import { Star, MapPin, Search, HardHat } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
@@ -16,14 +15,15 @@ import { useGeolocation } from '@/hooks/use-geolocation';
 import { sortArtisansByDistance } from '@/ai/flows/sort-by-distance-flow';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
+import { useLoading } from '@/context/loading-context';
 
 export default function SkillsPage() {
   const [artisans, setArtisans] = useState(initialArtisans);
-  const [isLoading, setIsLoading] = useState(false);
   const { location, error: geoError, getLocation } = useGeolocation();
   const { toast } = useToast();
+  const { isLoading, setIsLoading } = useLoading();
 
-  const handleSortByDistance = async () => {
+  const handleSortByDistance = () => {
     setIsLoading(true);
     // Request location. The sorting logic will be triggered by the useEffect below
     // once the location is successfully retrieved.
@@ -31,6 +31,8 @@ export default function SkillsPage() {
   };
 
   useEffect(() => {
+    if (!isLoading) return; // Only run if loading has been triggered
+
     if (location) {
       sortArtisansByDistance({
         userLocation: { latitude: location.latitude, longitude: location.longitude },
@@ -55,7 +57,9 @@ export default function SkillsPage() {
         .finally(() => {
           setIsLoading(false);
         });
-    } else if (geoError) {
+    }
+    
+    if (geoError) {
       toast({
         variant: 'destructive',
         title: 'Location Error',
@@ -63,7 +67,7 @@ export default function SkillsPage() {
       });
       setIsLoading(false);
     }
-  }, [location, geoError, toast]);
+  }, [location, geoError, toast, setIsLoading, isLoading]);
 
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
@@ -91,11 +95,7 @@ export default function SkillsPage() {
           />
         </div>
         <Button variant="outline" onClick={handleSortByDistance} disabled={isLoading}>
-          {isLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <MapPin className="mr-2 h-4 w-4" />
-          )}
+          <MapPin className="mr-2 h-4 w-4" />
           Sort by Distance
         </Button>
       </div>
@@ -137,7 +137,6 @@ export default function SkillsPage() {
                     <div className="mt-4 sm:mt-0 w-full sm:w-auto">
                       <RequestQuoteDialog artisan={artisan}>
                         <Button className="w-full sm:w-auto">
-                          <Phone className="mr-2 h-4 w-4" />
                           Request Quote
                         </Button>
                       </RequestQuoteDialog>

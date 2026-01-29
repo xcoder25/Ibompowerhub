@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -17,6 +16,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { type artisans } from '@/lib/data';
 import { useLoading } from '@/context/loading-context';
+import { Phone } from 'lucide-react';
 
 type Artisan = (typeof artisans)[number];
 

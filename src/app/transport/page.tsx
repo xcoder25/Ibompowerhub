@@ -1,9 +1,8 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Bus, Bot, Loader2 } from 'lucide-react';
+import { ArrowRight, Bus, Bot } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -13,17 +12,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { popularRoutes, fareEstimates } from '@/lib/data';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getNavigationRoute } from '@/ai/flows/map-navigation-flow';
+import { useLoading } from '@/context/loading-context';
 
 
 export default function TransportPage() {
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
     const [estimatedFare, setEstimatedFare] = useState<string | null>(null);
-    const [aiLoading, setAiLoading] = useState(false);
     const { toast } = useToast();
+    const { isLoading, setIsLoading, showLoader } = useLoading();
 
     const handleEstimate = () => {
         if (!origin || !destination) {
@@ -35,6 +35,8 @@ export default function TransportPage() {
             return;
         }
         
+        showLoader(1000); // Simulate a quick search
+
         const key = `${origin.toLowerCase()}-${destination.toLowerCase()}`;
         const fare = fareEstimates[key];
 
@@ -59,7 +61,7 @@ export default function TransportPage() {
             return;
         }
 
-        setAiLoading(true);
+        setIsLoading(true);
         setEstimatedFare(null);
 
         try {
@@ -82,7 +84,7 @@ export default function TransportPage() {
             console.error("AI Fare Estimation error:", error);
             toast({ variant: 'destructive', title: 'AI Error', description: 'Could not understand the route.' });
         } finally {
-            setAiLoading(false);
+            setIsLoading(false);
         }
     }
 
@@ -107,12 +109,12 @@ export default function TransportPage() {
             <Input placeholder="Destination (e.g., Watt Market)" className='text-base bg-background/50' value={destination} onChange={e => setDestination(e.target.value)} />
           </div>
           <div className='flex flex-col sm:flex-row gap-2'>
-            <Button className="w-full sm:w-auto" onClick={handleEstimate}>
+            <Button className="w-full sm:w-auto" onClick={handleEstimate} disabled={isLoading}>
                 Estimate Fare
                 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button variant="outline" className="w-full sm:w-auto" onClick={handleAiEstimate} disabled={aiLoading}>
-                {aiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Bot className="mr-2 h-4 w-4" />}
+            <Button variant="outline" className="w-full sm:w-auto" onClick={handleAiEstimate} disabled={isLoading}>
+                <Bot className="mr-2 h-4 w-4" />
                 AI Estimate
             </Button>
           </div>

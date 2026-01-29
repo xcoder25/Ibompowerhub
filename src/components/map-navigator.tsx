@@ -1,19 +1,18 @@
-
 'use client';
 import { useRef, useState, useEffect } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { MapPin, ArrowRight, X, User, Car, Bus, Bot, Mic, Loader2, ChevronDown, ChevronUp, Hospital } from 'lucide-react';
+import { MapPin, ArrowRight, X, User, Car, Bus, Bot, Mic, ChevronDown, ChevronUp } from 'lucide-react';
 import { type MapLocation } from '@/app/map/page';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { getNavigationRoute } from '@/ai/flows/map-navigation-flow';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from './ui/scroll-area';
-import { cn } from '@/lib/utils';
 import { Separator } from './ui/separator';
 import { findPlace } from '@/ai/flows/find-place-flow';
+import { useLoading } from '@/context/loading-context';
 
 type MapNavigatorProps = {
   origin: MapLocation | null;
@@ -54,8 +53,8 @@ export function MapNavigator({
   const [destinationAutocomplete, setDestinationAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
   const [isListening, setIsListening] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
   const { toast } = useToast();
+  const { isLoading, setIsLoading, showLoader } = useLoading();
   
   const speechRecognition = useRef<SpeechRecognition | null>(null);
 
@@ -87,6 +86,7 @@ export function MapNavigator({
   const calculateRoute = async (org: string, dest: string) => {
     if (!org || !dest) return;
     setPlaces(null);
+    setIsLoading(true);
     const directionsService = new google.maps.DirectionsService();
     try {
       const results = await directionsService.route({
@@ -101,12 +101,14 @@ export function MapNavigator({
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Could not calculate route.' });
       console.error(e);
+    } finally {
+        setIsLoading(false);
     }
   };
 
   const handleAiNavigation = async () => {
     if (!aiQueryRef.current?.value) return;
-    setAiLoading(true);
+    setIsLoading(true);
 
     try {
         const result = await getNavigationRoute({ query: aiQueryRef.current.value });
@@ -121,13 +123,13 @@ export function MapNavigator({
         console.error("AI navigation error:", error);
         toast({ variant: 'destructive', title: 'AI Error', description: 'Could not understand the destination.' });
     } finally {
-        setAiLoading(false);
+        setIsLoading(false);
     }
   };
 
    const handleFindPlace = async () => {
     if (!findPlaceQueryRef.current?.value || !map) return;
-    setAiLoading(true);
+    setIsLoading(true);
     setDirections(null);
 
     try {
@@ -161,7 +163,7 @@ export function MapNavigator({
         console.error("AI find place error:", error);
         toast({ variant: 'destructive', title: 'AI Error', description: 'Could not understand the place.' });
     } finally {
-        setAiLoading(false);
+        setIsLoading(false);
     }
   };
 
@@ -226,12 +228,11 @@ export function MapNavigator({
                             className="pl-10"
                             onKeyDown={(e) => e.key === 'Enter' && handleFindPlace()}
                             />
-                            <Button size="icon" variant="ghost" onClick={startListening} disabled={isListening} className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                               {isListening ? <Loader2 className='animate-spin'/> : <Mic />}
+                            <Button size="icon" variant="ghost" onClick={startListening} disabled={isListening || isLoading} className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
+                               <Mic />
                             </Button>
                         </div>
-                        <Button onClick={handleFindPlace} className="w-full" disabled={aiLoading}>
-                            {aiLoading && <Loader2 className="mr-2 animate-spin" />}
+                        <Button onClick={handleFindPlace} className="w-full" disabled={isLoading}>
                             Find Places <ArrowRight className="ml-2" />
                         </Button>
                     </TabsContent>
@@ -249,7 +250,7 @@ export function MapNavigator({
                             <Input type="text" placeholder="Destination" ref={destinationRef} className="pl-10" />
                             </Autocomplete>
                         </div>
-                        <Button onClick={() => calculateRoute(originRef.current?.value || '', destinationRef.current?.value || '')} className="w-full">
+                        <Button onClick={() => calculateRoute(originRef.current?.value || '', destinationRef.current?.value || '')} className="w-full" disabled={isLoading}>
                             Get Directions <ArrowRight className="ml-2" />
                         </Button>
                     </TabsContent>

@@ -8,8 +8,21 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Building2, Search, SlidersHorizontal } from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { useLoading } from '@/context/loading-context';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PropertyPage() {
+  const { isLoading, showLoader } = useLoading();
+  const { toast } = useToast();
+
+  const handleViewDetails = () => {
+    showLoader(3000);
+    toast({
+        title: 'Loading Details...',
+        description: 'This feature is coming soon!'
+    })
+  }
+
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
       <div className="mb-8">
@@ -46,7 +59,7 @@ export default function PropertyPage() {
                 <CardDescription className="font-bold text-lg text-primary">{listing.price}</CardDescription>
               </CardHeader>
               <CardFooter>
-                <Button className="w-full">View Details</Button>
+                <Button className="w-full" onClick={handleViewDetails} disabled={isLoading}>View Details</Button>
               </CardFooter>
             </Card>
           );

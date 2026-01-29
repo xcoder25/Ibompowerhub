@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -7,9 +6,22 @@ import { ArrowDownLeft, ArrowUpRight, Plus, Download } from 'lucide-react';
 import { transactions } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import React from 'react';
+import { useLoading } from '@/context/loading-context';
+import { useToast } from '@/hooks/use-toast';
 
 export default function TransactionsPage() {
   const balance = 245350.75; // Placeholder balance
+  const { isLoading, showLoader } = useLoading();
+  const { toast } = useToast();
+
+  const handleAction = (action: 'add' | 'withdraw') => {
+    showLoader(3000);
+    toast({
+        title: 'Processing...',
+        description: `Your ${action === 'add' ? 'deposit' : 'withdrawal'} is being processed.`
+    });
+  }
 
   return (
     <div className="flex-1 p-4 sm:p-6 md:p-8">
@@ -31,11 +43,11 @@ export default function TransactionsPage() {
                 </p>
             </CardContent>
             <CardFooter className='flex-col sm:flex-row gap-2'>
-                <Button className='w-full sm:flex-1'>
+                <Button className='w-full sm:flex-1' onClick={() => handleAction('add')} disabled={isLoading}>
                     <Plus className='mr-2'/>
                     Add Funds
                 </Button>
-                <Button variant="outline" className='w-full sm:flex-1'>
+                <Button variant="outline" className='w-full sm:flex-1' onClick={() => handleAction('withdraw')} disabled={isLoading}>
                     Withdraw Funds
                 </Button>
             </CardFooter>
@@ -81,6 +93,3 @@ export default function TransactionsPage() {
     </div>
   );
 }
-
-// Add a new file at src/app/transactions/page.tsx
-import React from 'react';

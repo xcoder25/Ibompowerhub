@@ -14,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, Loader2 } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
     Select,
@@ -23,6 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useLoading } from '@/context/loading-context';
 
 interface CreateTopicDialogProps {
     onCreateTopic: (topic: any) => void;
@@ -30,20 +31,17 @@ interface CreateTopicDialogProps {
 
 export function CreateTopicDialog({ onCreateTopic }: CreateTopicDialogProps) {
     const [open, setOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
+    const { isLoading, showLoader } = useLoading();
 
     // Form state
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('');
     const [content, setContent] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        showLoader(3000);
 
         const newTopic = {
             id: Date.now(), // Simple ID generation
@@ -59,7 +57,6 @@ export function CreateTopicDialog({ onCreateTopic }: CreateTopicDialogProps) {
 
         onCreateTopic(newTopic);
 
-        setIsLoading(false);
         setOpen(false);
 
         // Reset form
@@ -127,7 +124,6 @@ export function CreateTopicDialog({ onCreateTopic }: CreateTopicDialogProps) {
                     </div>
                     <DialogFooter>
                         <Button type="submit" disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Post Topic
                         </Button>
                     </DialogFooter>

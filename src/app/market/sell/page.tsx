@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -23,6 +23,7 @@ import { PlusCircle, Trash2 } from 'lucide-react';
 import { sellerCategories } from '@/lib/market';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useLoading } from '@/context/loading-context';
 
 const productSchema = z.object({
   name: z.string().min(2, { message: 'Product name must be at least 2 characters.' }),
@@ -45,6 +46,7 @@ export default function BecomeSellerPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const router = useRouter();
+  const { isLoading, setIsLoading } = useLoading();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,7 +66,7 @@ export default function BecomeSellerPage() {
         toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in.' });
         return;
     }
-
+    setIsLoading(true);
     try {
       const sellerDocRef = doc(firestore, 'sellers', user.uid);
       const userDocRef = doc(firestore, 'users', user.uid);
@@ -92,6 +94,8 @@ export default function BecomeSellerPage() {
     } catch (error) {
         console.error("Failed to create seller profile:", error);
         toast({ variant: 'destructive', title: 'Error', description: 'Could not create seller profile.' });
+    } finally {
+        setIsLoading(false);
     }
   }
 
@@ -188,7 +192,7 @@ export default function BecomeSellerPage() {
                             </Button>
                         </div>
                         
-                        <Button type="submit" className="w-full">
+                        <Button type="submit" className="w-full" disabled={isLoading}>
                             Submit Application
                         </Button>
                     </form>
