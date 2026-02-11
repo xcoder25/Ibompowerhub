@@ -6,6 +6,7 @@ import { Card, CardFooter } from "@/components/ui/card";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
 import { DialogTrigger } from "@/components/ui/dialog";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { SchedulePickupDialog } from "./schedule-pickup";
 
 export default function WasteHero() {
   const heroImage = PlaceHolderImages.find(
@@ -40,9 +41,11 @@ export default function WasteHero() {
             </Button>
           </DialogTrigger>
         </ReportIssueDialog>
-        <Button variant="outline" className="w-full">
-          <Calendar className="mr-2 h-4 w-4" /> Schedule Pickup
-        </Button>
+        <SchedulePickupDialog>
+          <Button variant="outline" className="w-full">
+            <Calendar className="mr-2 h-4 w-4" /> Schedule Pickup
+          </Button>
+        </SchedulePickupDialog>
       </CardFooter>
     </Card>
   );
