@@ -18,6 +18,7 @@ import { SplashScreen } from '../splash-screen';
 import { useToast } from '@/hooks/use-toast';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { LoadingProvider } from '@/context/loading-context';
+import { CartProvider } from '@/context/cart-context';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const [isClient, setIsClient] = useState(false);
@@ -32,10 +33,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
     // Auth logic is now in a separate component that is only rendered on the client
     return (
-        <>
+        <CartProvider>
             <AuthHandler>{children}</AuthHandler>
             <Toaster />
-        </>
+        </CartProvider>
     );
 }
 
@@ -139,10 +140,3 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
         </LoadingProvider>
     );
 }
-
-
-
-
-
-
-

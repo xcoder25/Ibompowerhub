@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -6,12 +7,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { sellers as initialSellers, sellerCategories } from '@/lib/market';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { MapPin, Phone, Truck, Search, Bot } from 'lucide-react';
+import { MapPin, Phone, ShoppingCart, Search, Bot, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { findProduct } from '@/ai/flows/agro-assistant-flow';
 import { useLoading } from '@/context/loading-context';
+import { useCart } from '@/context/cart-context';
 
 export default function MarketPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,6 +21,7 @@ export default function MarketPage() {
   const [sellers, setSellers] = useState(initialSellers);
   const { toast } = useToast();
   const { showLoader, isLoading, setIsLoading } = useLoading();
+  const { addItem } = useCart();
 
   const handleSearch = (term: string, category: string) => {
     let filtered = initialSellers.filter(seller => {
@@ -43,11 +46,21 @@ export default function MarketPage() {
       handleSearch(term, selectedCategory);
   }
   
-  const handleActionClick = (sellerId: number, action: 'whatsapp' | 'delivery') => {
-    showLoader(3000);
+  const handleAddToCart = (seller: typeof initialSellers[0], productName: string) => {
+    // Generate a simple mock price between 500 and 5000
+    const mockPrice = Math.floor(Math.random() * (5000 - 500 + 1)) + 500;
+    
+    addItem({
+      id: `${seller.id}-${productName}`,
+      name: productName,
+      price: mockPrice,
+      sellerName: seller.name,
+      imageId: seller.imageId,
+    });
+
     toast({
-        title: `${action === 'whatsapp' ? 'Opening WhatsApp...' : 'Processing Delivery...'}`,
-        description: `Connecting with ${sellers.find(s => s.id === sellerId)?.name}.`,
+      title: 'Added to cart',
+      description: `${productName} from ${seller.name} has been added.`,
     });
   };
 
@@ -140,7 +153,7 @@ export default function MarketPage() {
         {sellers.map((seller) => {
           const image = PlaceHolderImages.find((img) => img.id === seller.imageId);
           return (
-            <Card key={seller.id} glassy className="overflow-hidden">
+            <Card key={seller.id} glassy className="overflow-hidden flex flex-col h-full">
               {image && (
                 <div className="relative aspect-[3/2] w-full">
                   <Image
@@ -158,14 +171,28 @@ export default function MarketPage() {
                   <Badge variant="secondary">{seller.category}</Badge>
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-1">
                 <div className="flex items-center text-sm text-muted-foreground">
                   <MapPin className="mr-2 h-4 w-4" />
                   <span>{seller.distance} away</span>
                 </div>
                 <p className="font-semibold mt-2">{seller.priceRange}</p>
-                 <div className="mt-2 flex flex-wrap gap-1">
-                    {seller.products.slice(0, 3).map(p => <Badge key={p} variant="outline">{p}</Badge>)}
+                 <div className="mt-4 space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Available Products</p>
+                    <div className="flex flex-wrap gap-1.5">
+                        {seller.products.map(p => (
+                          <Button 
+                            key={p} 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-7 text-[10px] px-2 rounded-full hover:bg-primary hover:text-primary-foreground transition-colors"
+                            onClick={() => handleAddToCart(seller, p)}
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            {p}
+                          </Button>
+                        ))}
+                    </div>
                 </div>
               </CardContent>
               <CardFooter className="flex gap-2">
@@ -173,20 +200,12 @@ export default function MarketPage() {
                     variant="outline" 
                     size="sm" 
                     className="flex-1"
-                    onClick={() => handleActionClick(seller.id, 'whatsapp')}
-                    disabled={isLoading}
+                    asChild
                 >
-                    <Phone className="mr-2 h-4 w-4" />
-                    WhatsApp
-                </Button>
-                <Button 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => handleActionClick(seller.id, 'delivery')}
-                    disabled={isLoading}
-                >
-                    <Truck className="mr-2 h-4 w-4" />
-                    Delivery
+                    <a href="tel:08000000000">
+                      <Phone className="mr-2 h-4 w-4" />
+                      Contact
+                    </a>
                 </Button>
               </CardFooter>
             </Card>
