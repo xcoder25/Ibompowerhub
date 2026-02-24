@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,14 +14,34 @@ import { useToast } from '@/hooks/use-toast';
 import { findProduct } from '@/ai/flows/agro-assistant-flow';
 import { useLoading } from '@/context/loading-context';
 import { useCart } from '@/context/cart-context';
+import { useFirestore } from '@/firebase';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 
 export default function MarketPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sellers, setSellers] = useState(initialSellers);
+  const [approvedProducts, setApprovedProducts] = useState<any[]>([]);
   const { toast } = useToast();
   const { showLoader, isLoading, setIsLoading } = useLoading();
   const { addItem } = useCart();
+  const firestore = useFirestore();
+
+  // Fetch approved products
+  useEffect(() => {
+    if (!firestore) return;
+
+    const q = query(collection(firestore, 'approved_products'), orderBy('approvedAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const products: any[] = [];
+      snapshot.forEach((doc) => {
+        products.push({ id: doc.id, ...doc.data() });
+      });
+      setApprovedProducts(products);
+    });
+
+    return () => unsubscribe();
+  }, [firestore]);
 
   const handleSearch = (term: string, category: string) => {
     let filtered = initialSellers.filter(seller => {
@@ -46,21 +66,18 @@ export default function MarketPage() {
       handleSearch(term, selectedCategory);
   }
   
-  const handleAddToCart = (seller: typeof initialSellers[0], productName: string) => {
-    // Generate a simple mock price between 500 and 5000
-    const mockPrice = Math.floor(Math.random() * (5000 - 500 + 1)) + 500;
-    
+  const handleAddToCart = (product: any, productName?: string) => {
     addItem({
-      id: `${seller.id}-${productName}`,
-      name: productName,
-      price: mockPrice,
-      sellerName: seller.name,
-      imageId: seller.imageId,
+      id: product.id || `${product.name}-${Date.now()}`,
+      name: productName || product.name,
+      price: product.price,
+      sellerName: product.sellerName || product.name,
+      imageId: product.imageId,
     });
 
     toast({
       title: 'Added to cart',
-      description: `${productName} from ${seller.name} has been added.`,
+      description: `${productName || product.name} has been added.`,
     });
   };
 
@@ -150,6 +167,7 @@ export default function MarketPage() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {/* Show hardcoded sellers */}
         {sellers.map((seller) => {
           const image = PlaceHolderImages.find((img) => img.id === seller.imageId);
           return (
@@ -197,15 +215,57 @@ export default function MarketPage() {
               </CardContent>
               <CardFooter className="flex gap-2">
                 <Button 
-                    variant="outline" 
+                    variant="default" 
                     size="sm" 
                     className="flex-1"
-                    asChild
+                    onClick={() => handleAddToCart(seller, seller.products[0])}
                 >
-                    <a href="tel:08000000000">
-                      <Phone className="mr-2 h-4 w-4" />
-                      Contact
-                    </a>
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Add to Cart
+                </Button>
+              </CardFooter>
+            </Card>
+          );
+        })}
+        
+        {/* Show approved products */}
+        {approvedProducts.map((product) => {
+          const image = PlaceHolderImages.find((img) => img.id === 'seller-vegetables'); // Default image
+          return (
+            <Card key={product.id} glassy className="overflow-hidden flex flex-col h-full">
+              {image && (
+                <div className="relative aspect-[3/2] w-full">
+                  <Image
+                    src={image.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <CardHeader>
+                <CardTitle className="font-headline">{product.name}</CardTitle>
+                <CardDescription>
+                  <Badge variant="secondary">{product.category}</Badge>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1">
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <span>By {product.sellerName}</span>
+                </div>
+                <p className="font-semibold mt-2">₦{product.price.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{product.description}</p>
+                <p className="text-xs text-muted-foreground mt-1">Qty: {product.quantity}</p>
+              </CardContent>
+              <CardFooter className="flex gap-2">
+                <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => handleAddToCart(product)}
+                >
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Add to Cart
                 </Button>
               </CardFooter>
             </Card>

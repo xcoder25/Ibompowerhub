@@ -16,6 +16,16 @@ service cloud.firestore {
       allow read, write: if isOwner(userId);
     }
 
+    // Rules for the 'wallets' collection
+    match /wallets/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+      
+      // Rules for transactions subcollection
+      match /transactions/{transactionId} {
+        allow read, write: if isSignedIn() && request.auth.uid == userId;
+      }
+    }
+
     // Rules for the 'sellers' collection
     match /sellers/{userId} {
       allow read: if isSignedIn();
@@ -35,6 +45,12 @@ service cloud.firestore {
         allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       }
     }
+
+    // Rules for the 'alerts' collection
+    match /alerts/{alertId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only system/admin can create alerts
+    }
     
     // Rules for other collections
     match /services/{serviceId} {
@@ -50,6 +66,30 @@ service cloud.firestore {
 
     match /transactions/{transactionId} {
         allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Rules for the 'pending_products' collection
+    match /pending_products/{productId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Rules for the 'approved_products' collection
+    match /approved_products/{productId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Rules for the 'events' collection
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Rules for the 'businesses' collection
+    match /businesses/{businessId} {
+      allow read: if true;
+      allow write: if isSignedIn();
     }
   }
 }

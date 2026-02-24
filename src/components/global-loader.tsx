@@ -14,6 +14,9 @@ export function GlobalLoader() {
         />
         <span className="font-headline text-2xl font-bold text-foreground">PowerHub CRS</span>
       </div>
+      <div className="mt-6 w-64 h-2 bg-muted rounded-full overflow-hidden">
+        <div className="h-full bg-primary rounded-full animate-progress"></div>
+      </div>
     </div>
   );
 }

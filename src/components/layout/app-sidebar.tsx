@@ -30,6 +30,8 @@ import {
   Trash2,
   Palmtree,
   Newspaper,
+  Wallet,
+  Navigation,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -59,8 +61,10 @@ const mainNav = [
 const servicesNav = [
   { href: '/services', icon: GanttChartSquare, label: 'All Services' },
   { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
+  { href: '/wallet', icon: Wallet, label: 'Wallet' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
   { href: '/transport', icon: Bus, label: 'Transport Guide' },
+  { href: '/live-tracking', icon: Navigation, label: 'Live Tracking' },
 ];
 
 const communityNav = [

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { GlobalLoader } from '@/components/global-loader';
+import { usePathname } from 'next/navigation';
 
 interface LoadingContextType {
   isLoading: boolean;
@@ -13,13 +14,34 @@ const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
 export const LoadingProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const pathname = usePathname();
 
-  const showLoader = (duration: number = 3000) => {
+  const showLoader = (duration: number = 10000) => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
     }, duration);
   };
+
+  // Hide loader when navigating to a new page
+  useEffect(() => {
+    if (isLoading) {
+      setIsLoading(false);
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Show loader on clicks to links, buttons, or interactive elements
+      if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('a') || target.closest('button')) {
+        showLoader(3000);
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading, showLoader }}>

@@ -4,13 +4,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard, Moon, Sun, Languages, HardHat } from 'lucide-react';
+import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard, Moon, Sun, Languages, HardHat, Wallet, Plus, Minus, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useUser, useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
-import { doc } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
@@ -21,6 +21,9 @@ import { ActivityList } from '@/components/profile/activity-list';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 type UserProfile = {
     name: string;
@@ -29,6 +32,20 @@ type UserProfile = {
     rating?: number;
     bio?: string;
     location?: string;
+};
+
+type WalletData = {
+    balance: number;
+    currency: string;
+};
+
+type Transaction = {
+    id: string;
+    type: 'credit' | 'debit';
+    amount: number;
+    description: string;
+    timestamp: Date;
+    reference?: string;
 };
 
 export default function ProfilePage() {
@@ -46,8 +63,17 @@ export default function ProfilePage() {
 
     const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userDocRef);
 
+    const walletDocRef = useMemoFirebase(
+        () => (user && firestore ? doc(firestore, 'wallets', user.uid) : null),
+        [firestore, user]
+    );
+
+    const { data: walletData, isLoading: isWalletLoading } = useDoc<WalletData>(walletDocRef);
+
     // Local state for immediate UI updates (optimistic UI) across sessions in this demo
     const [localProfile, setLocalProfile] = useState<Partial<UserProfile>>({});
+    const [amount, setAmount] = useState('');
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
 
     useEffect(() => {
         if (userProfile) {
@@ -59,6 +85,29 @@ export default function ProfilePage() {
             })
         }
     }, [userProfile, user]);
+
+    // Load transactions
+    useEffect(() => {
+        if (!user || !firestore) return;
+
+        const transactionsRef = collection(firestore, 'wallets', user.uid, 'transactions');
+        const q = query(transactionsRef, orderBy('timestamp', 'desc'), limit(10));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const txns: Transaction[] = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                txns.push({
+                    id: doc.id,
+                    ...data,
+                    timestamp: data.timestamp?.toDate() || new Date()
+                } as Transaction);
+            });
+            setTransactions(txns);
+        });
+
+        return () => unsubscribe();
+    }, [user, firestore]);
 
 
     const handleSignOut = () => {
@@ -80,6 +129,70 @@ export default function ProfilePage() {
             })
         }
     }
+
+    const addFunds = async () => {
+        if (!amount || !user || !firestore || !walletData) return;
+
+        const numAmount = parseFloat(amount);
+        if (numAmount <= 0) return;
+
+        try {
+            const newBalance = walletData.balance + numAmount;
+            await updateDoc(walletDocRef!, { balance: newBalance });
+
+            await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
+                type: 'credit',
+                amount: numAmount,
+                description: 'Funds added',
+                timestamp: new Date()
+            });
+
+            setAmount('');
+            toast({
+                title: 'Funds Added',
+                description: `₦${numAmount.toLocaleString()} has been added to your wallet.`
+            });
+        } catch (error) {
+            console.error('Error adding funds:', error);
+            toast({
+                title: 'Error',
+                description: 'Failed to add funds. Please try again.',
+                variant: 'destructive'
+            });
+        }
+    };
+
+    const withdrawFunds = async () => {
+        if (!amount || !user || !firestore || !walletData) return;
+
+        const numAmount = parseFloat(amount);
+        if (numAmount <= 0 || numAmount > walletData.balance) return;
+
+        try {
+            const newBalance = walletData.balance - numAmount;
+            await updateDoc(walletDocRef!, { balance: newBalance });
+
+            await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
+                type: 'debit',
+                amount: numAmount,
+                description: 'Funds withdrawn',
+                timestamp: new Date()
+            });
+
+            setAmount('');
+            toast({
+                title: 'Funds Withdrawn',
+                description: `₦${numAmount.toLocaleString()} has been withdrawn from your wallet.`
+            });
+        } catch (error) {
+            console.error('Error withdrawing funds:', error);
+            toast({
+                title: 'Error',
+                description: 'Failed to withdraw funds. Please try again.',
+                variant: 'destructive'
+            });
+        }
+    };
 
     const isLoading = isUserLoading || isProfileLoading;
     const isSeller = localProfile?.role === 'Seller';
@@ -132,14 +245,91 @@ export default function ProfilePage() {
 
                 {/* content tabs */}
                 <Tabs defaultValue="activity" className="space-y-6">
-                    <TabsList className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex h-12">
+                    <TabsList className="w-full sm:w-auto grid grid-cols-2 sm:grid-cols-4 h-12">
                         <TabsTrigger value="activity" className="text-sm">Activity</TabsTrigger>
+                        <TabsTrigger value="wallet" className="text-sm">Wallet</TabsTrigger>
                         <TabsTrigger value="settings" className="text-sm">Settings</TabsTrigger>
                         <TabsTrigger value="dashboard" className="text-sm">Dashboard</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="activity" className="space-y-6">
                         <ActivityList />
+                    </TabsContent>
+
+                    <TabsContent value="wallet" className="space-y-6">
+                        <Card className="border-border/50">
+                            <CardHeader>
+                                <CardTitle className="font-headline text-xl flex items-center gap-2">
+                                    <Wallet className="h-5 w-5" />
+                                    Wallet Balance
+                                </CardTitle>
+                                <CardDescription>Manage your funds and view recent transactions.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="text-center">
+                                    <p className="text-4xl font-bold tracking-tighter">
+                                        ₦{walletData?.balance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
+                                    </p>
+                                    <p className="text-muted-foreground">Available Balance</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="amount">Amount (₦)</Label>
+                                        <Input
+                                            id="amount"
+                                            type="number"
+                                            placeholder="Enter amount"
+                                            value={amount}
+                                            onChange={(e) => setAmount(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex gap-2 pt-8">
+                                        <Button onClick={addFunds} disabled={!amount || isWalletLoading} className="flex-1 gap-2">
+                                            <Plus className="h-4 w-4" />
+                                            Add
+                                        </Button>
+                                        <Button onClick={withdrawFunds} disabled={!amount || !walletData || parseFloat(amount) > walletData.balance || isWalletLoading} variant="outline" className="flex-1 gap-2">
+                                            <Minus className="h-4 w-4" />
+                                            Withdraw
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                <div className="space-y-4">
+                                    <h3 className="font-semibold">Recent Transactions</h3>
+                                    {transactions.length === 0 ? (
+                                        <p className="text-muted-foreground text-center py-8">No transactions yet</p>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {transactions.slice(0, 5).map((txn) => (
+                                                <div key={txn.id} className="flex items-center justify-between p-3 rounded-lg border">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`p-2 rounded-full ${txn.type === 'credit' ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20'}`}>
+                                                            {txn.type === 'credit' ? <ArrowDownLeft className="h-4 w-4 text-green-600 dark:text-green-400" /> : <ArrowUpRight className="h-4 w-4 text-red-600 dark:text-red-400" />}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-medium">{txn.description}</p>
+                                                            <p className="text-sm text-muted-foreground">{txn.timestamp.toLocaleDateString()}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className={`font-semibold ${txn.type === 'credit' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                                                            {txn.type === 'credit' ? '+' : '-'}₦{txn.amount.toLocaleString()}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <Button asChild variant="outline" className="w-full">
+                                        <Link href="/wallet">View All Transactions</Link>
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
                     </TabsContent>
 
                     <TabsContent value="settings">

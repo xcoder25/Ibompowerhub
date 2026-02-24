@@ -4,6 +4,7 @@ import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
 import MainLayout from '@/components/layout/main-layout';
 import { ThemeProvider } from '@/components/theme-provider';
+import { AppInitializer } from '@/components/app-initializer';
 
 export const metadata: Metadata = {
   title: 'PowerHub CRS',
@@ -26,12 +27,13 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
         >
             <FirebaseClientProvider>
-            <MainLayout>{children}</MainLayout>
+                <AppInitializer />
+                <MainLayout>{children}</MainLayout>
             </FirebaseClientProvider>
         </ThemeProvider>
       </body>

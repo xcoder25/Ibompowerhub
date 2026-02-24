@@ -11,11 +11,18 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/cart-context';
-import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingCart, Wallet } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+
+type WalletData = {
+  balance: number;
+  currency: string;
+};
 
 interface CartSheetProps {
   open: boolean;
@@ -24,6 +31,15 @@ interface CartSheetProps {
 
 export function CartSheet({ open, onOpenChange }: CartSheetProps) {
   const { items, updateQuantity, removeItem, totalPrice, totalItems } = useCart();
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const walletDocRef = useMemoFirebase(
+    () => (user && firestore ? doc(firestore, 'wallets', user.uid) : null),
+    [firestore, user]
+  );
+
+  const { data: walletData } = useDoc<WalletData>(walletDocRef);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -131,6 +147,15 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                 <span>Total</span>
                 <span className="text-primary">₦{(totalPrice + 500).toLocaleString()}</span>
               </div>
+              {walletData && (
+                <div className="flex items-center justify-between text-sm bg-muted/50 p-2 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Wallet className="h-4 w-4 text-primary" />
+                    <span>Wallet Balance</span>
+                  </div>
+                  <span className="font-medium">₦{walletData.balance.toLocaleString()}</span>
+                </div>
+              )}
             </div>
             <SheetClose asChild>
               <Button asChild className="w-full h-12 text-lg">

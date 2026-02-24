@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUser, useFirestore } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, collection } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { PlusCircle, Trash2 } from 'lucide-react';
@@ -27,18 +27,17 @@ import { useLoading } from '@/context/loading-context';
 
 const productSchema = z.object({
   name: z.string().min(2, { message: 'Product name must be at least 2 characters.' }),
+  description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
+  price: z.number().min(1, { message: 'Price must be at least ₦1.' }),
+  quantity: z.number().min(1, { message: 'Quantity must be at least 1.' }),
 });
 
 const formSchema = z.object({
-  businessName: z.string().min(2, {
-    message: 'Business name must be at least 2 characters.',
-  }),
+  product: productSchema,
   category: z.string({
     required_error: "Please select a category.",
   }),
-  priceRange: z.string().min(3, { message: 'e.g., ₦500 - ₦5000'}),
-  products: z.array(productSchema).min(1, { message: 'Please add at least one product.' }),
-  description: z.string().optional(),
+  images: z.array(z.string()).optional(),
 });
 
 export default function BecomeSellerPage() {
@@ -51,14 +50,15 @@ export default function BecomeSellerPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      businessName: '',
-      products: [{ name: '' }],
+      product: {
+        name: '',
+        description: '',
+        price: 0,
+        quantity: 1,
+      },
+      category: '',
+      images: [],
     },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "products",
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -68,32 +68,29 @@ export default function BecomeSellerPage() {
     }
     setIsLoading(true);
     try {
-      const sellerDocRef = doc(firestore, 'sellers', user.uid);
-      const userDocRef = doc(firestore, 'users', user.uid);
+      const pendingProductRef = doc(collection(firestore, 'pending_products'));
 
-      await setDoc(sellerDocRef, {
-        ...values,
-        id: user.uid,
-        name: values.businessName,
-        products: values.products.map(p => p.name),
-        distance: '0km', // This would be calculated dynamically
-        imageId: 'seller-new' // Placeholder image
+      await setDoc(pendingProductRef, {
+        ...values.product,
+        category: values.category,
+        images: values.images || [],
+        sellerId: user.uid,
+        sellerName: user.displayName || 'Unknown Seller',
+        status: 'pending',
+        submittedAt: new Date(),
       });
-
-      await setDoc(userDocRef, {
-          role: 'Seller'
-      }, { merge: true });
 
       toast({
-        title: "Congratulations!",
-        description: "You are now a seller on AgroConnect Market.",
+        title: "Product Submitted!",
+        description: "Your product has been submitted for approval. We'll review it soon.",
       });
 
-      router.push('/profile');
+      form.reset();
+      router.push('/market');
 
     } catch (error) {
-        console.error("Failed to create seller profile:", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not create seller profile.' });
+        console.error("Failed to submit product:", error);
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not submit product.' });
     } finally {
         setIsLoading(false);
     }
@@ -103,20 +100,20 @@ export default function BecomeSellerPage() {
     <div className="flex-1 p-4 sm:p-6 md:p-8">
         <Card className="w-full max-w-2xl mx-auto" glassy>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">Become a Seller</CardTitle>
-                <CardDescription>Fill out your business details to start selling on AgroConnect Market.</CardDescription>
+                <CardTitle className="font-headline text-2xl">Upload Product</CardTitle>
+                <CardDescription>Submit your fresh produce for approval on AgroConnect Market.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <FormField
                             control={form.control}
-                            name="businessName"
+                            name="product.name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Business Name</FormLabel>
+                                    <FormLabel>Product Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="e.g., Grace's Fresh Produce" {...field} />
+                                        <Input placeholder="e.g., Fresh Tomatoes" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -142,58 +139,50 @@ export default function BecomeSellerPage() {
                                 </FormItem>
                             )}
                         />
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="product.price"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Price (₦)</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="1000" {...field} onChange={e => field.onChange(parseFloat(e.target.value) || 0)} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="product.quantity"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Quantity</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="10" {...field} onChange={e => field.onChange(parseInt(e.target.value) || 1)} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
                         <FormField
                             control={form.control}
-                            name="priceRange"
+                            name="product.description"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Price Range</FormLabel>
+                                    <FormLabel>Description</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="e.g., ₦1,000 - ₦10,000" {...field} />
+                                        <Textarea placeholder="Describe your product..." {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-
-                        <div>
-                            <FormLabel>Products</FormLabel>
-                            <FormDescription className="text-xs mb-2">List the items you have for sale.</FormDescription>
-                            <div className='space-y-2'>
-                                {fields.map((field, index) => (
-                                    <div key={field.id} className='flex items-center gap-2'>
-                                         <FormField
-                                            control={form.control}
-                                            name={`products.${index}.name`}
-                                            render={({ field }) => (
-                                                <FormItem className='flex-1'>
-                                                    <FormControl>
-                                                        <Input placeholder={`Product ${index + 1}`} {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                             <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="mt-2"
-                                onClick={() => append({ name: "" })}
-                                >
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                Add Product
-                            </Button>
-                        </div>
                         
                         <Button type="submit" className="w-full" disabled={isLoading}>
-                            Submit Application
+                            Submit for Approval
                         </Button>
                     </form>
                 </Form>

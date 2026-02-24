@@ -18,6 +18,8 @@ import { Input } from '@/components/ui/input';
 import { Logo } from '@/components/logo';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
 import { useAuth } from '@/firebase';
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -44,6 +46,8 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function SignupPage() {
   const auth = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -120,7 +124,18 @@ export default function SignupPage() {
                     <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                            <div className="relative">
+                                <Input type={showPassword ? "text" : "password"} className="pr-10" placeholder="••••••••" {...field} />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </Button>
+                            </div>
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -133,7 +148,18 @@ export default function SignupPage() {
                     <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                            <div className="relative">
+                                <Input type={showConfirmPassword ? "text" : "password"} className="pr-10" placeholder="••••••••" {...field} />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                >
+                                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </Button>
+                            </div>
                         </FormControl>
                         <FormMessage />
                     </FormItem>

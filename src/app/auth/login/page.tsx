@@ -19,6 +19,8 @@ import { Logo } from '@/components/logo';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useAuth } from '@/firebase';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -38,6 +40,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function LoginPage() {
   const auth = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -91,7 +94,18 @@ export default function LoginPage() {
                         <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
+                            <div className="relative">
+                                <Input type={showPassword ? "text" : "password"} className="pr-10" placeholder="••••••••" {...field} />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </Button>
+                            </div>
                         </FormControl>
                         <FormMessage />
                         </FormItem>

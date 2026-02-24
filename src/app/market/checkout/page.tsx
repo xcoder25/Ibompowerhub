@@ -11,13 +11,24 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ShoppingBag, ArrowLeft, CreditCard, Truck, MapPin } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, CreditCard, Truck, MapPin, Wallet } from 'lucide-react';
 import Link from 'next/link';
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc, updateDoc, addDoc, collection } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
+
+type WalletData = {
+  balance: number;
+  currency: string;
+};
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
   const { showLoader, isLoading } = useLoading();
   const router = useRouter();
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const { toast } = useToast();
   
   const [formData, setFormData] = useState({
     name: '',
@@ -26,17 +37,61 @@ export default function CheckoutPage() {
     notes: '',
   });
 
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+
+  const walletDocRef = useMemoFirebase(
+    () => (user && firestore ? doc(firestore, 'wallets', user.uid) : null),
+    [firestore, user]
+  );
+
+  const { data: walletData } = useDoc<WalletData>(walletDocRef);
+
   const deliveryFee = 500;
   const grandTotal = totalPrice + deliveryFee;
+  const hasEnoughBalance = walletData ? walletData.balance >= grandTotal : false;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) return;
+
+    if (paymentMethod === 'wallet') {
+      if (!hasEnoughBalance) {
+        toast({
+          variant: 'destructive',
+          title: 'Insufficient Balance',
+          description: 'Your wallet balance is not enough for this order.'
+        });
+        return;
+      }
+
+      try {
+        // Deduct from wallet
+        const newBalance = walletData!.balance - grandTotal;
+        await updateDoc(walletDocRef!, { balance: newBalance });
+
+        // Add transaction
+        await addDoc(collection(firestore!, 'wallets', user!.uid, 'transactions'), {
+          type: 'debit',
+          amount: grandTotal,
+          description: `Payment for order - ${items.length} items`,
+          timestamp: new Date(),
+          reference: `ORD-${Date.now()}`
+        });
+      } catch (error) {
+        console.error('Error processing wallet payment:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Payment Failed',
+          description: 'Failed to process wallet payment. Please try again.'
+        });
+        return;
+      }
+    }
 
     showLoader(3000);
     setTimeout(() => {
@@ -112,7 +167,7 @@ export default function CheckoutPage() {
               <CardDescription>Choose how you'd like to pay.</CardDescription>
             </CardHeader>
             <CardContent>
-              <RadioGroup defaultValue="cod">
+              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
                 <div className="flex items-center space-x-2 border p-4 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
                   <RadioGroupItem value="cod" id="cod" />
                   <Label htmlFor="cod" className="flex-1 flex justify-between items-center cursor-pointer">
@@ -120,14 +175,32 @@ export default function CheckoutPage() {
                     <span className="text-xs text-muted-foreground">Cash or Transfer</span>
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border p-4 rounded-lg cursor-pointer opacity-50">
-                  <RadioGroupItem value="wallet" id="wallet" disabled />
-                  <Label htmlFor="wallet" className="flex-1 flex justify-between items-center">
-                    <span>PowerHub Wallet</span>
-                    <span className="text-xs font-medium text-amber-600">Coming Soon</span>
+                <div className={`flex items-center space-x-2 border p-4 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors ${!hasEnoughBalance ? 'opacity-50' : ''}`}>
+                  <RadioGroupItem value="wallet" id="wallet" disabled={!hasEnoughBalance} />
+                  <Label htmlFor="wallet" className="flex-1 flex justify-between items-center cursor-pointer">
+                    <div className="flex flex-col">
+                      <span>PowerHub Wallet</span>
+                      <span className="text-xs text-muted-foreground">
+                        Balance: ₦{walletData?.balance?.toLocaleString() || '0'}
+                      </span>
+                    </div>
+                    {!hasEnoughBalance && (
+                      <span className="text-xs font-medium text-red-600">Insufficient</span>
+                    )}
                   </Label>
                 </div>
               </RadioGroup>
+              {paymentMethod === 'wallet' && !hasEnoughBalance && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-800">
+                    Insufficient wallet balance.{' '}
+                    <Link href="/wallet" className="underline font-medium">
+                      Add funds
+                    </Link>{' '}
+                    to continue.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
