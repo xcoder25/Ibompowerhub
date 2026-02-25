@@ -1,17 +1,22 @@
 
-'use server';
+ 'use server';
 
-/**
- * @fileOverview This file defines a Genkit flow for an AI assistant that is an expert on the PowerHub CRS application.
- *
- * @interface CrsAssistantInput - The input type for the CRS assistant flow.
- * @interface CrsAssistantOutput - The output type for the CRS assistant flow.
- * @function getCrsAssistantResponse - The exported function to trigger the CRS assistant flow.
- */
+ /**
+  * Simple Genkit-powered assistant for PowerHub CRS.
+  *
+  * We bypass the higher-level prompt/flow wrappers (which were throwing
+  * `content` errors) and call `ai.generate` directly.
+  *
+  * IMPORTANT: Because this file uses "use server", the only *runtime* export
+  * must be an async function (for Next.js server actions). Any other values
+  * (schemas, constants) must remain internal.
+  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+ import { ai } from '@/ai/genkit';
+ import { z } from 'genkit';
 
+// Schemas are kept internal so that the only runtime export is the async
+// server action function below.
 const CrsAssistantInputSchema = z.object({
   query: z.string().describe("The user's question about the PowerHub CRS application."),
 });
@@ -22,43 +27,52 @@ const CrsAssistantOutputSchema = z.object({
 });
 export type CrsAssistantOutput = z.infer<typeof CrsAssistantOutputSchema>;
 
-export async function getCrsAssistantResponse(input: CrsAssistantInput): Promise<CrsAssistantOutput> {
-  return crsAssistantFlow(input);
-}
-
-const crsAssistantPrompt = ai.definePrompt({
-  name: 'crsAssistantPrompt',
-  input: {schema: CrsAssistantInputSchema},
-  output: {schema: CrsAssistantOutputSchema},
-  system: `You are an expert AI assistant for the "PowerHub CRS" application. Your purpose is to provide helpful, clear, and concise answers to user questions about the app's features and how to use them.
+const SYSTEM_PROMPT = `You are an expert AI assistant for the "PowerHub CRS" application.
+Your job is to answer questions about Cross River State (CRS) services and the PowerHub app.
+Be clear, concise, and always give next steps inside the app (which page to open, which button to tap, etc.).
 
 You have complete knowledge of all features within PowerHub CRS, including:
+- Dashboard (personalized overview, community activity, recent reports)
+- Map View & Directions (live map, alerts, and helping users find & navigate to any location in CRS)
+- Services directory (all government and community services)
+- AgroConnect Market (local farmers & products)
+- SkillsHub (artisans and service providers)
+- Transport Guide (fares and routes)
+- Community Alerts (reports like power outages, flooding, waste issues)
+- Profile and Wallet
+- The in‑app AI Assistant (you).
 
-- **Dashboard**: The user's personalized home page with a snapshot of community activity, quick actions, and recent reports.
-- **Map View**: A live map showing real-time community alerts and reports.
-- **Services**: A directory of all available services in the app.
-- **AgroConnect Market**: A marketplace for users to buy fresh produce directly from local farmers. Users can browse sellers, see their products, and get contact information.
-- **SkillsHub**: A platform to find and hire trusted local artisans like electricians, plumbers, and carpenters. Users can view their skills, ratings, and request quotes.
-- **Transport Guide**: A tool to estimate fares for local routes and view a reference of standard fares for popular trips.
-- **Community Alerts**: A live feed of reports from the community (e.g., power outages, flooding, waste overflow). Users can upvote to confirm issues and see the status of reports.
-- **Profile**: Where users can view their activity, manage their provider listings, and edit their personal information.
-- **AI Assistant**: That's you! An AI-powered guide to help users navigate the app.
+For location and navigation questions, always:
+- Restate the origin and destination (or area) in CRS.
+- Tell the user to open the Map page in PowerHub.
+- Explain what to type in the origin and destination fields.
+- Optionally describe the likely route and key landmarks in simple steps.
+`;
 
-When responding to a user's query, be friendly and direct. Provide step-by-step instructions if a user asks how to do something.
+export async function getCrsAssistantResponse(
+  input: CrsAssistantInput
+): Promise<CrsAssistantOutput> {
+  try {
+    const result = await ai.generate({
+      messages: [
+        { role: 'system', content: [{ text: SYSTEM_PROMPT }] },
+        { role: 'user', content: [{ text: input.query }] },
+      ],
+    });
 
-User's Question:
-{{query}}
-`,
-});
+    // Genkit GoogleAI plugin exposes the main text as `outputText`
+    const text = (result as any).outputText ?? String((result as any).output ?? '');
 
-const crsAssistantFlow = ai.defineFlow(
-  {
-    name: 'crsAssistantFlow',
-    inputSchema: CrsAssistantInputSchema,
-    outputSchema: CrsAssistantOutputSchema,
-  },
-  async input => {
-    const {output} = await crsAssistantPrompt(input);
-    return output!;
+    if (!text) {
+      throw new Error('Empty model response');
+    }
+
+    return { response: text };
+  } catch (error) {
+    console.warn('getCrsAssistantResponse error:', error);
+    return {
+      response:
+        "Sorry, I couldn't process that just now. Please try again in a moment or rephrase your question.",
+    };
   }
-);
+}

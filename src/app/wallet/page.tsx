@@ -19,11 +19,13 @@ import {
   Banknote,
   History,
   TrendingUp,
-  DollarSign
+  DollarSign,
+  Send
 } from 'lucide-react';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, updateDoc, collection, addDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { loadPaystackScript, initializePaystack, verifyPayment } from '@/lib/paystack';
 
 type WalletData = {
   balance: number;
@@ -45,6 +47,15 @@ export default function WalletPage() {
   const { toast } = useToast();
   const [amount, setAmount] = useState('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [paystackLoaded, setPaystackLoaded] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Transfer states
+  const [transferAmount, setTransferAmount] = useState('');
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientAccount, setRecipientAccount] = useState('');
+  const [recipientBank, setRecipientBank] = useState('');
+  const [transferReason, setTransferReason] = useState('');
 
   const walletDocRef = useMemoFirebase(
     () => (user && firestore ? doc(firestore, 'wallets', user.uid) : null),
@@ -52,6 +63,27 @@ export default function WalletPage() {
   );
 
   const { data: walletData, isLoading } = useDoc<WalletData>(walletDocRef);
+
+  // Load Paystack script
+  useEffect(() => {
+    const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || 'pk_test_...';
+    if (publicKey && publicKey !== 'pk_test_...') {
+      loadPaystackScript(publicKey)
+        .then(() => {
+          setPaystackLoaded(true);
+        })
+        .catch((error) => {
+          console.error('Failed to load Paystack:', error);
+          toast({
+            variant: 'destructive',
+            title: 'Payment Error',
+            description: 'Failed to load payment system. Please refresh the page.'
+          });
+        });
+    } else {
+      console.warn('Paystack public key not configured');
+    }
+  }, [toast]);
 
   // Initialize wallet if it doesn't exist
   useEffect(() => {
@@ -94,73 +126,224 @@ export default function WalletPage() {
   }, [user, firestore]);
 
   const addFunds = async () => {
-    if (!amount || !user || !firestore || !walletData) return;
-
-    const numAmount = parseFloat(amount);
-    if (numAmount <= 0) return;
-
-    try {
-      const newBalance = walletData.balance + numAmount;
-
-      // Update wallet balance
-      await updateDoc(walletDocRef!, { balance: newBalance });
-
-      // Add transaction
-      await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
-        type: 'credit',
-        amount: numAmount,
-        description: 'Funds added to wallet',
-        timestamp: new Date(),
-        reference: `ADD-${Date.now()}`
-      });
-
-      setAmount('');
-      toast({
-        title: 'Funds Added',
-        description: `₦${numAmount.toLocaleString()} has been added to your wallet.`
-      });
-    } catch (error) {
-      console.error('Error adding funds:', error);
+    if (!amount || !user || !firestore || !paystackLoaded) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to add funds. Please try again.'
+        description: 'Payment system not ready. Please wait a moment.'
+      });
+      return;
+    }
+
+    const numAmount = parseFloat(amount);
+    if (numAmount <= 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Amount',
+        description: 'Please enter a valid amount.'
+      });
+      return;
+    }
+
+    const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '';
+    if (!publicKey || publicKey === 'pk_test_...') {
+      toast({
+        variant: 'destructive',
+        title: 'Configuration Error',
+        description: 'Paystack public key not configured. Please contact support.'
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+    const reference = `PH-${Date.now()}-${user.uid}`;
+
+    try {
+      initializePaystack({
+        publicKey,
+        email: user.email || '',
+        amount: numAmount * 100, // Convert to kobo
+        reference,
+        metadata: {
+          userId: user.uid,
+          userName: user.displayName || '',
+          custom_fields: [
+            {
+              display_name: 'Wallet Top-up',
+              variable_name: 'wallet_topup',
+              value: 'true'
+            }
+          ]
+        },
+        onSuccess: async (response: any) => {
+          try {
+            // Verify payment with backend
+            const baseUrl = window.location.origin;
+            const verifyResult = await verifyPayment(baseUrl, response.reference);
+            
+            if (verifyResult.status && verifyResult.data.status === 'success') {
+              const verifiedAmount = verifyResult.data.amount / 100; // Convert from kobo
+              
+              // Update wallet balance
+              const currentBalance = walletData?.balance || 0;
+              const newBalance = currentBalance + verifiedAmount;
+              await updateDoc(walletDocRef!, { balance: newBalance });
+
+              // Add transaction
+              await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
+                type: 'credit',
+                amount: verifiedAmount,
+                description: 'Funds added via Paystack',
+                timestamp: new Date(),
+                reference: response.reference
+              });
+
+              setAmount('');
+              setIsProcessing(false);
+              toast({
+                title: 'Payment Successful',
+                description: `₦${verifiedAmount.toLocaleString()} has been added to your wallet.`
+              });
+            } else {
+              throw new Error('Payment verification failed');
+            }
+          } catch (error) {
+            console.error('Error verifying payment:', error);
+            setIsProcessing(false);
+            toast({
+              variant: 'destructive',
+              title: 'Verification Error',
+              description: 'Payment received but verification failed. Please contact support with reference: ' + response.reference
+            });
+          }
+        },
+        onClose: () => {
+          setIsProcessing(false);
+          toast({
+            title: 'Payment Cancelled',
+            description: 'You cancelled the payment process.'
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing payment:', error);
+      setIsProcessing(false);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to initialize payment. Please try again.'
       });
     }
   };
 
   const withdrawFunds = async () => {
-    if (!amount || !user || !firestore || !walletData) return;
-
-    const numAmount = parseFloat(amount);
-    if (numAmount <= 0 || numAmount > walletData.balance) return;
-
-    try {
-      const newBalance = walletData.balance - numAmount;
-
-      // Update wallet balance
-      await updateDoc(walletDocRef!, { balance: newBalance });
-
-      // Add transaction
-      await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
-        type: 'debit',
-        amount: numAmount,
-        description: 'Funds withdrawn from wallet',
-        timestamp: new Date(),
-        reference: `WD-${Date.now()}`
-      });
-
-      setAmount('');
-      toast({
-        title: 'Funds Withdrawn',
-        description: `₦${numAmount.toLocaleString()} has been withdrawn from your wallet.`
-      });
-    } catch (error) {
-      console.error('Error withdrawing funds:', error);
+    if (!transferAmount || !user || !firestore || !walletData) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to withdraw funds. Please try again.'
+        description: 'Please fill in all transfer details.'
+      });
+      return;
+    }
+
+    const numAmount = parseFloat(transferAmount);
+    if (numAmount <= 0 || numAmount > walletData.balance) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Amount',
+        description: 'Amount must be greater than 0 and not exceed your balance.'
+      });
+      return;
+    }
+
+    if (!recipientName || !recipientAccount || !recipientBank) {
+      toast({
+        variant: 'destructive',
+        title: 'Missing Information',
+        description: 'Please provide recipient name, account number, and bank.'
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+    const baseUrl = window.location.origin;
+
+    try {
+      // Step 1: Create transfer recipient
+      const recipientResponse = await fetch(`${baseUrl}/api/paystack/create-recipient`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'nuban',
+          name: recipientName,
+          account_number: recipientAccount,
+          bank_code: recipientBank,
+          currency: 'NGN'
+        })
+      });
+
+      if (!recipientResponse.ok) {
+        throw new Error('Failed to create recipient');
+      }
+
+      const recipientData = await recipientResponse.json();
+      const recipientCode = recipientData.data.recipient_code;
+
+      // Step 2: Initiate transfer
+      const transferResponse = await fetch(`${baseUrl}/api/paystack/transfer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'balance',
+          amount: numAmount * 100, // Convert to kobo
+          recipient: recipientCode,
+          reason: transferReason || 'Wallet withdrawal',
+          reference: `WD-${Date.now()}-${user.uid}`
+        })
+      });
+
+      if (!transferResponse.ok) {
+        throw new Error('Transfer failed');
+      }
+
+      const transferData = await transferResponse.json();
+
+      if (transferData.status && transferData.data.status === 'success') {
+        // Update wallet balance
+        const newBalance = walletData.balance - numAmount;
+        await updateDoc(walletDocRef!, { balance: newBalance });
+
+        // Add transaction
+        await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
+          type: 'debit',
+          amount: numAmount,
+          description: `Transfer to ${recipientName} - ${transferReason || 'Wallet withdrawal'}`,
+          timestamp: new Date(),
+          reference: transferData.data.reference || `WD-${Date.now()}`
+        });
+
+        // Reset form
+        setTransferAmount('');
+        setRecipientName('');
+        setRecipientAccount('');
+        setRecipientBank('');
+        setTransferReason('');
+        setIsProcessing(false);
+
+        toast({
+          title: 'Transfer Successful',
+          description: `₦${numAmount.toLocaleString()} has been transferred to ${recipientName}.`
+        });
+      } else {
+        throw new Error(transferData.message || 'Transfer failed');
+      }
+    } catch (error: any) {
+      console.error('Error processing transfer:', error);
+      setIsProcessing(false);
+      toast({
+        variant: 'destructive',
+        title: 'Transfer Failed',
+        description: error.message || 'Failed to process transfer. Please try again.'
       });
     }
   };
@@ -246,47 +429,94 @@ export default function WalletPage() {
                   <Button
                     onClick={addFunds}
                     className="w-full"
-                    disabled={!amount || parseFloat(amount) <= 0}
+                    disabled={!amount || parseFloat(amount) <= 0 || isProcessing || !paystackLoaded}
                   >
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Funds
+                    {isProcessing ? 'Processing...' : 'Pay with Paystack'}
                   </Button>
+                  {!paystackLoaded && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      Loading payment system...
+                    </p>
+                  )}
                 </CardContent>
               </Card>
 
-              {/* Withdraw Funds */}
+              {/* Transfer Funds */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Minus className="h-5 w-5 text-red-600" />
-                    Withdraw Funds
+                    <Send className="h-5 w-5 text-blue-600" />
+                    Transfer Funds
                   </CardTitle>
                   <CardDescription>
-                    Transfer money to your bank account
+                    Send money to bank account via Paystack
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="withdraw-amount">Amount (₦)</Label>
+                    <Label htmlFor="transfer-amount">Amount (₦)</Label>
                     <Input
-                      id="withdraw-amount"
+                      id="transfer-amount"
                       type="number"
                       placeholder="1000"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      value={transferAmount}
+                      onChange={(e) => setTransferAmount(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="recipient-name">Recipient Name</Label>
+                    <Input
+                      id="recipient-name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={recipientName}
+                      onChange={(e) => setRecipientName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="recipient-account">Account Number</Label>
+                    <Input
+                      id="recipient-account"
+                      type="text"
+                      placeholder="0123456789"
+                      value={recipientAccount}
+                      onChange={(e) => setRecipientAccount(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="recipient-bank">Bank Code</Label>
+                    <Input
+                      id="recipient-bank"
+                      type="text"
+                      placeholder="058 (GTBank)"
+                      value={recipientBank}
+                      onChange={(e) => setRecipientBank(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Find bank codes at paystack.com/docs/payments/transfers/bank-codes
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="transfer-reason">Reason (Optional)</Label>
+                    <Input
+                      id="transfer-reason"
+                      type="text"
+                      placeholder="Payment for services"
+                      value={transferReason}
+                      onChange={(e) => setTransferReason(e.target.value)}
                     />
                   </div>
                   <div className="text-xs text-muted-foreground">
                     Available: ₦{balance.toLocaleString()}
                   </div>
                   <Button
-                    variant="outline"
                     onClick={withdrawFunds}
                     className="w-full"
-                    disabled={!amount || parseFloat(amount) <= 0 || parseFloat(amount) > balance}
+                    disabled={!transferAmount || parseFloat(transferAmount) <= 0 || parseFloat(transferAmount) > balance || isProcessing || !recipientName || !recipientAccount || !recipientBank}
                   >
-                    <Minus className="mr-2 h-4 w-4" />
-                    Withdraw
+                    <Send className="mr-2 h-4 w-4" />
+                    {isProcessing ? 'Processing...' : 'Transfer'}
                   </Button>
                 </CardContent>
               </Card>

@@ -166,111 +166,107 @@ export default function MarketPage() {
             </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {/* Show hardcoded sellers */}
-        {sellers.map((seller) => {
-          const image = PlaceHolderImages.find((img) => img.id === seller.imageId);
-          return (
-            <Card key={seller.id} glassy className="overflow-hidden flex flex-col h-full">
-              {image && (
-                <div className="relative aspect-[3/2] w-full">
-                  <Image
-                    src={image.imageUrl}
-                    alt={seller.name}
-                    fill
-                    className="object-cover"
-                    data-ai-hint={image.imageHint}
-                  />
-                </div>
-              )}
-              <CardHeader>
-                <CardTitle className="font-headline">{seller.name}</CardTitle>
-                <CardDescription>
-                  <Badge variant="secondary">{seller.category}</Badge>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  <span>{seller.distance} away</span>
-                </div>
-                <p className="font-semibold mt-2">{seller.priceRange}</p>
-                 <div className="mt-4 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Available Products</p>
-                    <div className="flex flex-wrap gap-1.5">
-                        {seller.products.map(p => (
-                          <Button 
-                            key={p} 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-7 text-[10px] px-2 rounded-full hover:bg-primary hover:text-primary-foreground transition-colors"
-                            onClick={() => handleAddToCart(seller, p)}
-                          >
-                            <Plus className="h-3 w-3 mr-1" />
-                            {p}
-                          </Button>
-                        ))}
-                    </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex gap-2">
-                <Button 
-                    variant="default" 
-                    size="sm" 
+      {/* Product & seller grid - 4 cards per row; on small screens this scrolls horizontally without shrinking cards */}
+      <div className="w-full overflow-x-auto pb-2">
+        <div className="grid grid-cols-4 gap-6 min-w-max">
+          {/* Show hardcoded sellers */}
+          {sellers.map((seller) => {
+            const image = PlaceHolderImages.find((img) => img.id === seller.imageId);
+            return (
+              <Card
+                key={seller.id}
+                glassy
+                className="overflow-hidden flex flex-col h-full min-w-[220px]"
+              >
+                {image && (
+                  <div className="relative aspect-[3/2] w-full">
+                    <Image
+                      src={image.imageUrl}
+                      alt={seller.name}
+                      fill
+                      className="object-cover"
+                      data-ai-hint={image.imageHint}
+                    />
+                  </div>
+                )}
+                <CardHeader>
+                  <CardTitle className="font-headline">{seller.name}</CardTitle>
+                  <CardDescription>
+                    <Badge variant="secondary">{seller.category}</Badge>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    <span>{seller.distance} away</span>
+                  </div>
+                  <p className="font-semibold mt-2">{seller.priceRange}</p>
+                </CardContent>
+                <CardFooter className="flex gap-2">
+                  <Button
+                    variant="default"
+                    size="sm"
                     className="flex-1"
                     onClick={() => handleAddToCart(seller, seller.products[0])}
-                >
+                  >
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Add to Cart
-                </Button>
-              </CardFooter>
-            </Card>
-          );
-        })}
-        
-        {/* Show approved products */}
-        {approvedProducts.map((product) => {
-          const image = PlaceHolderImages.find((img) => img.id === 'seller-vegetables'); // Default image
-          return (
-            <Card key={product.id} glassy className="overflow-hidden flex flex-col h-full">
-              {image && (
-                <div className="relative aspect-[3/2] w-full">
-                  <Image
-                    src={image.imageUrl}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              <CardHeader>
-                <CardTitle className="font-headline">{product.name}</CardTitle>
-                <CardDescription>
-                  <Badge variant="secondary">{product.category}</Badge>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <span>By {product.sellerName}</span>
-                </div>
-                <p className="font-semibold mt-2">₦{product.price.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{product.description}</p>
-                <p className="text-xs text-muted-foreground mt-1">Qty: {product.quantity}</p>
-              </CardContent>
-              <CardFooter className="flex gap-2">
-                <Button 
-                    variant="default" 
-                    size="sm" 
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
+
+          {/* Show approved products */}
+          {approvedProducts.map((product) => {
+            const image = PlaceHolderImages.find((img) => img.id === 'seller-vegetables'); // Default image
+            return (
+              <Card
+                key={product.id}
+                glassy
+                className="overflow-hidden flex flex-col h-full min-w-[220px]"
+              >
+                {image && (
+                  <div className="relative aspect-[3/2] w-full">
+                    <Image
+                      src={image.imageUrl}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+                <CardHeader>
+                  <CardTitle className="font-headline">{product.name}</CardTitle>
+                  <CardDescription>
+                    <Badge variant="secondary">{product.category}</Badge>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <span>By {product.sellerName}</span>
+                  </div>
+                  <p className="font-semibold mt-2">₦{product.price.toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    {product.description}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Qty: {product.quantity}</p>
+                </CardContent>
+                <CardFooter className="flex gap-2">
+                  <Button
+                    variant="default"
+                    size="sm"
                     className="flex-1"
                     onClick={() => handleAddToCart(product)}
-                >
+                  >
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Add to Cart
-                </Button>
-              </CardFooter>
-            </Card>
-          );
-        })}
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
