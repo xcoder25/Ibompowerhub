@@ -126,6 +126,9 @@ export default function WalletPage() {
   const [isIbomAskModalOpen, setIsIbomAskModalOpen] = useState(false);
   const [scanTab, setScanTab] = useState<'scan' | 'my-qr'>('scan');
 
+  // Rate limit scanner errors so it doesn't flood the UI
+  const lastScanErrorTime = useRef(0);
+
   // Vault/Card states
   const [vaults, setVaults] = useState<Vault[]>([]);
   const [isCreateVaultOpen, setIsCreateVaultOpen] = useState(false);
@@ -1490,7 +1493,11 @@ export default function WalletPage() {
                             setIsScanModalOpen(false);
                             toast({ title: 'Account Scanned', description: `Captured account ${val}` });
                           } else {
-                            toast({ variant: 'destructive', title: 'Invalid QR', description: 'Not a valid Ibom X payment code.' });
+                            const now = Date.now();
+                            if (now - lastScanErrorTime.current > 3000) {
+                              toast({ variant: 'destructive', title: 'Invalid QR', description: 'Not a valid Ibom X payment code.' });
+                              lastScanErrorTime.current = now;
+                            }
                           }
                         }
                       }
