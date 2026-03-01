@@ -1514,23 +1514,32 @@ export default function WalletPage() {
                 <div className="relative aspect-square w-full sm:w-[300px] mx-auto bg-slate-950 rounded-3xl overflow-hidden border border-slate-300 dark:border-slate-800 flex items-center justify-center shadow-inner">
                   <Scanner
                     onScan={(result: any) => {
-                      if (result && result.length && result[0]) {
-                        // The scanner found something
-                        const val = typeof result[0].rawValue === 'string' ? result[0].rawValue : result[0];
+                      if (result && result.length) {
+                        const scanItem = result[0];
+                        // Robustly extract string from various browser detector implementations
+                        let val = '';
+                        if (typeof scanItem === 'string') val = scanItem;
+                        else if (scanItem.rawValue) val = scanItem.rawValue;
+                        else if (scanItem.text) val = scanItem.text;
+                        else val = String(scanItem);
+
                         try {
                           const parsed = JSON.parse(val);
                           if (parsed.type === 'ibomx' && parsed.account) {
                             setRecipientAccount(parsed.account);
-                            setRecipientBank('Ibom X (Internal)'); // Dummy code for visual representation
+                            setRecipientBank('ibomx'); // Must map EXACTLY to the Select option value
                             setIsScanModalOpen(false);
                             toast({ title: 'QR Scanned', description: 'Ibom X profile accepted.' });
+                          } else {
+                            // Correctly parsed JSON, but not an Ibom X code
+                            throw new Error('Not Ibom X format');
                           }
                         } catch (e) {
-                          // Not our JSON payload
-                          if (val && val.length === 10 && /^\d+$/.test(val)) {
-                            setRecipientAccount(val);
+                          // Could not parse as JSON (or thrown from above)
+                          if (val && val.trim().length === 10 && /^\d+$/.test(val.trim())) {
+                            setRecipientAccount(val.trim());
                             setIsScanModalOpen(false);
-                            toast({ title: 'Account Scanned', description: `Captured account ${val}` });
+                            toast({ title: 'Account Scanned', description: `Captured account ${val.trim()}` });
                           } else {
                             const now = Date.now();
                             if (now - lastScanErrorTime.current > 3000) {
