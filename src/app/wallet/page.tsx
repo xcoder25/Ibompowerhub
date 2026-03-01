@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const NIGERIAN_BANKS = [
+  { code: '044', name: 'Access Bank' },
+  { code: '059', name: 'Ecobank' },
+  { code: '070', name: 'Fidelity Bank' },
+  { code: '011', name: 'First Bank' },
+  { code: '214', name: 'FCMB' },
+  { code: '058', name: 'Guaranty Trust Bank (GTB)' },
+  { code: '030', name: 'Heritage Bank' },
+  { code: '082', name: 'Keystone Bank' },
+  { code: '50211', name: 'Kuda Bank' },
+  { code: '50515', name: 'Moniepoint' },
+  { code: '999992', name: 'OPay' },
+  { code: '999991', name: 'PalmPay' },
+  { code: '076', name: 'Polaris Bank' },
+  { code: '221', name: 'Stanbic IBTC Bank' },
+  { code: '232', name: 'Sterling Bank' },
+  { code: '032', name: 'Union Bank' },
+  { code: '033', name: 'United Bank for Africa (UBA)' },
+  { code: '215', name: 'Unity Bank' },
+  { code: '035', name: 'Wema Bank' },
+  { code: '057', name: 'Zenith Bank' },
+  { code: 'ibomx', name: 'Ibom X (Internal Transfer)' }
+].sort((a, b) => a.name.localeCompare(b.name));
 import {
   Wallet,
   Plus,
@@ -308,13 +333,21 @@ export default function WalletPage() {
     }
   };
 
+  // Debounced realtime verification
   useEffect(() => {
     if (recipientAccount.length >= 10 && recipientBank.length >= 3) {
       if (recipientBank.toLowerCase().includes('ibom')) {
         setRecipientName('Ibom X User');
         return;
       }
-      handleResolveAccount();
+
+      const timeoutId = setTimeout(() => {
+        handleResolveAccount();
+      }, 700);
+
+      return () => clearTimeout(timeoutId);
+    } else {
+      setRecipientName('');
     }
   }, [recipientAccount, recipientBank]);
 
@@ -1127,13 +1160,19 @@ export default function WalletPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bank Code</Label>
-                        <Input
-                          placeholder="058"
-                          className="h-14 rounded-2xl bg-slate-50/50 border-slate-100 font-mono tracking-widest"
-                          value={recipientBank}
-                          onChange={(e) => setRecipientBank(e.target.value)}
-                        />
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bank Name</Label>
+                        <Select value={recipientBank} onValueChange={setRecipientBank}>
+                          <SelectTrigger className="h-14 rounded-2xl bg-slate-50/50 border-slate-100 font-medium truncate w-[130px] sm:w-[150px]">
+                            <SelectValue placeholder="Select Bank" />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[300px]">
+                            {NIGERIAN_BANKS.map((bank) => (
+                              <SelectItem key={bank.code} value={bank.code} className="font-medium">
+                                {bank.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</Label>
