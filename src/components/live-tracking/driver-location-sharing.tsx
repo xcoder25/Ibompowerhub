@@ -71,7 +71,7 @@ export function DriverLocationSharing({ orderId, onLocationUpdate }: DriverLocat
     if (isSharing && user && liveTrackingService) {
       const handleOnline = () => {
         if (offlineLocationCache.hasUnsyncedLocations(orderId)) {
-          offlineLocationCache.syncCachedLocations(orderId, user.uid).then(() => {
+          offlineLocationCache.syncCachedLocations(orderId, user.uid, liveTrackingService).then(() => {
             toast({
               title: 'Synced',
               description: 'Cached location updates have been synced.',

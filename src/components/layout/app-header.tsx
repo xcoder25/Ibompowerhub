@@ -66,7 +66,7 @@ export function AppHeader() {
   return (
     <>
       <header className={cn(
-        "sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6",
+        "sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-green-100/60 bg-background/80 px-4 backdrop-blur-sm md:px-6",
         isMapPage && "absolute border-none bg-transparent backdrop-blur-none"
       )}>
         <div className="flex w-full items-center justify-between">
@@ -75,80 +75,80 @@ export function AppHeader() {
 
           {/* Right Side: Actions */}
           <div className="flex items-center gap-2">
-              {isDashboard && (
-                   <div className="relative hidden flex-1 sm:flex-initial md:block max-w-xs lg:max-w-md">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                          type="search"
-                          placeholder="Search services, alerts..."
-                          className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background/50"
-                      />
-                  </div>
-              )}
-              
-              <QuickNav>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                      <LayoutGrid className="h-5 w-5" />
-                  </Button>
-              </QuickNav>
-              
-              {isDashboard && (
-                  <Button asChild className='hidden sm:flex'>
-                      <Link href="/report"><Plus className='mr-2'/>Report Issue</Link>
-                  </Button>
-              )}
+            {isDashboard && (
+              <div className="relative hidden flex-1 sm:flex-initial md:block max-w-xs lg:max-w-md">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search services, alerts..."
+                  className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background/50 focus-visible:ring-green-400"
+                />
+              </div>
+            )}
 
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="rounded-full relative"
-                onClick={() => setCartOpen(true)}
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {totalItems > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0 text-[10px] bg-primary text-primary-foreground border-2 border-background">{totalItems}</Badge>
-                )}
-                <span className="sr-only">Open cart</span>
+            <QuickNav>
+              <Button variant="ghost" size="icon" className="rounded-full hover:text-green-700">
+                <LayoutGrid className="h-5 w-5" />
               </Button>
-              
-              <Button variant="ghost" size="icon" className="rounded-full relative">
-                <Bell className="h-5 w-5" />
-                {notificationCount > 0 && (
-                  <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">{notificationCount}</Badge>
-                )}
-                <span className="sr-only">Toggle notifications</span>
+            </QuickNav>
+
+            {isDashboard && (
+              <Button asChild className='hidden sm:flex bg-green-700 hover:bg-green-800 text-white'>
+                <Link href="/report"><Plus className='mr-2' />Report Issue</Link>
               </Button>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
-                      <AvatarFallback>{user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
-                    </Avatar>
-                    <span className="sr-only">Toggle user menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                   <DropdownMenuItem asChild>
-                    <Link href="/profile">
-                      <UserIcon className='mr-2' />
-                      Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                      <Settings className='mr-2' />
-                      Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className='mr-2' />
-                      Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            )}
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full relative"
+              onClick={() => setCartOpen(true)}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0 text-[10px] bg-primary text-primary-foreground border-2 border-background">{totalItems}</Badge>
+              )}
+              <span className="sr-only">Open cart</span>
+            </Button>
+
+            <Button variant="ghost" size="icon" className="rounded-full relative">
+              <Bell className="h-5 w-5" />
+              {notificationCount > 0 && (
+                <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">{notificationCount}</Badge>
+              )}
+              <span className="sr-only">Toggle notifications</span>
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
+                    <AvatarFallback>{user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
+                  </Avatar>
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <UserIcon className='mr-2' />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className='mr-2' />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className='mr-2' />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

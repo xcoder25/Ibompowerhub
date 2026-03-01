@@ -7,8 +7,8 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AppInitializer } from '@/components/app-initializer';
 
 export const metadata: Metadata = {
-  title: 'PowerHub CRS',
-  description: 'One map. All the services. Everyday life, simplified.',
+  title: 'Arise AKS',
+  description: 'Your digital gateway to Akwa Ibom State services — ARISE Agenda powered.',
 };
 
 export default function RootLayout({
@@ -26,15 +26,15 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
         >
-            <FirebaseClientProvider>
-                <AppInitializer />
-                <MainLayout>{children}</MainLayout>
-            </FirebaseClientProvider>
+          <FirebaseClientProvider>
+            <AppInitializer />
+            <MainLayout>{children}</MainLayout>
+          </FirebaseClientProvider>
         </ThemeProvider>
       </body>
     </html>

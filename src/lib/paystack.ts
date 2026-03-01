@@ -159,3 +159,45 @@ export async function verifyPayment(
 
   return response.json();
 }
+
+/**
+ * Resolve bank account details
+ */
+export async function resolveBankAccount(
+  apiUrl: string,
+  accountNumber: string,
+  bankCode: string
+): Promise<{ status: boolean; data: { account_name: string } }> {
+  const response = await fetch(
+    `${apiUrl}/api/paystack/resolve-account?account_number=${accountNumber}&bank_code=${bankCode}`,
+    { method: 'GET' }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to resolve bank account');
+  }
+
+  return response.json();
+}
+
+/**
+ * Create a Dedicated Virtual Account
+ */
+export async function createDedicatedAccount(
+  apiUrl: string,
+  userData: { email: string; firstName?: string; lastName?: string; phone?: string }
+): Promise<{ status: boolean; data: any }> {
+  const response = await fetch(`${apiUrl}/api/paystack/create-dva`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to create dedicated account');
+  }
+
+  return response.json();
+}

@@ -31,16 +31,8 @@ export const LoadingProvider = ({ children }: { children: ReactNode }) => {
   }, [pathname]);
 
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      // Show loader on clicks to links, buttons, or interactive elements
-      if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('a') || target.closest('button')) {
-        showLoader(3000);
-      }
-    };
-
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
+    // We removed the global click listener to prevent the loader from showing on every click.
+    // The loader should now be triggered manually where necessary (e.g. login, signup, routing).
   }, []);
 
   return (

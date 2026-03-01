@@ -1,4 +1,4 @@
-import { liveTrackingService, type LiveLocation } from './live-tracking';
+import { type LiveLocation } from './live-tracking';
 
 type CachedLocation = LiveLocation & {
   cachedAt: number;
@@ -38,7 +38,7 @@ class OfflineLocationCache {
   }
 
   // Sync cached locations when back online
-  async syncCachedLocations(orderId: string, driverId: string): Promise<void> {
+  async syncCachedLocations(orderId: string, driverId: string, liveTrackingService: any): Promise<void> {
     if (this.syncInProgress.has(orderId)) return;
 
     const cachedLocations = this.cache.get(orderId);

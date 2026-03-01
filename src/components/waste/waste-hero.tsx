@@ -24,11 +24,11 @@ export default function WasteHero() {
         />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center text-scenter p-6">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
-            Clean Cross River
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4 text-center">
+            Clean Akwa Ibom
           </h1>
-          <p className="text-slate-200 max-w-xl text-lg">
-            Supporting Calabar's beauty through smart waste management and
+          <p className="text-slate-200 max-w-xl text-lg text-center">
+            Preserving our state's beauty through smart waste management and
             community action.
           </p>
         </div>

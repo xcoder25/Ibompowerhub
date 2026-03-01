@@ -4,6 +4,7 @@ import React, { DependencyList, createContext, useContext, ReactNode, useMemo } 
 import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { Auth } from 'firebase/auth';
+import { FirebaseStorage } from 'firebase/storage';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
 interface FirebaseProviderProps {
@@ -11,6 +12,7 @@ interface FirebaseProviderProps {
   firebaseApp: FirebaseApp;
   firestore: Firestore;
   auth: Auth;
+  storage: FirebaseStorage;
 }
 
 // Combined state for the Firebase context
@@ -18,6 +20,7 @@ export interface FirebaseContextState {
   firebaseApp: FirebaseApp;
   firestore: Firestore;
   auth: Auth;
+  storage: FirebaseStorage;
 }
 
 // React Context
@@ -31,6 +34,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   firebaseApp,
   firestore,
   auth,
+  storage,
 }) => {
 
   const contextValue = useMemo((): FirebaseContextState => {
@@ -38,8 +42,9 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       firebaseApp,
       firestore,
       auth,
+      storage,
     };
-  }, [firebaseApp, firestore, auth]);
+  }, [firebaseApp, firestore, auth, storage]);
 
   return (
     <FirebaseContext.Provider value={contextValue}>
@@ -81,13 +86,19 @@ export const useFirebaseApp = (): FirebaseApp => {
   return firebaseApp;
 };
 
-type MemoFirebase <T> = T & {__memo?: boolean};
+/** Hook to access Firebase Storage instance. */
+export const useStorage = (): FirebaseStorage => {
+  const { storage } = useFirebase();
+  return storage;
+};
+
+type MemoFirebase<T> = T & { __memo?: boolean };
 
 export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (MemoFirebase<T>) {
   const memoized = useMemo(factory, deps);
-  
-  if(typeof memoized !== 'object' || memoized === null) return memoized;
+
+  if (typeof memoized !== 'object' || memoized === null) return memoized;
   (memoized as MemoFirebase<T>).__memo = true;
-  
+
   return memoized;
 }

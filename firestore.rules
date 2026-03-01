@@ -91,5 +91,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isSignedIn();
     }
+
+    // Rules for the 'kyc' collection — each user can only access their own KYC document
+    match /kyc/{userId} {
+      allow read, write: if isSignedIn() && isOwner(userId);
+    }
   }
 }

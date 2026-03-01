@@ -11,14 +11,13 @@ import { useLoading } from '@/context/loading-context';
 import { useToast } from '@/hooks/use-toast';
 
 export default function JobsPage() {
-  const { isLoading, showLoader } = useLoading();
+  const { isLoading } = useLoading();
   const { toast } = useToast();
 
   const handleApply = () => {
-    showLoader(3000);
     toast({
-        title: 'Application Sent!',
-        description: 'Your application has been submitted successfully.'
+      title: 'Application Sent!',
+      description: 'Your application has been submitted successfully.'
     })
   }
 
@@ -48,12 +47,12 @@ export default function JobsPage() {
                 <CardDescription>{job.company}</CardDescription>
               </CardHeader>
               <CardContent className="flex-grow space-y-2">
-                 <div className="flex items-center text-sm text-muted-foreground">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    <span>{job.location}</span>
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  <span>{job.location}</span>
                 </div>
                 <div>
-                    <Badge variant="secondary">{job.type}</Badge>
+                  <Badge variant="secondary">{job.type}</Badge>
                 </div>
               </CardContent>
               <CardFooter>

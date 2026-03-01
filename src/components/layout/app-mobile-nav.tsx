@@ -3,18 +3,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Compass, CircleUser, Bell, Plus } from 'lucide-react';
+import { Home, Compass, CircleUser, Bell, Plus, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import React from 'react';
 import { ReportIssueDialog } from '../report-issue-dialog';
 import { DialogTrigger } from '../ui/dialog';
+import { QuickNav } from '../quick-nav';
 
 const mobileNavItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/discover', icon: Compass, label: 'Discover' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
-  { href: '/profile', icon: CircleUser, label: 'Profile' },
 ];
 
 export function AppMobileNav() {
@@ -28,27 +28,38 @@ export function AppMobileNav() {
           return (
             <React.Fragment key={item.href}>
               {index === 2 && (
-                 <Link href="/report" passHref>
-                    <Button size="icon" className='rounded-full size-12 -mt-8 shadow-lg'>
-                        <Plus className="size-6"/>
-                    </Button>
-                 </Link>
+                <Link href="/report" passHref>
+                  <Button size="icon" className='rounded-full size-12 -mt-8 shadow-lg'>
+                    <Plus className="size-6" />
+                  </Button>
+                </Link>
               )}
               <Link
-                  href={item.href}
-                  className={cn(
-                      "flex flex-col items-center justify-center gap-1 transition-colors duration-200 w-16",
-                      isActive
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  )}
-                  >
-                  <item.icon className="h-6 w-6" />
-                  <span className="text-xs font-medium">{item.label}</span>
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 transition-colors duration-200 w-16",
+                  isActive
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                )}
+              >
+                <item.icon className="h-6 w-6" />
+                <span className="text-xs font-medium">{item.label}</span>
               </Link>
             </React.Fragment>
           );
         })}
+
+        <QuickNav>
+          <button
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 transition-colors duration-200 w-16 text-muted-foreground hover:text-primary"
+            )}
+          >
+            <LayoutGrid className="h-6 w-6" />
+            <span className="text-xs font-medium">More</span>
+          </button>
+        </QuickNav>
       </nav>
     </div>
   );

@@ -38,7 +38,7 @@ export const services = [
   { id: 'agro-connect', name: 'AgroConnect', iconId: 'agro-connect', description: 'Fresh farm produce near you', href: '/market' },
   { id: 'skills-hub', name: 'SkillsHub', iconId: 'skills-hub', description: 'Find reliable artisans', href: '/skills' },
   { id: 'laundry-hub', name: 'LaundryHub', iconId: 'laundry-hub', description: 'Convenient laundry services', href: '#' },
-  { id: 'clean-crs', name: 'CleanCRS', iconId: 'clean-crs', description: 'Report waste issues', href: '/waste' },
+  { id: 'clean-aks', name: 'CleanAKS', iconId: 'clean-aks', description: 'Report waste issues', href: '/waste' },
   { id: 'transport-guide', name: 'Transport Guide', iconId: 'transport-guide', description: 'Fares and routes', href: '/transport' },
   { id: 'community-safety', name: 'Community Safety', iconId: 'community-safety', description: 'Stay safe and informed', href: '/alerts' },
 ];
@@ -57,9 +57,9 @@ export const alerts = [
     type: "Power Outage",
     Icon: Power,
     iconColor: "text-yellow-500",
-    location: "Marian Road",
+    location: "Ibom Plaza",
     time: "2h ago",
-    description: "Power just went out around the MTN office. Anyone else experiencing this?",
+    description: "Power just went out around the Plaza area. Anyone else experiencing this?",
     upvotes: 12,
     comments: 3,
     user: { name: "David U.", avatarId: "user-avatar-1" },
@@ -69,9 +69,9 @@ export const alerts = [
     type: "Flood Alert",
     Icon: CloudRain,
     iconColor: "text-blue-500",
-    location: "8 Miles Area",
+    location: "Itam Market Area",
     time: "5h ago",
-    description: "Heavy flooding on the highway, please be careful if you're driving.",
+    description: "Heavy flooding on the highway near Itam, please be careful if you're driving.",
     upvotes: 25,
     comments: 8,
     user: { name: "Sarah B.", avatarId: "user-avatar-2" },
@@ -81,9 +81,9 @@ export const alerts = [
     type: "Waste Overflow",
     Icon: Trash2,
     iconColor: "text-gray-500",
-    location: "Watt Market",
+    location: "Oron Road",
     time: "1 day ago",
-    description: "The bins near the main entrance are overflowing. Requesting pickup.",
+    description: "The bins near the main junction are overflowing. Requesting pickup from AKSWMA.",
     upvotes: 8,
     comments: 1,
     user: { name: "Mike E.", avatarId: "user-avatar-3" },
@@ -118,42 +118,42 @@ export const recentActivities = [
 ];
 
 export const jobListings = [
-  { id: 1, title: 'Frontend Developer', company: 'Tech Solutions Ltd.', location: 'Calabar', type: 'Full-time', imageId: 'job-tech' },
-  { id: 2, title: 'Store Manager', company: 'Calabar Supermart', location: 'Marian', type: 'Full-time', imageId: 'job-retail' },
-  { id: 3, title: 'Site Supervisor', company: 'CRS Construction', location: 'Akpabuyo', type: 'Contract', imageId: 'job-construction' },
+  { id: 1, title: 'Frontend Developer', company: 'Ibom Tech Hub', location: 'Uyo', type: 'Full-time', imageId: 'job-tech' },
+  { id: 2, title: 'Store Manager', company: 'Ibom Mall', location: 'Oron Road', type: 'Full-time', imageId: 'job-retail' },
+  { id: 3, title: 'Site Supervisor', company: 'AKS Construction', location: 'Eket', type: 'Contract', imageId: 'job-construction' },
 ];
 
 export const propertyListings = [
-  { id: 1, title: '3 Bedroom Flat in a Serene Environment', price: '₦1,200,000/yr', type: 'For Rent', imageId: 'property-apartment' },
-  { id: 2, title: 'Newly-built 4 Bedroom Duplex', price: '₦85,000,000', type: 'For Sale', imageId: 'property-house' },
-  { id: 3, title: 'Half Plot of Land in a Developing Area', price: '₦5,000,000', type: 'For Sale', imageId: 'property-land' },
+  { id: 1, title: '3 Bedroom Flat in Shelter Afrique', price: '₦1,800,000/yr', type: 'For Rent', imageId: 'property-apartment' },
+  { id: 2, title: 'Newly-built 4 Bedroom Duplex at Ewet Housing', price: '₦125,000,000', type: 'For Sale', imageId: 'property-house' },
+  { id: 3, title: 'Plot of Land at Airport Road', price: '₦15,000,000', type: 'For Sale', imageId: 'property-land' },
 ];
 
 export const healthFacilities = [
-  { id: 1, name: 'UCTH (University of Calabar Teaching Hospital)', type: 'Hospital', imageId: 'health-hospital', phone: '08012345678', hours: '24 Hours' },
-  { id: 2, name: 'Asi Ukpo Comprehensive Medical Centre', type: 'Clinic', imageId: 'health-clinic', phone: '09011223344', hours: '8am - 9pm' },
-  { id: 3, 'name': 'City Pharmacy', 'type': 'Pharmacy', imageId: 'health-pharmacy', phone: '07098765432', hours: '8am - 10pm' },
+  { id: 1, name: 'Ibom Specialty Hospital', type: 'Hospital', imageId: 'health-hospital', phone: '08030000001', hours: '24 Hours' },
+  { id: 2, name: 'St. Luke’s Hospital, Anua', type: 'Hospital', imageId: 'health-clinic', phone: '09011223344', hours: '24 Hours' },
+  { id: 3, 'name': 'Uyo City Pharmacy', 'type': 'Pharmacy', imageId: 'health-pharmacy', phone: '07098765432', hours: '8am - 11pm' },
 ];
 
 export const educationalInstitutions = [
-  { id: 1, name: 'University of Calabar (UNICAL)', type: 'University', imageId: 'education-university' },
-  { id: 2, name: 'Hope Waddell Training Institution', type: 'Secondary School', imageId: 'education-school' },
-  { id: 3, name: 'CRS Library Board', type: 'Library', imageId: 'education-library' },
+  { id: 1, name: 'University of Uyo (UNIUYO)', type: 'University', imageId: 'education-university' },
+  { id: 2, name: 'Akwa Ibom State Library', type: 'Library', imageId: 'education-library' },
+  { id: 3, name: 'Akwa Ibom State Polytechnic', type: 'Polytechnic', imageId: 'education-school' },
 ];
 
 export const forumTopics = [
   {
     id: 1,
-    title: 'Best places to get fresh seafood in Calabar?',
+    title: 'Best places to get fresh seafood in Uyo?',
     category: 'Food & Drink',
     replies: 12,
     author: 'Esther H.',
     imageId: 'forum-discussion',
-    content: 'I have been looking for some really fresh fish and shrimps for a weekend meal. I usually go to Watt Market but the traffic is terrible lately. Are there any other good spots, maybe around 8 Miles or Marian?',
+    content: 'I have been looking for some really fresh fish and shrimps for a weekend meal. I usually go to Itam Market but the traffic is terrible lately. Are there any other good spots, maybe around Shelter Afrique or Ewet Housing?',
     createdAt: '2 hours ago',
     comments: [
-      { id: 101, author: 'David U.', text: 'Try the evening market at Marian, just by the roadside. Very fresh catches.', time: '1 hour ago' },
-      { id: 102, author: 'Sarah B.', text: 'There is a woman who brings fresh supplies to State Housing every Saturday morning. DM me for her contact.', time: '45 mins ago' }
+      { id: 101, author: 'David U.', text: 'Try the evening market at Plaza, just by the roadside. Very fresh catches.', time: '1 hour ago' },
+      { id: 102, author: 'Sarah B.', text: 'There is a woman who brings fresh supplies to Osongama every Saturday morning. DM me for her contact.', time: '45 mins ago' }
     ]
   },
   {
@@ -185,7 +185,7 @@ export const forumTopics = [
 
 export const polls = [
   { id: 1, title: 'Should streetlights be on all night?', votes: { Yes: 128, No: 34 }, totalVotes: 162 },
-  { id: 2, title: 'Which road needs urgent repairs the most?', votes: { 'Marian Road': 78, 'Murtala Mohammed Highway': 55, 'Atimbo Road': 23 }, totalVotes: 156 },
+  { id: 2, title: 'Which road needs urgent repairs the most?', votes: { 'Oron Road': 78, 'Abak Road': 55, 'Ikpa Road': 23 }, totalVotes: 156 },
 ];
 
 export const emergencyContacts = [
@@ -201,39 +201,39 @@ export const waterSchedule = [
 ];
 
 export const powerSchedule = [
-  { area: 'Federal Housing', group: 'A', 'in': '6 hours', out: '12 hours' },
-  { area: 'Etta Agbor', group: 'B', 'in': '12 hours', out: '6 hours' },
-  { area: 'MCC Road', group: 'C', 'in': '8 hours', out: '8 hours' },
+  { area: 'Shelter Afrique', group: 'A', 'in': '6 hours', out: '12 hours' },
+  { area: 'Ewet Housing', group: 'B', 'in': '12 hours', out: '6 hours' },
+  { area: 'Osongama', group: 'C', 'in': '8 hours', out: '8 hours' },
 ];
 
 export const tourismSpots = [
-  { id: 1, name: 'Obudu Mountain Resort', description: 'Famous for its temperate climate, breathtaking views, and the longest cable car in Africa.', imageId: 'tourism-obudu' },
-  { id: 2, name: 'Tinapa Business Resort', description: 'A unique blend of business and leisure, featuring retail outlets, an eight-screen cinema, and an artificial tidal lake.', imageId: 'tourism-tinapa' },
-  { id: 3, name: 'Kwa Waterfalls', description: 'A spectacular waterfall located in a narrow, steep gorge, surrounded by a tropical rainforest.', imageId: 'tourism-kwa' },
-  { id: 4, name: 'Calabar Carnival', description: 'Known as Africa\'s Biggest Street Party, a month-long celebration of culture and creativity.', imageId: 'tourism-carnival' },
+  { id: 1, name: 'Ibom Icon Hotel & Golf Resort', description: 'A world-class resort featuring a lush 18-hole golf course and premium leisure facilities.', imageId: 'tourism-obudu' },
+  { id: 2, name: 'Godswill Akpabio International Stadium', description: 'The Nest of Champions, a multi-use national stadium that hosts major sports events.', imageId: 'tourism-tinapa' },
+  { id: 3, name: 'Ibom Plaza', description: 'The heart of Uyo city, featuring a beautiful fountain and a center for social interactions.', imageId: 'tourism-kwa' },
+  { id: 4, name: 'Ibibio Museum and State Park', description: 'Showcasing the rich cultural heritage and artifacts of the Ibibio people.', imageId: 'tourism-carnival' },
 ];
 
 export const newsArticles = [
   {
     id: 1,
-    title: 'State Government Announces Plans for New Ring Road',
-    summary: 'The Cross River State government has unveiled an ambitious plan to construct a new ring road aimed at easing traffic congestion in Calabar.',
+    title: 'Governor Announces ARise Agenda Expansion',
+    summary: 'The Akwa Ibom State government has unveiled new projects under the ARISE Agenda to boost rural development.',
     category: 'Government',
     date: 'October 28, 2024',
     imageId: 'news-road'
   },
   {
     id: 2,
-    title: 'Calabar Carnival Preparations in Full Swing',
-    summary: 'With the annual Calabar Carnival just weeks away, bands are putting the final touches on their costumes and routines.',
+    title: 'Christmas Unplugged Preparations in Full Swing',
+    summary: 'Uyo is getting ready for the biggest end-of-year concert series, Christmas Unplugged, at the Christmas Village.',
     category: 'Culture',
     date: 'October 27, 2024',
     imageId: 'event-carnival'
   },
   {
     id: 3,
-    title: 'Waste Management Agency Announces New Pickup Schedule',
-    summary: 'The Cross River State Waste Management Agency has released a new schedule for waste pickup in several key areas of Calabar.',
+    title: 'AKSWMA Announces New Waste Pickup Schedule',
+    summary: 'The Akwa Ibom State Waste Management Agency has released a new schedule for waste pickup in Uyo metropolis.',
     category: 'Community',
     date: 'October 26, 2024',
     imageId: 'waste-management-hero'
@@ -241,15 +241,15 @@ export const newsArticles = [
 ];
 
 export const popularRoutes = [
-  { from: '8 Miles', to: 'Watt Market', fare: '₦300' },
-  { from: 'Marian', to: 'Unical', fare: '₦200' },
-  { from: 'Housing Estate', to: 'Akpabuyo', fare: '₦500' },
-  { from: 'Airport', to: 'Tinapa', fare: '₦400' },
+  { from: 'Ibom Plaza', to: 'Itam Park', fare: '₦200' },
+  { from: 'Oron Road', to: 'UNIUYO Town Campus', fare: '₦150' },
+  { from: 'Shelter Afrique', to: 'Plaza', fare: '₦300' },
+  { from: 'Aka Road', to: 'Ibom Hall', fare: '₦100' },
 ];
 
 export const fareEstimates: { [key: string]: string } = {
-  '8 miles-watt market': '₦300',
-  'marian-unical': '₦200',
-  'housing estate-akpabuyo': '₦500',
-  'airport-tinapa': '₦400',
+  'ibom plaza-itam park': '₦200',
+  'oron road-uniuyo town campus': '₦150',
+  'shelter afrique-plaza': '₦300',
+  'aka road-ibom hall': '₦100',
 };

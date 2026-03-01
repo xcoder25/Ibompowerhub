@@ -12,14 +12,13 @@ import { useLoading } from '@/context/loading-context';
 import { useToast } from '@/hooks/use-toast';
 
 export default function PropertyPage() {
-  const { isLoading, showLoader } = useLoading();
+  const { isLoading } = useLoading();
   const { toast } = useToast();
 
   const handleViewDetails = () => {
-    showLoader(3000);
     toast({
-        title: 'Loading Details...',
-        description: 'This feature is coming soon!'
+      title: 'Coming Soon!',
+      description: 'Property details feature is coming soon!'
     })
   }
 

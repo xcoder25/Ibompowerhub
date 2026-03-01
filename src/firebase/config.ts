@@ -12,6 +12,7 @@ export function getFirebaseConfig() {
     appId: '1:190947417613:web:c1c1e2835105b28b31bf44',
     apiKey: 'AIzaSyBcJWdofLf59OOgJB63IqAY3-KVMy_seaM',
     authDomain: 'applaud-cf1zc.firebaseapp.com',
+    storageBucket: 'applaud-cf1zc.firebasestorage.app',
     measurementId: '',
     messagingSenderId: '190947417613',
   };
@@ -20,7 +21,8 @@ export function getFirebaseConfig() {
     !firebaseConfig.apiKey ||
     !firebaseConfig.authDomain ||
     !firebaseConfig.projectId ||
-    !firebaseConfig.appId
+    !firebaseConfig.appId ||
+    !firebaseConfig.storageBucket
   ) {
     throw new Error('Invalid hardcoded Firebase config object.');
   }

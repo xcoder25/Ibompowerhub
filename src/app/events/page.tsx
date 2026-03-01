@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EventsPage() {
   const { toast } = useToast();
-  const { isLoading, showLoader } = useLoading();
+  const { isLoading } = useLoading();
   const [events, setEvents] = useState<any[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const firestore = useFirestore();
@@ -36,7 +36,6 @@ export default function EventsPage() {
   }, [firestore]);
 
   const handleViewDetails = (eventTitle: string) => {
-    showLoader(3000);
     toast({
       title: 'Coming Soon!',
       description: `Full details for "${eventTitle}" will be available shortly.`,

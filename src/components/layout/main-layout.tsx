@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState, useRef } from 'react';
 import { AssistantWidget } from '../assistant-widget';
+import { IbibioVoiceTool } from '../ibibio-voice-tool';
 import { Toaster } from '../ui/toaster';
 import { useUser, useFirestore } from '@/firebase';
 import { SplashScreen } from '../splash-screen';
@@ -19,6 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { LoadingProvider } from '@/context/loading-context';
 import { CartProvider } from '@/context/cart-context';
+import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const [isClient, setIsClient] = useState(false);
@@ -33,10 +35,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
     // Auth logic is now in a separate component that is only rendered on the client
     return (
-        <CartProvider>
-            <AuthHandler>{children}</AuthHandler>
-            <Toaster />
-        </CartProvider>
+        <LoadingProvider>
+            <CartProvider>
+                <AuthHandler>{children}</AuthHandler>
+                <Toaster />
+            </CartProvider>
+        </LoadingProvider>
     );
 }
 
@@ -121,22 +125,63 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <LoadingProvider>
-            <SidebarProvider>
-                <div className={cn("flex min-h-screen", isDashboard ? "bg-slate-50" : "bg-background")}>
-                    {!isMobile && <AppSidebar />}
-                    <div className="flex flex-col flex-1">
-                        <AppHeader />
-                        <SidebarInset>
-                            <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0")}>
-                                {children}
-                            </main>
-                        </SidebarInset>
-                        <AssistantWidget />
-                        {isMobile && <AppMobileNav />}
-                    </div>
+        <SidebarProvider>
+            <WalletMonitor />
+            <div className={cn("flex min-h-screen", isDashboard ? "bg-slate-50" : "bg-background")}>
+                {!isMobile && <AppSidebar />}
+                <div className="flex flex-col flex-1">
+                    <AppHeader />
+                    <SidebarInset>
+                        <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0")}>
+                            {children}
+                        </main>
+                    </SidebarInset>
+                    <AssistantWidget />
+                    <IbibioVoiceTool />
+                    {isMobile && <AppMobileNav />}
                 </div>
-            </SidebarProvider>
-        </LoadingProvider>
+            </div>
+        </SidebarProvider>
     );
+}
+
+function WalletMonitor() {
+    const { user } = useUser();
+    const firestore = useFirestore();
+    const { toast } = useToast();
+    const lastNotifiedTxnId = useRef<string | null>(null);
+
+    useEffect(() => {
+        if (!user || !firestore) return;
+
+        const transactionsRef = collection(firestore, 'wallets', user.uid, 'transactions');
+        const q = query(transactionsRef, orderBy('timestamp', 'desc'), limit(1));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    const data = change.doc.data();
+                    const txnId = change.doc.id;
+
+                    if (lastNotifiedTxnId.current === txnId) return;
+
+                    const timestamp = data.timestamp?.toDate() || new Date();
+                    const now = new Date();
+
+                    // Only notify if transaction happened in the last 10 seconds
+                    if (now.getTime() - timestamp.getTime() < 10000) {
+                        toast({
+                            title: data.type === 'credit' ? 'Funds Received' : 'Payment Sent',
+                            description: `${data.description}: ₦${data.amount?.toLocaleString()}`,
+                        });
+                        lastNotifiedTxnId.current = txnId;
+                    }
+                }
+            });
+        });
+
+        return () => unsubscribe();
+    }, [user, firestore, toast]);
+
+    return null;
 }

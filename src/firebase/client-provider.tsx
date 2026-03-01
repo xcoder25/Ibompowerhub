@@ -29,13 +29,14 @@ export function FirebaseClientProvider({
     return <>{children}</>;
   }
 
-  const { firebaseApp, auth, firestore } = instances;
+  const { firebaseApp, auth, firestore, storage } = instances;
 
   return (
     <FirebaseProvider
       firebaseApp={firebaseApp}
       auth={auth}
       firestore={firestore}
+      storage={storage}
     >
       {children}
     </FirebaseProvider>

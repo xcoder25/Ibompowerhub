@@ -16,6 +16,7 @@ import {
   Home,
   Lightbulb,
   Shield,
+  ShieldAlert,
   Bot,
   Building,
   Building2,
@@ -48,9 +49,11 @@ import {
 } from '@/components/ui/sidebar';
 import { Logo } from '../logo';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth, useUser, useDoc, useMemoFirebase, useFirestore } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { doc } from 'firebase/firestore';
+import { useAdmin } from '@/hooks/use-admin';
 
 const mainNav = [
   { href: '/dashboard', icon: Home, label: 'Home' },
@@ -61,7 +64,7 @@ const mainNav = [
 const servicesNav = [
   { href: '/services', icon: GanttChartSquare, label: 'All Services' },
   { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
-  { href: '/wallet', icon: Wallet, label: 'Wallet' },
+  { href: '/wallet', icon: Wallet, label: 'Ibom X' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
   { href: '/transport', icon: Bus, label: 'Transport Guide' },
   { href: '/live-tracking', icon: Navigation, label: 'Live Tracking' },
@@ -76,11 +79,11 @@ const communityNav = [
 ];
 
 const reportNav = [
-    { href: '/issues', icon: Lightbulb, label: 'All Issues' },
-    { href: '/safety', icon: Shield, label: 'Safety' },
-    { href: '/waste', icon: Trash2, label: 'Waste' },
-    { href: '/water', icon: Droplets, label: 'Water' },
-    { href: '/power', icon: Power, label: 'Power' },
+  { href: '/issues', icon: Lightbulb, label: 'All Issues' },
+  { href: '/safety', icon: Shield, label: 'Safety' },
+  { href: '/waste', icon: Trash2, label: 'Waste' },
+  { href: '/water', icon: Droplets, label: 'Water' },
+  { href: '/power', icon: Power, label: 'Power' },
 ]
 
 export function AppSidebar() {
@@ -89,6 +92,15 @@ export function AppSidebar() {
   const auth = useAuth();
   const { toast } = useToast();
   const router = useRouter();
+  const firestore = useFirestore();
+
+  const walletDocRef = useMemoFirebase(
+    () => (user && firestore ? doc(firestore, 'wallets', user.uid) : null),
+    [firestore, user]
+  );
+
+  const { data: walletData } = useDoc(walletDocRef);
+  const balance = walletData?.balance ?? 0;
 
 
   const handleSignOut = async () => {
@@ -110,24 +122,31 @@ export function AppSidebar() {
     }
   };
 
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
+
   const renderNavGroup = (items: typeof mainNav, groupLabel: string) => (
-      <SidebarGroup>
-        <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard')}
-                tooltip={item.label}
-              >
-                <Link href={item.href}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-      </SidebarGroup>
+    <SidebarGroup>
+      <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>
+      {items.map((item) => (
+        <SidebarMenuItem key={item.href}>
+          <SidebarMenuButton
+            asChild
+            isActive={pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard')}
+            tooltip={item.label}
+          >
+            <Link href={item.href} className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-2">
+                <item.icon />
+                <span>{item.label}</span>
+              </div>
+              {item.label === 'Ibom X' && (
+                <span className="text-xs font-bold text-primary">₦{balance.toLocaleString()}</span>
+              )}
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarGroup>
   )
 
   return (
@@ -137,41 +156,61 @@ export function AppSidebar() {
         <SidebarTrigger />
       </SidebarHeader>
       <SidebarContent className="p-0">
-          {renderNavGroup(mainNav, 'Main')}
-          <SidebarSeparator />
-          {renderNavGroup(servicesNav, 'Services')}
-           <SidebarSeparator />
-          {renderNavGroup(communityNav, 'Community')}
-           <SidebarSeparator />
-          {renderNavGroup(reportNav, 'Reports')}
+        {!isAdminLoading && isAdmin && (
+          <>
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-blue-600 font-bold uppercase tracking-widest text-[10px]">Administrative</SidebarGroupLabel>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.startsWith('/admin')}
+                  className="bg-blue-50/50 hover:bg-blue-100/50 text-blue-700"
+                >
+                  <Link href="/admin">
+                    <ShieldAlert className="size-4" />
+                    <span className="font-bold">Admin Panel</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarGroup>
+            <SidebarSeparator />
+          </>
+        )}
+        {renderNavGroup(mainNav, 'Main')}
+        <SidebarSeparator />
+        {renderNavGroup(servicesNav, 'Services')}
+        <SidebarSeparator />
+        {renderNavGroup(communityNav, 'Community')}
+        <SidebarSeparator />
+        {renderNavGroup(reportNav, 'Reports')}
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>
-         <SidebarMenu>
-           <SidebarMenuItem>
+        <SidebarMenu>
+          <SidebarMenuItem>
             <SidebarMenuButton tooltip="User Settings" asChild>
-                <Link href="/profile">
-                    <Avatar className="size-7">
-                        <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
-                        <AvatarFallback>{user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
-                    </Avatar>
-                    <span className='truncate'>{user?.displayName ?? 'Profile'}</span>
-                </Link>
+              <Link href="/profile">
+                <Avatar className="size-7">
+                  <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
+                  <AvatarFallback>{user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
+                </Avatar>
+                <span className='truncate'>{user?.displayName ?? 'Profile'}</span>
+              </Link>
             </SidebarMenuButton>
-           </SidebarMenuItem>
-           <SidebarMenuItem>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton tooltip="Settings">
               <Settings />
               <span>Settings</span>
             </SidebarMenuButton>
-           </SidebarMenuItem>
-           <SidebarMenuItem>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton tooltip="Logout" onClick={handleSignOut}>
-                <LogOut />
-                <span>Logout</span>
+              <LogOut />
+              <span>Logout</span>
             </SidebarMenuButton>
-           </SidebarMenuItem>
-         </SidebarMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

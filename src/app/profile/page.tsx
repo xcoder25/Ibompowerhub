@@ -4,12 +4,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard, Moon, Sun, Languages, HardHat, Wallet, Plus, Minus, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { Edit, Star, FileText, Settings, LogOut, Package, Power, LayoutDashboard, Moon, Sun, Languages, HardHat, Wallet, Plus, Minus, ArrowUpRight, ArrowDownLeft, ShieldCheck } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useUser, useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth';
+import { signOut, updateProfile } from 'firebase/auth';
 import { doc, updateDoc, collection, addDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -32,6 +32,15 @@ type UserProfile = {
     rating?: number;
     bio?: string;
     location?: string;
+};
+
+type KycData = {
+    emailVerified?: boolean;
+    phoneVerified?: boolean;
+    bvnVerified?: boolean;
+    identityVerified?: boolean;
+    addressVerified?: boolean;
+    faceVerified?: boolean;
 };
 
 type WalletData = {
@@ -69,6 +78,26 @@ export default function ProfilePage() {
     );
 
     const { data: walletData, isLoading: isWalletLoading } = useDoc<WalletData>(walletDocRef);
+
+    const kycDocRef = useMemoFirebase(
+        () => (user && firestore ? doc(firestore, 'kyc', user.uid) : null),
+        [firestore, user]
+    );
+
+    const { data: kycData } = useDoc<KycData>(kycDocRef);
+
+    const effectiveKyc: KycData = {
+        emailVerified: user?.emailVerified ?? false,
+        phoneVerified: kycData?.phoneVerified ?? false,
+        bvnVerified: kycData?.bvnVerified ?? false,
+        identityVerified: kycData?.identityVerified ?? false,
+        addressVerified: kycData?.addressVerified ?? false,
+        faceVerified: kycData?.faceVerified ?? false,
+    };
+
+    const kycCompletedCount = Object.values(effectiveKyc).filter(Boolean).length;
+    const kycTotal = 6;
+    const isFullyVerified = kycCompletedCount === kycTotal;
 
     // Local state for immediate UI updates (optimistic UI) across sessions in this demo
     const [localProfile, setLocalProfile] = useState<Partial<UserProfile>>({});
@@ -115,10 +144,32 @@ export default function ProfilePage() {
         signOut(auth);
     };
 
-    const handleUpdateProfile = (updates: any) => {
+    const handleUpdateProfile = async (updates: any) => {
         setLocalProfile(prev => ({ ...prev, ...updates }));
-        // In a real app, you would update Firestore here
-        // updateDoc(userDocRef, updates);
+
+        if (!user || !userDocRef) return;
+
+        try {
+            // Update Firestore document
+            await updateDoc(userDocRef, updates);
+
+            // Update Auth profile if name changed
+            if (updates.name && updates.name !== user.displayName) {
+                await updateProfile(user, { displayName: updates.name });
+            }
+
+            toast({
+                title: 'Profile Saved',
+                description: 'Your changes have been synced to your account.',
+            });
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            toast({
+                variant: 'destructive',
+                title: 'Save Failed',
+                description: 'Could not sync changes to the database.',
+            });
+        }
     };
 
     const handleLanguageChange = (language: string) => {
@@ -198,10 +249,8 @@ export default function ProfilePage() {
     const isSeller = localProfile?.role === 'Seller';
     const isArtisan = localProfile?.role === 'Artisan';
     const currentName = localProfile?.name ?? user?.displayName ?? 'User';
-    // @ts-ignore
     const currentBio = localProfile?.bio ?? 'Community Member';
-    // @ts-ignore
-    const currentLocation = localProfile?.location ?? 'Calabar, Nigeria';
+    const currentLocation = localProfile?.location ?? 'Uyo, Akwa Ibom';
 
 
     return (
@@ -216,7 +265,7 @@ export default function ProfilePage() {
                     <CardContent className="relative pt-0 px-6 sm:px-8 pb-8">
                         <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 -mt-12 mb-6">
                             <Avatar className="h-24 w-24 sm:h-32 sm:w-32 border-4 border-background shadow-lg text-4xl">
-                                <AvatarImage src={userProfile?.profileImageUrl ?? user?.photoURL ?? undefined} alt={currentName} />
+                                <AvatarImage src={localProfile?.profileImageUrl ?? userProfile?.profileImageUrl ?? user?.photoURL ?? undefined} alt={currentName} />
                                 <AvatarFallback>{currentName.charAt(0)}</AvatarFallback>
                             </Avatar>
 
@@ -231,7 +280,13 @@ export default function ProfilePage() {
 
                             <div className="mb-2 shrink-0">
                                 <EditProfileDialog
-                                    user={{ ...localProfile, name: currentName, bio: currentBio, location: currentLocation }}
+                                    user={{
+                                        ...localProfile,
+                                        name: currentName,
+                                        bio: currentBio,
+                                        location: currentLocation,
+                                        profileImageUrl: localProfile?.profileImageUrl ?? userProfile?.profileImageUrl ?? user?.photoURL ?? undefined
+                                    }}
                                     onUpdateProfile={handleUpdateProfile}
                                 />
                             </div>
@@ -239,6 +294,62 @@ export default function ProfilePage() {
 
                         <div className="max-w-2xl">
                             <p className="text-foreground/80 leading-relaxed">{currentBio}</p>
+                        </div>
+
+                        {/* Digital Identity / KYC Status */}
+                        <div className="mt-5 pt-5 border-t border-border/40">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div className="flex items-center gap-2">
+                                    <ShieldCheck className={`h-5 w-5 ${isFullyVerified ? 'text-green-500' : 'text-muted-foreground'}`} />
+                                    <span className="text-sm font-semibold">Digital Identity</span>
+                                    {isFullyVerified ? (
+                                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-full">
+                                            ✓ Fully Verified
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-full">
+                                            {kycCompletedCount}/{kycTotal} Steps
+                                        </span>
+                                    )}
+                                </div>
+                                <Link
+                                    href="/kyc"
+                                    className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
+                                >
+                                    {isFullyVerified ? 'View KYC' : 'Complete Verification'} →
+                                </Link>
+                            </div>
+
+                            {/* Mini Progress Bar */}
+                            <div className="mt-2 h-1.5 bg-secondary rounded-full overflow-hidden">
+                                <div
+                                    className={`h-full rounded-full transition-all duration-700 ${isFullyVerified
+                                        ? 'bg-green-500'
+                                        : 'bg-gradient-to-r from-amber-400 to-primary'
+                                        }`}
+                                    style={{ width: `${(kycCompletedCount / kycTotal) * 100}%` }}
+                                />
+                            </div>
+
+                            {/* Individual step dots */}
+                            <div className="mt-2 flex gap-1.5">
+                                {[
+                                    { key: 'emailVerified', label: 'Email' },
+                                    { key: 'phoneVerified', label: 'Phone' },
+                                    { key: 'bvnVerified', label: 'BVN' },
+                                    { key: 'identityVerified', label: 'ID' },
+                                    { key: 'addressVerified', label: 'Address' },
+                                    { key: 'faceVerified', label: 'Face' },
+                                ].map(({ key, label }) => (
+                                    <div key={key} className="flex flex-col items-center gap-1">
+                                        <div className={`w-2 h-2 rounded-full ${effectiveKyc[key as keyof KycData]
+                                            ? 'bg-green-500'
+                                            : 'bg-border'
+                                            }`} />
+                                        <span className="text-[9px] text-muted-foreground">{label}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -333,6 +444,21 @@ export default function ProfilePage() {
                     </TabsContent>
 
                     <TabsContent value="settings">
+                        {/* KYC Verification Banner */}
+                        <Link href="/kyc" className="block mb-4">
+                            <div className="flex items-center justify-between p-4 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-full">
+                                        <ShieldCheck className="h-5 w-5 text-primary" />
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-sm">KYC Verification</p>
+                                        <p className="text-xs text-muted-foreground">Complete your identity verification</p>
+                                    </div>
+                                </div>
+                                <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full">Verify →</span>
+                            </div>
+                        </Link>
                         <Card className="border-border/50">
                             <CardHeader>
                                 <CardTitle className="font-headline text-xl">App Settings</CardTitle>

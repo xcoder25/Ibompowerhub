@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { GoogleMap as GoogleMapApi, MarkerF, InfoWindow } from '@react-google-maps/api';
-import { liveTrackingService, type LiveLocation } from '@/lib/live-tracking';
+import { getLiveTrackingService, type LiveLocation } from '@/lib/live-tracking';
 import { useToast } from '@/hooks/use-toast';
+import { useFirestore } from '@/firebase';
 import { Loader2, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -13,8 +14,8 @@ const containerStyle = {
 };
 
 const center = {
-  lat: 4.97, // Calabar coordinates
-  lng: 8.34
+  lat: 5.03, // Uyo coordinates
+  lng: 7.92
 };
 
 const mapOptions = {
@@ -31,14 +32,19 @@ interface LiveTrackingMapProps {
 
 export function LiveTrackingMap({ orderId, destination, onLocationUpdate }: LiveTrackingMapProps) {
   const { toast } = useToast();
+  const firestore = useFirestore();
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [driverLocation, setDriverLocation] = useState<LiveLocation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const liveTrackingService = firestore ? getLiveTrackingService(firestore) : null;
+
   // Subscribe to location updates
   useEffect(() => {
-    const unsubscribe = liveTrackingService.subscribeToLocation(orderId, (location) => {
+    if (!liveTrackingService) return;
+
+    const unsubscribe = liveTrackingService.subscribeToLocation(orderId, (location: LiveLocation | null) => {
       setDriverLocation(location);
       onLocationUpdate?.(location);
       setIsLoading(false);
@@ -62,7 +68,7 @@ export function LiveTrackingMap({ orderId, destination, onLocationUpdate }: Live
       unsubscribe();
       clearTimeout(timeout);
     };
-  }, [orderId, onLocationUpdate, isLoading]);
+  }, [orderId, onLocationUpdate, isLoading, liveTrackingService]);
 
   // Center map on driver location when it updates
   useEffect(() => {
