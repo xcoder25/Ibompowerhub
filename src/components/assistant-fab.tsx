@@ -1,7 +1,7 @@
 
 'use client';
 
-import { MessageSquare } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -51,19 +51,19 @@ export function AssistantFAB({ onClick }: AssistantFABProps) {
     // Calculate new position based on cursor position and initial offset
     const newX = clientX - dragStart.x;
     const newY = clientY - dragStart.y;
-    
+
     // Check if the button has moved more than a few pixels to count as a drag
     if (!hasMoved) {
-        const currentRect = fabRef.current.getBoundingClientRect();
-        if (Math.abs(newX - currentRect.left) > 5 || Math.abs(newY - currentRect.top) > 5) {
-            setHasMoved(true);
-        }
+      const currentRect = fabRef.current.getBoundingClientRect();
+      if (Math.abs(newX - currentRect.left) > 5 || Math.abs(newY - currentRect.top) > 5) {
+        setHasMoved(true);
+      }
     }
 
     // Constrain movement within the viewport
     const maxX = window.innerWidth - fabRef.current.offsetWidth;
     const maxY = window.innerHeight - fabRef.current.offsetHeight;
-    
+
     const constrainedX = Math.max(0, Math.min(newX, maxX));
     const constrainedY = Math.max(0, Math.min(newY, maxY));
 
@@ -75,13 +75,13 @@ export function AssistantFAB({ onClick }: AssistantFABProps) {
     // Important: Reset hasMoved after a short delay to allow the click event to process
     setTimeout(() => setHasMoved(false), 0);
   };
-  
+
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (hasMoved) {
       e.preventDefault(); // Prevent click if it was a drag
       e.stopPropagation();
     } else {
-        onClick(e); // Fire the passed onClick handler
+      onClick(e); // Fire the passed onClick handler
     }
   }
 
@@ -96,9 +96,9 @@ export function AssistantFAB({ onClick }: AssistantFABProps) {
               isDragging && 'cursor-grabbing'
             )}
             style={{
-                left: `${position.x}px`,
-                top: `${position.y}px`,
-                touchAction: 'none' // Prevent scrolling on mobile while dragging
+              left: `${position.x}px`,
+              top: `${position.y}px`,
+              touchAction: 'none' // Prevent scrolling on mobile while dragging
             }}
             size="icon"
             onMouseDown={(e) => handleDragStart(e.clientX, e.clientY)}
@@ -111,7 +111,7 @@ export function AssistantFAB({ onClick }: AssistantFABProps) {
             onClick={handleClick}
             aria-label="AI Assistant"
           >
-            <MessageSquare className="h-7 w-7" />
+            <Sparkles className="h-7 w-7" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="left">

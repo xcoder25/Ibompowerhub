@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState, useRef } from 'react';
 import { AssistantWidget } from '../assistant-widget';
-import { IbibioVoiceTool } from '../ibibio-voice-tool';
 import { Toaster } from '../ui/toaster';
 import { useUser, useFirestore } from '@/firebase';
 import { SplashScreen } from '../splash-screen';
@@ -137,7 +136,6 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
                         </main>
                     </SidebarInset>
                     <AssistantWidget />
-                    <IbibioVoiceTool />
                     {isMobile && <AppMobileNav />}
                 </div>
             </div>
