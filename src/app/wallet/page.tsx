@@ -1587,7 +1587,7 @@ export default function WalletPage() {
                   <div className="bg-white p-6 rounded-[2rem] shadow-inner border border-slate-100 mb-6 transition-transform duration-500 hover:scale-105 group relative overflow-hidden flex items-center justify-center min-h-[224px]">
                     {walletData?.dva?.account_number ? (
                       <QRCodeSVG
-                        value={JSON.stringify({ type: 'ibomx', account: walletData.dva.account_number })}
+                        value={`{"type":"ibomx","account":"${walletData.dva.account_number}"}`}
                         size={200}
                         bgColor="#ffffff"
                         fgColor="#0f172a"
