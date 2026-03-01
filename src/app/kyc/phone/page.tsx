@@ -34,7 +34,7 @@ export default function PhoneVerificationPage() {
             return;
         }
         setIsLoading(true);
-        await new Promise(r => setTimeout(r, 1500));
+        // Instant
         setIsLoading(false);
         setStep('enter_otp');
         toast({ title: 'OTP Sent', description: `Code sent to ${phone}` });
@@ -54,7 +54,6 @@ export default function PhoneVerificationPage() {
             return;
         }
         setIsLoading(true);
-        await new Promise(r => setTimeout(r, 1500));
         try {
             if (kycDocRef) await setDoc(kycDocRef, { phoneVerified: true }, { merge: true });
             toast({ title: 'Phone Verified!', description: 'Your phone number has been verified.' });

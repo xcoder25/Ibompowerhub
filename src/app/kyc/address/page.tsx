@@ -41,7 +41,6 @@ export default function AddressVerificationPage() {
             return;
         }
         setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 2000));
         try {
             if (kycDocRef) {
                 await setDoc(kycDocRef, { addressVerified: true, address: form }, { merge: true });
@@ -58,27 +57,25 @@ export default function AddressVerificationPage() {
     const isComplete = form.street && form.city && form.lga;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+        <div className="flex flex-col h-full bg-background">
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/40">
-                <div className="max-w-lg mx-auto flex items-center gap-3 px-4 py-4">
-                    <button onClick={() => router.back()} className="p-2 rounded-full hover:bg-secondary/60 transition-colors">
-                        <ArrowLeft className="h-5 w-5" />
-                    </button>
-                    <h1 className="text-xl font-bold font-headline">Address Verification</h1>
-                </div>
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border/40 shrink-0">
+                <button onClick={() => router.back()} className="p-1.5 rounded-full hover:bg-secondary/70 transition-colors">
+                    <ArrowLeft className="h-5 w-5" />
+                </button>
+                <h1 className="text-base font-bold">Address Verification</h1>
             </div>
 
-            <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
                 {/* Icon */}
-                <div className="flex flex-col items-center text-center space-y-3">
-                    <div className="w-20 h-20 rounded-full bg-orange-500/10 flex items-center justify-center">
-                        <MapPin className="h-9 w-9 text-orange-500" />
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0">
+                        <MapPin className="h-5 w-5 text-orange-500" />
                     </div>
-                    <h2 className="text-2xl font-bold font-headline">Verify Your Address</h2>
-                    <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
-                        Provide your current residential address for verification.
-                    </p>
+                    <div>
+                        <p className="font-semibold text-sm">Verify Your Address</p>
+                        <p className="text-xs text-muted-foreground">Provide your current residential address</p>
+                    </div>
                 </div>
 
                 {/* Form */}
