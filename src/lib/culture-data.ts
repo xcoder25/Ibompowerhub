@@ -162,6 +162,11 @@ export const IBIBIO_DICTIONARY = [
     { english: "Thirst", ibibio: "Isui mmung", tones: "H-L H", category: "food" },
     { english: "I am hungry", ibibio: "Mme isui", tones: "H H-L", category: "food" },
     { english: "I am thirsty", ibibio: "Mme isui mmung", tones: "H H-L H", category: "food" },
+    { english: "Money", ibibio: "Okuk", tones: "H-L", category: "phrases" },
+    { english: "Wallet", ibibio: "Ekpat okuk", tones: "H-L H-L", category: "phrases" },
+    { english: "Received", ibibio: "Ama bọ", tones: "H L", category: "verbs" },
+    { english: "Transfer", ibibio: "Ika okuk", tones: "H-L H-L", category: "verbs" },
+    { english: "Funds", ibibio: "Okuk", tones: "H-L", category: "phrases" },
 
     // ─── Numbers ───────────────────────────────────────────────────────────────
     { english: "One", ibibio: "Kiet", tones: "H-L", category: "numbers" },

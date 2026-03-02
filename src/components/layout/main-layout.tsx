@@ -20,6 +20,7 @@ import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { LoadingProvider } from '@/context/loading-context';
 import { CartProvider } from '@/context/cart-context';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { useIbibioAI } from '@/hooks/use-ibibio-ai';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const [isClient, setIsClient] = useState(false);
@@ -147,6 +148,7 @@ function WalletMonitor() {
     const { user } = useUser();
     const firestore = useFirestore();
     const { toast } = useToast();
+    const { translateAndSpeak } = useIbibioAI();
     const lastNotifiedTxnId = useRef<string | null>(null);
 
     useEffect(() => {
@@ -172,6 +174,25 @@ function WalletMonitor() {
                             title: data.type === 'credit' ? 'Funds Received' : 'Payment Sent',
                             description: `${data.description}: ₦${data.amount?.toLocaleString()}`,
                         });
+
+                        // Voice notification
+                        if (data.type === 'credit') {
+                            const amountStr = data.amount?.toLocaleString();
+                            // Handle source (from description)
+                            let fromStr = data.description
+                                .replace('Top-up: ', '')
+                                .replace('Funds added via ', '')
+                                .replace('Internal Transfer from ', '')
+                                .replace('Demo Credit Top-up', 'Simulation Source');
+
+                            if (fromStr === 'Paystack' || fromStr.includes('webhook')) fromStr = 'External Transfer';
+                            if (!fromStr || fromStr.trim() === '') fromStr = 'Unknown Payer';
+
+                            const msg = `You have received ${amountStr} naira from ${fromStr}`;
+                            translateAndSpeak(msg);
+                            console.log('Speaking wallet notification:', msg);
+                        }
+
                         lastNotifiedTxnId.current = txnId;
                     }
                 }

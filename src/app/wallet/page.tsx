@@ -69,7 +69,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, updateDoc, where, getDocs } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { loadPaystackScript, initializePaystack, verifyPayment, resolveBankAccount, createDedicatedAccount } from '@/lib/paystack';
 import { Copy, Check, Info } from 'lucide-react';
@@ -575,6 +575,8 @@ export default function WalletPage() {
       try {
         const newBalance = walletData.balance - numAmount;
         await updateDoc(walletDocRef, { balance: newBalance });
+
+        // 1. Log debit for sender
         await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
           type: 'debit',
           amount: numAmount,
@@ -583,6 +585,30 @@ export default function WalletPage() {
           reference: `IX-${Date.now()}`,
           status: 'success'
         });
+
+        // 2. Resolve recipient and log credit
+        const walletsRef = collection(firestore, 'wallets');
+        const qRecipient = query(walletsRef, where('dva.account_number', '==', recipientAccount), limit(1));
+        const recipientDocs = await getDocs(qRecipient);
+
+        if (!recipientDocs.empty) {
+          const recipientId = recipientDocs.docs[0].id;
+          const recipientDataRaw = recipientDocs.docs[0].data();
+          const recipientRef = doc(firestore, 'wallets', recipientId);
+
+          // Credit recipient
+          await updateDoc(recipientRef, { balance: (recipientDataRaw.balance || 0) + numAmount });
+
+          // Add transaction for recipient
+          await addDoc(collection(firestore, 'wallets', recipientId, 'transactions'), {
+            type: 'credit',
+            amount: numAmount,
+            description: `Internal Transfer from ${user.displayName || 'Ibom X User'}`,
+            timestamp: serverTimestamp(),
+            reference: `IX-REC-${Date.now()}`,
+            status: 'success'
+          });
+        }
 
         setTransferAmount('');
         setRecipientName('');
