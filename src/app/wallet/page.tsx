@@ -65,7 +65,8 @@ import {
   Wifi,
   PiggyBank,
   Snowflake,
-  Zap
+  Zap,
+  AlertTriangle
 } from 'lucide-react';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
@@ -144,6 +145,10 @@ export default function WalletPage() {
   const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [securityPin, setSecurityPin] = useState('');
   const [isPinSetup, setIsPinSetup] = useState(false);
+
+  // Simulator for Starter/Test mode
+  const [showSimulatePrompt, setShowSimulatePrompt] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
   const [isCreatingDva, setIsCreatingDva] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
@@ -672,11 +677,59 @@ export default function WalletPage() {
     } catch (error: any) {
       console.error('Error processing transfer:', error);
       setIsTransferring(false);
-      toast({
-        variant: 'destructive',
-        title: 'Transfer Failed',
-        description: error.message || 'Payment provider error. Please check your account details.'
+
+      const errorMsg = error.message || '';
+      console.log('Transfer Error Received:', errorMsg);
+
+      if (errorMsg.toLowerCase().includes('starter')) {
+        setLastError(errorMsg);
+        setShowSimulatePrompt(true);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Transfer Failed',
+          description: errorMsg || 'Payment provider error. Please check your account details.'
+        });
+      }
+    }
+  };
+
+  const performSimulatedTransfer = async () => {
+    if (!user || !walletData || !recipientAccount) return;
+    const numAmount = parseFloat(transferAmount);
+    if (isNaN(numAmount) || numAmount <= 0) return;
+
+    setIsTransferring(true);
+    setShowSimulatePrompt(false);
+
+    try {
+      const newBalance = walletData.balance - numAmount;
+      await updateDoc(walletDocRef!, { balance: newBalance });
+
+      await addDoc(collection(firestore!, 'wallets', user.uid, 'transactions'), {
+        type: 'debit',
+        amount: numAmount,
+        description: `(SIMULATED) Transfer to ${recipientAccount} - ${transferReason || 'Withdrawal'}`,
+        timestamp: serverTimestamp(),
+        reference: `SIM-${Date.now()}`,
+        status: 'success',
+        isSimulated: true
       });
+
+      setTransferAmount('');
+      setRecipientName('');
+      setRecipientAccount('');
+      setRecipientBank('');
+      setTransferReason('');
+
+      toast({
+        title: 'Simulation Successful',
+        description: `₦${numAmount.toLocaleString()} deducted in Demo Mode.`
+      });
+    } catch (err: any) {
+      toast({ variant: 'destructive', title: 'Simulation Error', description: err.message });
+    } finally {
+      setIsTransferring(false);
     }
   };
 
@@ -1724,6 +1777,42 @@ export default function WalletPage() {
               Fund Instantly
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Simulator Dialog for Starter restriction */}
+      <Dialog open={showSimulatePrompt} onOpenChange={setShowSimulatePrompt}>
+        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8 text-center">
+          <div className="mx-auto bg-amber-100 dark:bg-amber-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <AlertTriangle className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+          </div>
+          <DialogTitle className="text-2xl font-black uppercase tracking-widest text-slate-900 dark:text-white mb-2">Transfer Restricted</DialogTitle>
+          <DialogDescription className="text-sm font-medium text-slate-500 mb-6">
+            Paystack has restricted your account from making live transfers because it is currently in "Starter" mode.
+          </DialogDescription>
+
+          <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-left mb-8">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Provider Error</p>
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-300 italic">"{lastError}"</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3">
+            <Button
+              onClick={performSimulatedTransfer}
+              className="h-16 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-widest shadow-xl shadow-amber-600/20"
+            >
+              <Zap className="mr-2 h-5 w-5" />
+              Simulate Success (Demo)
+            </Button>
+            <Button
+              onClick={() => setShowSimulatePrompt(false)}
+              variant="ghost"
+              className="h-12 rounded-2xl font-bold text-slate-500"
+            >
+              Cancel
+            </Button>
+          </div>
+          <p className="text-[10px] text-slate-400 mt-6 font-medium">Use Simulation to test the wallet flow until your Paystack account is upgraded.</p>
         </DialogContent>
       </Dialog>
     </>

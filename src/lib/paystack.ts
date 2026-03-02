@@ -4,14 +4,14 @@
  */
 
 export interface PaystackConfig {
-  publicKey: string;
+  key: string;
   email: string;
   amount: number; // in kobo (NGN) or smallest currency unit
-  reference?: string;
+  ref?: string;
   metadata?: Record<string, any>;
-  callback_url?: string;
-  onSuccess?: (response: any) => void;
+  callback?: (response: any) => void;
   onClose?: () => void;
+  currency?: string;
 }
 
 export interface TransferRecipient {
@@ -29,6 +29,31 @@ export interface TransferData {
   recipient: string; // recipient code from Paystack
   reason?: string;
   reference?: string;
+  currency?: string;
+}
+
+export interface BulkTransferData {
+  source: 'balance';
+  currency?: string;
+  transfers: {
+    amount: number;
+    recipient: string;
+    reference?: string;
+    reason?: string;
+  }[];
+}
+
+export interface FinalizeTransferData {
+  transfer_code: string;
+  otp: string;
+}
+
+export interface ListTransferParams {
+  perPage?: number;
+  page?: number;
+  recipient?: string;
+  from?: string;
+  to?: string;
 }
 
 declare global {
@@ -50,14 +75,14 @@ export function initializePaystack(config: PaystackConfig): void {
   }
 
   const handler = window.PaystackPop.setup({
-    key: config.publicKey,
+    key: config.key,
     email: config.email,
     amount: config.amount,
-    ref: config.reference || `PH-${Date.now()}`,
+    ref: config.ref || `PH-${Date.now()}`,
     metadata: config.metadata || {},
     callback: (response: any) => {
-      if (config.onSuccess) {
-        config.onSuccess(response);
+      if (config.callback) {
+        config.callback(response);
       }
     },
     onClose: () => {
@@ -197,6 +222,116 @@ export async function createDedicatedAccount(
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to create dedicated account');
+  }
+
+  return response.json();
+}
+
+/**
+ * Finalize transfer via Paystack API
+ */
+export async function finalizeTransfer(
+  apiUrl: string,
+  finalizeData: FinalizeTransferData
+): Promise<{ status: boolean; data: any }> {
+  const response = await fetch(`${apiUrl}/api/paystack/transfer/finalize`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(finalizeData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to finalize transfer');
+  }
+
+  return response.json();
+}
+
+/**
+ * Initiate bulk transfer via Paystack API
+ */
+export async function initiateBulkTransfer(
+  apiUrl: string,
+  bulkData: BulkTransferData
+): Promise<{ status: boolean; data: any[] }> {
+  const response = await fetch(`${apiUrl}/api/paystack/transfer/bulk`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(bulkData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to initiate bulk transfer');
+  }
+
+  return response.json();
+}
+
+/**
+ * List transfers via Paystack API
+ */
+export async function listTransfers(
+  apiUrl: string,
+  params: ListTransferParams = {}
+): Promise<{ status: boolean; data: any[]; meta: any }> {
+  const queryParams = new URLSearchParams();
+  if (params.perPage) queryParams.append('perPage', params.perPage.toString());
+  if (params.page) queryParams.append('page', params.page.toString());
+  if (params.recipient) queryParams.append('recipient', params.recipient);
+  if (params.from) queryParams.append('from', params.from);
+  if (params.to) queryParams.append('to', params.to);
+
+  const response = await fetch(`${apiUrl}/api/paystack/transfer?${queryParams.toString()}`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to list transfers');
+  }
+
+  return response.json();
+}
+
+/**
+ * Fetch transfer details via Paystack API
+ */
+export async function fetchTransfer(
+  apiUrl: string,
+  idOrCode: string
+): Promise<{ status: boolean; data: any }> {
+  const response = await fetch(`${apiUrl}/api/paystack/transfer/${idOrCode}`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch transfer');
+  }
+
+  return response.json();
+}
+
+/**
+ * Verify transfer status via Paystack API
+ */
+export async function verifyTransfer(
+  apiUrl: string,
+  reference: string
+): Promise<{ status: boolean; data: any }> {
+  const response = await fetch(`${apiUrl}/api/paystack/transfer/verify/${reference}`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to verify transfer');
   }
 
   return response.json();
