@@ -334,6 +334,69 @@ function DesktopLanding() {
         </div>
       </section>
 
+      {/* Governor / ARISE Spotlight */}
+      <section className="relative px-6 py-24 overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-40 left-0 w-[600px] h-[600px] rounded-full bg-emerald-800/20 blur-[140px]" />
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-amber-800/10 blur-[140px]" />
+        </div>
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-0 bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/10 rounded-[2.5rem] overflow-hidden">
+
+            {/* Governor image — left panel */}
+            <div className="relative w-full lg:w-[420px] shrink-0 h-[420px] lg:h-auto lg:self-stretch">
+              <Image
+                src="/governor.png"
+                alt="Governor Umo Eno — Akwa Ibom State"
+                fill
+                className="object-cover object-top"
+                priority
+              />
+              {/* Gradient overlay fading to dark on the right */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#040d06]/80 hidden lg:block" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#040d06]/80 via-transparent to-transparent lg:hidden" />
+
+              {/* Name badge */}
+              <div className="absolute bottom-5 left-5 bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl px-4 py-2.5">
+                <p className="text-white font-black text-sm">H.E. Umo Eno</p>
+                <p className="text-emerald-400 text-xs font-semibold">Governor, Akwa Ibom State</p>
+              </div>
+            </div>
+
+            {/* Text — right panel */}
+            <div className="flex-1 p-8 lg:p-14">
+              <div className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 rounded-full px-4 py-1.5 mb-6 text-emerald-300 text-xs font-bold uppercase tracking-widest">
+                <Image src="/arise2.png" alt="ARISE" width={16} height={16} className="rounded-sm" />
+                ARISE Agenda
+              </div>
+
+              <blockquote className="text-2xl lg:text-3xl font-black text-white leading-snug mb-6">
+                "Digitising access to government services, empowering our people, and driving inclusive economic growth across every LGA."
+              </blockquote>
+
+              <p className="text-white/50 text-base leading-relaxed mb-8">
+                Ibom PowerHub is the digital backbone of the ARISE Agenda — connecting 31 Local Government Areas of Akwa Ibom State to smarter governance, financial inclusion, and modern public services.
+              </p>
+
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { value: '31', label: 'LGAs Connected' },
+                  { value: '4M+', label: 'Citizens Served' },
+                  { value: '2025', label: 'ARISE Roadmap' },
+                ].map(({ value, label }) => (
+                  <div key={label} className="bg-white/5 border border-white/8 rounded-2xl p-4 text-center">
+                    <p className="text-2xl font-black text-emerald-400 mb-1">{value}</p>
+                    <p className="text-xs text-white/50 font-medium">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Security */}
       <section className="px-6 py-24 bg-[#040d06]">
         <div className="max-w-5xl mx-auto">
