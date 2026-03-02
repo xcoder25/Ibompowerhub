@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { IBIBIO_DICTIONARY } from '@/lib/culture-data';
+import { IBIBIO_DICTIONARY, findIbibioTranslation } from '@/lib/culture-data';
 
 export type TonalPattern = 'H' | 'L' | 'D' | string;
 
@@ -85,18 +85,16 @@ export function useIbibioAI() {
     }, []);
 
     const translateAndSpeak = useCallback((englishText: string) => {
-        const found = IBIBIO_DICTIONARY.find(
-            p => p.english.toLowerCase() === englishText.toLowerCase()
-        );
+        const found = findIbibioTranslation(englishText);
 
         if (found) {
             speakTonal(found.ibibio, found.tones);
             return found.ibibio;
         }
 
-        // AI Fallback for unknown words (simulated)
+        // AI Fallback for unknown words — speak as-is
         speakTonal(englishText);
-        return englishText;
+        return `[No Ibibio translation found for "${englishText}"]`;
     }, [speakTonal]);
 
     return {
