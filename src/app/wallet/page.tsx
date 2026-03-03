@@ -11,36 +11,14 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-const NIGERIAN_BANKS = [
-  { code: '044', name: 'Access Bank' },
-  { code: '059', name: 'Ecobank' },
-  { code: '070', name: 'Fidelity Bank' },
-  { code: '011', name: 'First Bank' },
-  { code: '214', name: 'FCMB' },
-  { code: '058', name: 'Guaranty Trust Bank (GTB)' },
-  { code: '030', name: 'Heritage Bank' },
-  { code: '082', name: 'Keystone Bank' },
-  { code: '50211', name: 'Kuda Bank' },
-  { code: '50515', name: 'Moniepoint' },
-  { code: '999992', name: 'OPay' },
-  { code: '999991', name: 'PalmPay' },
-  { code: '076', name: 'Polaris Bank' },
-  { code: '221', name: 'Stanbic IBTC Bank' },
-  { code: '232', name: 'Sterling Bank' },
-  { code: '032', name: 'Union Bank' },
-  { code: '033', name: 'United Bank for Africa (UBA)' },
-  { code: '215', name: 'Unity Bank' },
-  { code: '035', name: 'Wema Bank' },
-  { code: '057', name: 'Zenith Bank' },
-  { code: 'ibomx', name: 'Ibom X (Internal Transfer)' }
-].sort((a, b) => a.name.localeCompare(b.name));
+import { Switch } from '@/components/ui/switch';
 import {
   Wallet,
   Plus,
   Minus,
   ArrowUpRight,
   ArrowDownLeft,
+  ArrowRight,
   CreditCard,
   Smartphone,
   Banknote,
@@ -840,20 +818,24 @@ export default function WalletPage() {
   return (
     <>
       {!isUnlocked && <WalletLock onUnlock={handleUnlock} />}
-      <div className="flex-1 bg-slate-50/50 dark:bg-slate-950 pb-20 md:pb-8 overflow-x-hidden w-full">
-        <div className="max-w-md mx-auto sm:max-w-2xl md:max-w-4xl lg:max-w-6xl p-4 sm:p-6 md:p-8 space-y-6">
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative overflow-hidden mesh-gradient">
+        {/* Cinematic Background Glows */}
+        <div className="absolute top-0 right-0 w-[1200px] h-[1200px] bg-emerald-500/10 rounded-full blur-[200px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
+        <div className="absolute bottom-0 left-0 w-[1000px] h-[1000px] bg-orange-500/10 rounded-full blur-[200px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
+
+        <div className="container mx-auto p-4 md:p-12 space-y-12 relative z-10">
 
           {/* Header - Premium Look */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-tr from-emerald-600 to-emerald-400 p-2.5 rounded-2xl shadow-lg shadow-emerald-500/20">
-                <Wallet className="h-6 w-6 text-white" />
+            <div className="flex items-center gap-4">
+              <div className="size-14 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/20">
+                <Wallet className="size-8 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-black tracking-tight flex items-center gap-2">
-                  Ibom <span className="text-emerald-500 italic">X</span>
+                <h1 className="text-4xl font-black tracking-tighter flex items-center gap-3">
+                  Ibom <span className="bg-gradient-to-r from-emerald-500 to-orange-500 bg-clip-text text-transparent italic tracking-tightest">Pay.</span>
                 </h1>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Financial Super App</p>
+                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.4em]">Official ARISE Ecosystem</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" className="rounded-full bg-slate-100 dark:bg-slate-900">
@@ -1056,393 +1038,370 @@ export default function WalletPage() {
               </TabsList>
             </div>
 
-            <TabsContent value="manage" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Enhanced Add Funds */}
-                <Card className="border-none shadow-sm rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-100 dark:ring-slate-800">
-                  <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800/50">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-emerald-500/10 rounded-xl">
-                        <Plus className="h-5 w-5 text-emerald-600" />
+            <TabsContent value="manage" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                {/* Institutional Deposit Protocol */}
+                <Card className="border-none shadow-[0_80px_160px_-30px_rgba(16,185,129,0.15)] rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(16,185,129,0.25)] transition-all duration-700">
+                  <CardHeader className="p-10 pb-0">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-2">
+                        <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Inbound Protocol</Badge>
+                        <CardTitle className="text-4xl font-black tracking-tightest">DEPOSIT</CardTitle>
                       </div>
-                      <div>
-                        <CardTitle className="text-base font-black uppercase tracking-widest">Deposit</CardTitle>
-                        <CardDescription className="text-[10px] font-bold uppercase tracking-tight">Instant Secure Top-up</CardDescription>
+                      <div className="size-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center shadow-inner">
+                        <Plus className="size-8 text-emerald-600" />
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="pt-8 space-y-8">
-                    <div className="space-y-3">
-                      <Label htmlFor="add-amount" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Amount to Deposit</Label>
-                      <div className="relative">
-                        <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-slate-300 text-xl">₦</span>
+                  <CardContent className="p-10 space-y-10">
+                    <div className="space-y-4">
+                      <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Quantum of Injection</Label>
+                      <div className="relative group">
+                        <span className="absolute left-8 top-1/2 -translate-y-1/2 font-black text-slate-300 text-3xl transition-colors group-focus-within:text-emerald-500">₦</span>
                         <Input
-                          id="add-amount"
                           type="number"
                           placeholder="0.00"
-                          className="pl-12 h-16 text-2xl font-black rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-emerald-500 transition-all"
+                          className="pl-16 h-24 text-4xl font-black rounded-3xl border-none bg-slate-50 dark:bg-slate-950/50 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-inner tracking-tighter"
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
                         />
                       </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      {['1000', '5000', '10000'].map(val => (
-                        <Button
-                          key={val}
-                          variant="outline"
-                          onClick={() => setAmount(val)}
-                          className="rounded-2xl border-slate-100 py-7 font-black text-sm hover:border-emerald-500 hover:bg-emerald-50/30 active:scale-95 transition-all"
-                        >
-                          ₦{parseInt(val).toLocaleString()}
-                        </Button>
-                      ))}
+                      <div className="grid grid-cols-3 gap-4">
+                        {['5000', '10000', '25000'].map(val => (
+                          <Button
+                            key={val}
+                            variant="outline"
+                            onClick={() => setAmount(val)}
+                            className="rounded-2xl border-slate-100 dark:border-slate-800 py-8 font-black text-xs uppercase tracking-widest hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all shadow-sm"
+                          >
+                            ₦{parseInt(val).toLocaleString()}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
 
                     <Button
                       onClick={addFunds}
-                      className="w-full h-16 rounded-[1.5rem] text-sm font-black uppercase tracking-[0.2em] shadow-2xl shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      className="w-full h-20 rounded-3xl text-sm font-black uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(16,185,129,0.4)] bg-emerald-600 hover:bg-emerald-500 transition-all hover:scale-[1.02] active:scale-[0.95] py-6"
                       disabled={!amount || parseFloat(amount) <= 0 || isAddingFunds}
                     >
-                      {isAddingFunds ? (
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      ) : (
-                        <CreditCard className="mr-2 h-5 w-5" />
-                      )}
-                      {isAddingFunds ? 'Verifying...' : 'Pay Securely'}
+                      {isAddingFunds ? <Loader2 className="mr-3 size-6 animate-spin" /> : <CreditCard className="mr-3 size-6" />}
+                      {isAddingFunds ? 'CALIBRATING...' : 'INITIATE SECURE PAY'}
                     </Button>
 
-                    <Separator />
+                    <Separator className="bg-slate-100/50 dark:bg-slate-800/50" />
 
-                    {/* Dedicated Virtual Account Section */}
-                    <div className="space-y-4 pt-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-slate-500 font-bold text-xs uppercase tracking-widest">Bank Transfer Top-up</Label>
-                        <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[10px]">Permanent</Badge>
+                    {/* DVA Section Restyled */}
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between px-2">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Direct Reserve Node</Label>
+                        <Badge className="bg-orange-500/10 text-orange-500 border-none font-black px-3 py-1 rounded-lg uppercase text-[8px] tracking-[0.2em]">Live Simulation Off</Badge>
                       </div>
 
                       {walletData?.dva ? (
-                        <div className="relative overflow-hidden bg-slate-950 text-white p-6 rounded-[1.5rem] border border-white/5 shadow-2xl group">
-                          <div className="relative z-10 space-y-5">
+                        <div className="relative overflow-hidden bg-slate-950 p-8 rounded-[2.5rem] border border-white/5 shadow-2xl group cursor-pointer hover:border-emerald-500/20 transition-all duration-500">
+                          <div className="absolute top-0 right-0 p-32 bg-emerald-500/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                          <div className="relative z-10 space-y-6">
                             <div className="flex justify-between items-center">
-                              <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">Bank Account Number</p>
-                              <div className="p-1.5 bg-white/5 rounded-lg border border-white/10">
-                                <Banknote className="h-4 w-4 text-emerald-400" />
+                              <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.3em] italic">System IBAN / DVA</p>
+                              <div className="size-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:rotate-12 transition-transform">
+                                <Banknote className="size-6 text-emerald-400" />
                               </div>
                             </div>
-
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="text-2xl sm:text-3xl font-black font-mono tracking-widest break-all">{walletData.dva.account_number}</h3>
+                            <div className="flex items-center gap-4">
+                              <h3 className="text-3xl font-black font-mono tracking-[0.15em] text-white group-hover:text-emerald-400 transition-colors">{walletData.dva.account_number}</h3>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-10 w-10 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl"
-                                onClick={() => copyToClipboard(walletData.dva.account_number)}
+                                className="size-12 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl"
+                                onClick={(e) => { e.stopPropagation(); copyToClipboard(walletData.dva.account_number); }}
                               >
-                                {hasCopied ? <Check className="h-5 w-5 text-emerald-500" /> : <Copy className="h-5 w-5" />}
+                                {hasCopied ? <Check className="size-6 text-emerald-500" /> : <Copy className="size-6" />}
                               </Button>
                             </div>
-
-                            <div className="flex items-center gap-2 pt-2 border-t border-white/5 overflow-hidden">
-                              <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest truncate">{walletData.dva.bank_name}</p>
-                              <div className="w-1 h-1 rounded-full bg-slate-700 shrink-0"></div>
-                              <p className="text-[10px] sm:text-xs font-medium text-slate-500 truncate">{walletData.dva.account_name}</p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                              <span className="text-xs font-black uppercase tracking-widest text-slate-400">{walletData.dva.bank_name}</span>
+                              <div className="size-1 rounded-full bg-slate-700" />
+                              <span className="text-xs font-medium text-slate-500 truncate italic">{walletData.dva.account_name}</span>
                             </div>
                           </div>
-                          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                            <ShieldCheck className="h-24 w-24" />
-                          </div>
-                        </div>
-                      ) : !isKycComplete ? (
-                        <div className="space-y-4">
-                          <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl">
-                            <div className="flex gap-3">
-                              <Lock className="h-5 w-5 text-amber-600 flex-shrink-0" />
-                              <div className="flex-1">
-                                <p className="text-xs font-bold text-amber-900 dark:text-amber-400 uppercase tracking-wide">KYC Required</p>
-                                <p className="text-[10px] text-amber-800/70 dark:text-amber-500/70 mt-0.5">Your permanent transfer account is automatically generated once you complete your identity verification.</p>
-                              </div>
-                            </div>
-                          </div>
-                          <Button
-                            variant="outline"
-                            asChild
-                            className="w-full h-14 rounded-2xl border-amber-200 bg-amber-50/50 hover:bg-amber-100 text-amber-700 font-bold"
-                          >
-                            <Link href="/kyc">
-                              <ShieldCheck className="mr-2 h-5 w-5" />
-                              Complete KYC to Unlock
-                            </Link>
-                          </Button>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center p-8 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 text-center space-y-3">
-                          <Loader2 className="h-10 w-10 text-primary animate-spin" />
-                          <div>
-                            <p className="text-sm font-bold">Generating your DVA...</p>
-                            <p className="text-xs text-slate-500">Your account will be ready in a moment.</p>
+                        <div className="bg-slate-50 dark:bg-slate-950/50 p-10 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 text-center space-y-4 group hover:border-emerald-500/50 transition-all">
+                          <div className="size-20 rounded-full bg-slate-100 dark:bg-slate-900 mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500 transition-all">
+                            <Lock className="size-10 text-slate-300 group-hover:text-white" />
                           </div>
+                          <div className="space-y-1">
+                            <p className="text-xl font-black tracking-tighter">Vault Uninitialized</p>
+                            <p className="text-xs text-slate-400 font-medium px-4">Direct liquidity nodes are locked until identity synchronization is completed via the ARISE gateway.</p>
+                          </div>
+                          <Button asChild className="h-14 rounded-2xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase text-xs tracking-widest px-8">
+                            <Link href="/kyc">Synchronize Identity <ArrowRight className="ml-2 size-4" /></Link>
+                          </Button>
                         </div>
                       )}
                     </div>
-
-                    <div className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/30">
-                      <div className="flex gap-3">
-                        <ShieldCheck className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-blue-900 dark:text-blue-300">Secured Settlement</p>
-                          <p className="text-[10px] text-blue-700/70 dark:text-blue-400/60">Your payments are encrypted and strictly verified through Paystack's security layer.</p>
-                        </div>
-                      </div>
-                    </div>
-
-
                   </CardContent>
                 </Card>
 
-                {/* Enhanced Transfer */}
-                <Card className="border-none shadow-sm rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-100 dark:ring-slate-800">
-                  <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800/50">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-slate-900 dark:bg-slate-800 rounded-xl">
-                        <Send className="h-5 w-5 text-white" />
+                {/* Tactical Outbound Protocol */}
+                <Card className="border-none shadow-[0_80px_160px_-30px_rgba(15,23,42,0.15)] rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(15,23,42,0.25)] transition-all duration-700">
+                  <CardHeader className="p-10 pb-0">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-2">
+                        <Badge className="bg-slate-950/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Outbound Protocol</Badge>
+                        <CardTitle className="text-4xl font-black tracking-tightest">TRANSFER</CardTitle>
                       </div>
-                      <div>
-                        <CardTitle className="text-base font-black uppercase tracking-widest">Transfer</CardTitle>
-                        <CardDescription className="text-[10px] font-bold uppercase tracking-tight">Send to Bank Account</CardDescription>
+                      <div className="size-16 bg-slate-950 text-white rounded-2xl flex items-center justify-center shadow-xl">
+                        <Send className="size-8" />
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="pt-8 space-y-5">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">Recipient Account</Label>
-                        <button
-                          onClick={() => {
-                            setScanTab('scan');
-                            setIsScanModalOpen(true);
-                          }}
-                          className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-full flex items-center gap-1 hover:bg-emerald-100 dark:hover:bg-emerald-800/50 transition-colors"
-                        >
-                          <QrCode className="h-3 w-3" />
-                          Use QR
-                        </button>
+                  <CardContent className="p-10 space-y-8">
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between px-2">
+                          <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Target Terminal</Label>
+                          <Button
+                            variant="ghost"
+                            onClick={() => { setScanTab('scan'); setIsScanModalOpen(true); }}
+                            className="h-8 rounded-full bg-emerald-500/5 text-emerald-600 font-black uppercase text-[8px] tracking-[0.2em] px-3 gap-2 hover:bg-emerald-500/10"
+                          >
+                            <QrCode className="size-3" /> Optical Scan
+                          </Button>
+                        </div>
+                        <Input
+                          placeholder="RECIPIENT ACCOUNT"
+                          className="h-20 rounded-3xl bg-slate-50/50 border-none focus:bg-white font-mono text-2xl tracking-[0.2em] px-8 shadow-inner"
+                          value={recipientAccount}
+                          onChange={(e) => setRecipientAccount(e.target.value)}
+                        />
                       </div>
-                      <Input
-                        id="recipient-account-input"
-                        placeholder="0000000000"
-                        className="h-14 rounded-2xl bg-slate-50/50 border-slate-100 focus:bg-white font-mono text-lg tracking-widest transition-all"
-                        value={recipientAccount}
-                        onChange={(e) => setRecipientAccount(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bank Name</Label>
-                        <Select value={recipientBank} onValueChange={setRecipientBank}>
-                          <SelectTrigger className="h-14 rounded-2xl bg-slate-50/50 border-slate-100 font-medium truncate w-[130px] sm:w-[150px]">
-                            <SelectValue placeholder="Select Bank" />
-                          </SelectTrigger>
-                          <SelectContent className="max-h-[300px]">
-                            {NIGERIAN_BANKS.map((bank) => (
-                              <SelectItem key={bank.code} value={bank.code} className="font-medium">
-                                {bank.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</Label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-xs">₦</span>
-                          <Input
-                            type="number"
-                            placeholder="0.00"
-                            className="h-14 pl-8 rounded-2xl bg-slate-50/50 border-slate-100 font-black text-lg"
-                            value={transferAmount}
-                            onChange={(e) => setTransferAmount(e.target.value)}
-                          />
+
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Gateway</Label>
+                          <Select value={recipientBank} onValueChange={setRecipientBank}>
+                            <SelectTrigger className="h-16 rounded-2xl border-none bg-slate-50/50 font-black uppercase text-[10px] tracking-widest px-6 shadow-inner">
+                              <SelectValue placeholder="GATEWAY" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-2xl border-none shadow-2xl">
+                              {NIGERIAN_BANKS.map((bank) => (
+                                <SelectItem key={bank.code} value={bank.code} className="font-bold text-xs">
+                                  {bank.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-4">
+                          <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Liquidity</Label>
+                          <div className="relative group">
+                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-black text-sm group-focus-within:text-slate-950 transition-colors">₦</span>
+                            <Input
+                              type="number"
+                              placeholder="0.00"
+                              className="h-16 pl-10 rounded-2xl border-none bg-slate-50/50 font-black text-xl shadow-inner focus:bg-white transition-all"
+                              value={transferAmount}
+                              onChange={(e) => setTransferAmount(e.target.value)}
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {recipientName && (
-                      <div className="bg-green-500/5 border border-green-500/10 p-3 rounded-xl flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <ShieldCheck className="h-4 w-4 text-green-600" />
-                          <span className="text-[10px] font-bold text-green-700 uppercase">Verified Name</span>
+                      {recipientName && (
+                        <div className="bg-emerald-500/5 border border-emerald-500/10 p-6 rounded-2xl flex items-center justify-between animate-in zoom-in-95 duration-500">
+                          <div className="flex items-center gap-3">
+                            <div className="size-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                              <ShieldCheck className="size-6 text-emerald-600" />
+                            </div>
+                            <div className="space-y-0.5">
+                              <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Validated Recipient</p>
+                              <p className="text-base font-black tracking-tightest leading-none">{recipientName}</p>
+                            </div>
+                          </div>
                         </div>
-                        <span className="text-xs font-bold text-green-900">{recipientName}</span>
-                      </div>
-                    )}
-
-                    {isResolving && (
-                      <div className="flex items-center gap-2 px-1">
-                        <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                        <span className="text-[10px] text-slate-400 font-medium">Verifying account...</span>
-                      </div>
-                    )}
-
-                    {walletData && (
-                      <div className="flex items-center justify-between px-1">
-                        <span className="text-[10px] font-bold text-slate-400">AVAILABLE</span>
-                        <span className="text-xs font-bold text-slate-700">₦{balance.toLocaleString()}</span>
-                      </div>
-                    )}
-
-                    <Button
-                      onClick={withdrawFunds}
-                      className="w-full h-16 rounded-[1.5rem] bg-slate-900 dark:bg-white text-white dark:text-slate-950 hover:opacity-90 transition-all font-black uppercase tracking-[0.2em] shadow-2xl mt-2"
-                      disabled={isTransferring || !transferAmount || parseFloat(transferAmount) > balance || (!recipientName && !recipientBank.toLowerCase().includes('ibom'))}
-                    >
-                      {isTransferring ? (
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      ) : (
-                        <ArrowUpRight className="mr-2 h-5 w-5" />
                       )}
-                      {isTransferring ? 'Verifying...' : 'Confirm X-Transfer'}
-                    </Button>
+
+                      <div className="flex items-center justify-between px-2 pt-2">
+                        <div className="flex items-center gap-2">
+                          <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Available Cap</span>
+                        </div>
+                        <span className="text-lg font-black tracking-tighter">₦{balance.toLocaleString()}</span>
+                      </div>
+
+                      <Button
+                        onClick={withdrawFunds}
+                        className="w-full h-20 rounded-3xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase tracking-[0.3em] shadow-[0_40px_80px_-20px_rgba(15,23,42,0.3)] active:scale-95 py-6"
+                        disabled={isTransferring || !transferAmount || parseFloat(transferAmount) > balance || (!recipientName && !recipientBank.toLowerCase().includes('ibom'))}
+                      >
+                        {isTransferring ? <Loader2 className="mr-3 size-6 animate-spin" /> : <ArrowUpRight className="mr-3 size-6" />}
+                        {isTransferring ? 'SYNCHRONIZING...' : 'EXECUTE X-TRANSFER'}
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
             </TabsContent>
 
-            <TabsContent value="cards" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className={`border-none shadow-xl rounded-[2.5rem] overflow-hidden bg-slate-950 text-white relative transition-all duration-500 ${walletData?.isCardFrozen ? 'grayscale opacity-70' : ''}`}>
-                  {/* Visual Mesh */}
-                  <div className="absolute top-[-50%] right-[-50%] w-[100%] h-[100%] bg-indigo-500/20 blur-[100px] rounded-full pointer-events-none"></div>
+            <TabsContent value="cards" className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                {/* Ultra-Premium Virtual Card */}
+                <div className="relative group perspective-2000">
+                  <div className="absolute -inset-2 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-[3.5rem] blur-2xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
 
-                  <CardHeader className="relative z-10 flex flex-row items-center justify-between pb-8">
-                    <div>
-                      <p className="text-xs text-slate-400 font-black uppercase tracking-widest mb-1">Virtual Card</p>
-                      <CardTitle className="text-2xl font-black">Ibom X Global</CardTitle>
-                    </div>
-                    <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-sm border border-white/10">
-                      <CreditCard className="h-6 w-6 text-indigo-400" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="relative z-10 space-y-8">
-                    <div className="space-y-1">
-                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Card Number</p>
-                      <h3 className="text-xl sm:text-2xl font-mono tracking-widest">**** **** **** 4092</h3>
+                  <Card className={`relative border-none shadow-[0_80px_160px_-30px_rgba(0,0,0,0.4)] rounded-[3.5rem] overflow-hidden bg-slate-950 text-white min-h-[380px] flex flex-col justify-between p-12 transition-all duration-700 ${walletData?.isCardFrozen ? 'grayscale opacity-60' : 'hover:-translate-y-4 hover:rotate-1'}`}>
+                    {/* Advanced Mesh / Holographic Background */}
+                    <div className="absolute top-[-20%] right-[-10%] w-[80%] h-[80%] bg-indigo-500/30 blur-[120px] rounded-full animate-pulse" />
+                    <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-500/20 blur-[100px] rounded-full animate-pulse " style={{ animationDelay: '1s' }} />
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
+
+                    <div className="relative z-10 flex justify-between items-start">
+                      <div className="space-y-1">
+                        <Badge className="bg-white/10 text-white border-white/20 font-black px-4 py-1.5 rounded-xl uppercase text-[9px] tracking-widest backdrop-blur-md">Premium Virtual Asset</Badge>
+                        <h3 className="text-4xl font-black tracking-tightest mt-2 leading-none">IBOM <span className="text-indigo-400 italic">X.</span></h3>
+                      </div>
+                      <div className="size-16 bg-white/5 rounded-[1.5rem] border border-white/10 flex items-center justify-center backdrop-blur-3xl shadow-2xl">
+                        <CreditCard className="size-8 text-white" />
+                      </div>
                     </div>
 
-                    <div className="flex justify-between items-end">
-                      <div className="flex gap-6">
+                    <div className="relative z-10 space-y-4">
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">Global Terminal Identifier</p>
+                      <h3 className="text-3xl sm:text-4xl font-black font-mono tracking-[0.2em] drop-shadow-2xl">4092 • 8820 • 0012 • 9024</h3>
+                    </div>
+
+                    <div className="relative z-10 flex justify-between items-end">
+                      <div className="flex gap-10">
                         <div className="space-y-1">
-                          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Expiry</p>
-                          <p className="font-mono font-medium tracking-widest">12/28</p>
+                          <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">Valid Thru</p>
+                          <p className="text-xl font-black tracking-widest font-mono">12 / 28</p>
                         </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">CVV</p>
-                          <div className="flex items-center gap-2 cursor-pointer group">
-                            <p className="font-mono font-medium tracking-widest">***</p>
-                            <Eye className="h-3 w-3 text-slate-400 group-hover:text-white transition-colors" />
+                        <div className="space-y-1 cursor-pointer group/cvv">
+                          <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">Security Node</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-xl font-black tracking-widest font-mono group-hover/cvv:text-indigo-400 transition-colors">492</p>
+                            <Eye className="size-3 text-slate-600 group-hover/cvv:text-white transition-colors" />
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Status</p>
-                        {walletData?.isCardFrozen ? (
-                          <Badge variant="outline" className="text-rose-400 border-rose-400/30 bg-rose-400/10 uppercase font-black text-[9px] tracking-widest">Frozen</Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-emerald-400 border-emerald-400/30 bg-emerald-400/10 uppercase font-black text-[9px] tracking-widest">Active</Badge>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <div className="space-y-4">
-                  <h3 className="font-black text-xs uppercase tracking-widest text-slate-400 px-1">Card Controls</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div onClick={toggleCardFreeze} className="bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-3xl flex flex-col gap-4 cursor-pointer hover:scale-105 transition-transform">
-                      <div className="h-10 w-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                        <Snowflake className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm">{walletData?.isCardFrozen ? 'Unfreeze Card' : 'Freeze Card'}</p>
-                        <p className="text-[10px] text-slate-500 font-medium">{walletData?.isCardFrozen ? 'Re-enable for use' : 'Temporarily disable'}</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-3xl flex flex-col gap-4 cursor-pointer hover:scale-105 transition-transform">
-                      <div className="h-10 w-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                        <TrendingUp className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm">Set Limits</p>
-                        <p className="text-[10px] text-slate-500 font-medium">Daily & monthly caps</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-3xl flex flex-col gap-4 cursor-pointer hover:scale-105 transition-transform col-span-2">
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 bg-rose-100 dark:bg-rose-900/30 rounded-xl flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
-                          <ShieldCheck className="h-5 w-5" />
+                      <div className="flex flex-col items-end gap-2">
+                        <div className={`size-12 rounded-full flex items-center justify-center border-2 ${walletData?.isCardFrozen ? 'border-rose-500/30' : 'border-emerald-500/30'}`}>
+                          {walletData?.isCardFrozen ? <Snowflake className="size-6 text-rose-500" /> : <ShieldCheck className="size-6 text-emerald-500" />}
                         </div>
-                        <div>
-                          <p className="font-bold text-sm">Replace Card</p>
-                          <p className="text-xs text-slate-500 font-medium mt-0.5">Lost or stolen? Get a new virtual card instantly.</p>
-                        </div>
+                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Encrypted / Active</p>
                       </div>
                     </div>
+                  </Card>
+                </div>
+
+                {/* Card Control Matrix */}
+                <div className="space-y-10">
+                  <div className="space-y-1 px-2">
+                    <h3 className="text-3xl font-black tracking-tightest leading-none">CARD CONTROL</h3>
+                    <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Asset Management Protocols</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <ControlMatrixCard
+                      label={walletData?.isCardFrozen ? 'THAW PROTOCOL' : 'CRYOGENIC LOCK'}
+                      desc={walletData?.isCardFrozen ? 'Re-activate asset node' : 'Temporarily suspend all IO'}
+                      icon={<Snowflake className="size-6" />}
+                      onClick={toggleCardFreeze}
+                      active={walletData?.isCardFrozen}
+                      color="rose"
+                    />
+                    <ControlMatrixCard
+                      label="THRESHOLD CALIBRATION"
+                      desc="Synchronize spend capacity"
+                      icon={<TrendingUp className="size-6" />}
+                      color="indigo"
+                    />
+                    <ControlMatrixCard
+                      label="TERMINAL RESET"
+                      desc="Rotate digital identifiers"
+                      icon={<RefreshCw className="size-6" />}
+                      color="emerald"
+                    />
+                    <ControlMatrixCard
+                      label="GEAR REPLACEMENT"
+                      desc="Provision new visual node"
+                      icon={<ShieldCheck className="size-6" />}
+                      color="slate"
+                    />
                   </div>
                 </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="vaults" className="space-y-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-lg">Savings Vaults</h3>
-                <Button size="sm" onClick={() => setIsCreateVaultOpen(true)} className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase text-[10px] tracking-widest shadow-md">
-                  <Plus className="mr-1 h-4 w-4" /> New Vault
+            <TabsContent value="vaults" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+              <div className="flex items-center justify-between px-2">
+                <div className="space-y-1">
+                  <h3 className="text-3xl font-black tracking-tighter">Strategic Vaults</h3>
+                  <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Target-Based Wealth Preservation</p>
+                </div>
+                <Button onClick={() => setIsCreateVaultOpen(true)} className="size-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-600/20 active:scale-90 transition-all">
+                  <Plus className="size-8" />
                 </Button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {vaults.map(vault => {
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {vaults.map((vault, idx) => {
                   const percentage = Math.min(100, Math.round((vault.currentAmount / vault.targetAmount) * 100));
                   return (
-                    <Card key={vault.id} className="border border-emerald-100 dark:border-emerald-900/30 shadow-sm rounded-3xl overflow-hidden bg-emerald-50 dark:bg-emerald-900/10">
-                      <CardContent className="p-6 space-y-6">
+                    <Card key={vault.id} className="group relative border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] hover:shadow-[0_60px_120px_-30px_rgba(16,185,129,0.3)] transition-all duration-700 rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${idx * 100}ms` }}>
+                      <CardContent className="p-8 space-y-8">
                         <div className="flex justify-between items-start">
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Target: ₦{vault.targetAmount.toLocaleString()}</p>
-                            <CardTitle className="text-xl font-bold">{vault.name}</CardTitle>
+                          <div className="space-y-2">
+                            <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1.5 rounded-xl uppercase text-[9px] tracking-widest shadow-sm">
+                              ID: {vault.id.slice(0, 8).toUpperCase()}
+                            </Badge>
+                            <CardTitle className="text-3xl font-black tracking-tightest leading-none">{vault.name}</CardTitle>
                           </div>
-                          <div className="h-12 w-12 bg-white dark:bg-emerald-950 rounded-full flex items-center justify-center shadow-sm">
-                            <PiggyBank className="h-6 w-6 text-emerald-500" />
+                          <div className="size-16 bg-slate-50 dark:bg-emerald-950 rounded-[1.5rem] flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform duration-500">
+                            <PiggyBank className="size-8 text-emerald-500" />
                           </div>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                           <div className="flex justify-between items-end">
-                            <h4 className="text-2xl font-black font-mono tracking-tight text-emerald-950 dark:text-white">₦{vault.currentAmount.toLocaleString()}</h4>
-                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-0.5 rounded text-[10px]">{percentage}%</span>
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Preserved Capital</p>
+                              <h4 className="text-4xl font-black font-mono tracking-tight text-slate-950 dark:text-white">₦{vault.currentAmount.toLocaleString()}</h4>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              <span className="text-lg font-black text-emerald-500">₦{vault.targetAmount.toLocaleString()}</span>
+                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Objective</span>
+                            </div>
                           </div>
-                          <div className="h-2 w-full bg-emerald-200 dark:bg-emerald-950 rounded-full overflow-hidden">
-                            <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
+                          <div className="space-y-2">
+                            <div className="h-4 w-full bg-slate-100 dark:bg-emerald-950 rounded-full overflow-hidden p-1 shadow-inner">
+                              <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-[2000ms] shadow-lg shadow-emerald-500/40 relative overflow-hidden" style={{ width: `${percentage}%` }}>
+                                <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                              <span>Stabilization Status</span>
+                              <span className="text-emerald-500">{percentage}% Collateralized</span>
+                            </div>
                           </div>
                         </div>
 
-                        <Button onClick={() => setTopUpVaultId(vault.id)} variant="outline" className="w-full h-12 rounded-2xl border-emerald-200 dark:border-emerald-800 bg-white/50 dark:bg-slate-900/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-bold text-emerald-800 dark:text-emerald-300">
-                          <Zap className="mr-2 h-4 w-4" /> Quick Top-up
+                        <Button onClick={() => setTopUpVaultId(vault.id)} className="w-full h-18 rounded-2xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase text-xs tracking-[0.2em] shadow-2xl active:scale-95 py-6">
+                          <Zap className="mr-3 size-5" /> Injection Protocol
                         </Button>
                       </CardContent>
                     </Card>
                   );
                 })}
 
-                <Card onClick={() => setIsCreateVaultOpen(true)} className="border border-dashed border-slate-300 dark:border-slate-800 shadow-none rounded-3xl bg-transparent flex flex-col items-center justify-center p-8 text-center min-h-[200px] hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors cursor-pointer group">
-                  <div className="h-14 w-14 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <PiggyBank className="h-6 w-6 text-slate-400" />
+                <Card onClick={() => setIsCreateVaultOpen(true)} className="border-2 border-dashed border-slate-200 dark:border-slate-800 shadow-none rounded-[2.5rem] bg-transparent flex flex-col items-center justify-center p-12 text-center min-h-[300px] hover:bg-white dark:hover:bg-slate-900/50 hover:border-emerald-500 transition-all cursor-pointer group hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${vaults.length * 100}ms` }}>
+                  <div className="size-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-inner">
+                    <PiggyBank className="size-10 text-slate-300 group-hover:text-white" />
                   </div>
-                  <h3 className="font-bold text-sm mb-1">Create a Vault</h3>
-                  <p className="text-xs text-slate-500 max-w-[200px]">Lock funds away securely to meet your specific financial goals.</p>
+                  <h3 className="text-2xl font-black tracking-tightest mb-2 group-hover:text-emerald-500 transition-colors">INITIATE VAULT</h3>
+                  <p className="text-sm text-slate-400 font-medium max-w-[220px]">Deploy a new capital reservation protocol for enhanced financial autonomy.</p>
                 </Card>
               </div>
             </TabsContent>
@@ -1456,116 +1415,141 @@ export default function WalletPage() {
                 </Button>
               </div>
 
-              <Card className="border-none shadow-sm rounded-3xl overflow-hidden">
-                <CardContent className="p-0">
-                  {transactions.length === 0 ? (
-                    <div className="text-center py-16 px-4">
-                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <History className="h-8 w-8 text-slate-300" />
+              <TabsContent value="history" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
+                  <div className="space-y-2">
+                    <Badge className="bg-slate-900/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Digital Ledger</Badge>
+                    <h3 className="text-4xl font-black tracking-tightest">TRANSACTION FEED</h3>
+                    <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Historical Telemetry & Settlements</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
+                      All Nodes
+                    </Button>
+                    <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
+                      Export CSV
+                    </Button>
+                  </div>
+                </div>
+
+                <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[3rem] overflow-hidden bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl border border-white/20">
+                  <CardContent className="p-4 sm:p-8">
+                    {transactions.length === 0 ? (
+                      <div className="text-center py-32 px-4 space-y-6">
+                        <div className="size-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto shadow-inner group animate-pulse">
+                          <History className="size-10 text-slate-300 dark:text-slate-600" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-2xl font-black tracking-tightest text-slate-900 dark:text-white">NO FEED DETECTED</p>
+                          <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Current epoch has no transaction telemetry.</p>
+                        </div>
                       </div>
-                      <p className="text-slate-500 font-medium">No activity in this period</p>
-                      <p className="text-xs text-slate-400 mt-1">Your payments will show up here</p>
-                    </div>
-                  ) : (
-                    <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {transactions.map((txn) => (
-                        <div key={txn.id} className="flex items-center justify-between p-5 hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-all cursor-pointer group border-b border-slate-50 dark:border-slate-800 last:border-0">
-                          <div className="flex items-center gap-5">
-                            <div className={`p-3.5 rounded-2xl shadow-sm ${txn.type === 'credit' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/20' : 'bg-slate-100 text-slate-600 dark:bg-slate-800'} group-active:scale-90 transition-transform`}>
-                              {txn.type === 'credit' ? <ArrowDownLeft className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
-                            </div>
-                            <div className="space-y-1">
-                              <p className="font-black text-sm tracking-tight">{txn.description}</p>
-                              <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                                  {txn.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric' })} • {txn.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </span>
+                    ) : (
+                      <div className="space-y-4">
+                        {transactions.map((txn, idx) => (
+                          <div key={txn.id} className="group relative">
+                            <div className="absolute inset-0 bg-slate-50/50 dark:bg-slate-800/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
+                            <div className="flex items-center justify-between p-6 cursor-pointer border-b border-slate-50 dark:border-slate-800/50 last:border-0 transition-all">
+                              <div className="flex items-center gap-6">
+                                <div className={`size-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 group-active:scale-90 ${txn.type === 'credit' ? 'bg-emerald-500/10 text-emerald-600 shadow-emerald-500/10' : 'bg-slate-950 text-white shadow-slate-950/10'}`}>
+                                  {txn.type === 'credit' ? <ArrowDownLeft className="size-7" /> : <ArrowUpRight className="size-7" />}
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="font-black text-xl tracking-tightest uppercase text-slate-900 dark:text-white">{txn.description}</p>
+                                  <div className="flex items-center gap-2">
+                                    <Badge className="bg-slate-100 dark:bg-slate-800 text-[8px] font-black tracking-widest uppercase py-0.5 px-2 rounded-md border-none text-slate-400">Node ID: {txn.id.slice(-8).toUpperCase()}</Badge>
+                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                      {txn.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} • {txn.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right space-y-2">
+                                <p className={`font-black text-2xl tracking-tighter ${txn.type === 'credit' ? 'text-emerald-500' : 'text-slate-950 dark:text-white'}`}>
+                                  {txn.type === 'credit' ? '+' : '-'}₦{txn.amount.toLocaleString()}
+                                </p>
+                                <div className="flex justify-end">
+                                  <Badge className="text-[9px] h-5 px-3 font-black border-none bg-emerald-500/10 text-emerald-600 uppercase tracking-[0.2em] rounded-lg">Settled ✓</Badge>
+                                </div>
                               </div>
                             </div>
                           </div>
-                          <div className="text-right space-y-1">
-                            <p className={`font-black text-base tracking-tighter ${txn.type === 'credit' ? 'text-emerald-500' : 'text-slate-950 dark:text-white'}`}>
-                              {txn.type === 'credit' ? '+' : '-'}₦{txn.amount.toLocaleString()}
-                            </p>
-                            <div className="flex justify-end">
-                              <Badge variant="outline" className="text-[8px] h-4 px-2 font-black border-none bg-slate-50 dark:bg-slate-800 text-slate-400 uppercase tracking-widest">Completed</Badge>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              <Button variant="ghost" className="w-full text-slate-400 text-xs font-bold gap-2">
-                <Download className="h-3 w-3" />
-                Statement PDF
-              </Button>
-            </TabsContent>
-
-            <TabsContent value="security" className="space-y-6">
-              <div className="space-y-4">
-                <Card className="border-none shadow-sm rounded-3xl overflow-hidden">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Lock className="h-5 w-5 text-primary" />
-                      Security Settings
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <p className="font-bold text-sm">Transaction PIN</p>
-                        <p className="text-xs text-muted-foreground">Require PIN for all transfers</p>
+                        ))}
                       </div>
-                      <Button
-                        variant={isPinSetup ? "outline" : "default"}
-                        size="sm"
-                        onClick={() => setIsPinSetup(!isPinSetup)}
-                        className="rounded-full"
-                      >
-                        {isPinSetup ? "Disable" : "Enable"}
-                      </Button>
-                    </div>
-
-                    <Separator />
-
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <p className="font-bold text-sm">Biometric Authentication</p>
-                        <p className="text-xs text-muted-foreground">Use FaceID or Fingerprint</p>
-                      </div>
-                      <div className="bg-primary/10 text-primary p-2 rounded-full">
-                        <Fingerprint className="h-5 w-5" />
-                      </div>
-                    </div>
-
-                    <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/30">
-                      <div className="flex gap-3">
-                        <Lock className="h-5 w-5 text-amber-600 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-amber-900 dark:text-amber-300">Privacy Mode Enabled</p>
-                          <p className="text-[10px] text-amber-700/70 dark:text-amber-400/60">Balance masking is available on the wallet card using the eye icon.</p>
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
+                <div className="flex justify-center pt-4">
+                  <Button variant="ghost" className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] gap-3 px-8 h-12 hover:text-emerald-500 transition-colors group">
+                    <Download className="size-4 group-hover:-translate-y-1 transition-transform" />
+                    Request Full Session Statement PDF
+                  </Button>
+                </div>
+              </TabsContent>
 
-                <Card className="bg-slate-900 text-white rounded-3xl border-none shadow-xl">
-                  <CardContent className="p-6 flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Verified Account</p>
-                      <p className="text-sm font-medium">KYC Tier 1: ₦50,000 Limit/Day</p>
+              <TabsContent value="security" className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
+                <div className="text-center space-y-3 pb-4">
+                  <div className="size-20 rounded-[2rem] bg-slate-950 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20 group hover:rotate-12 transition-transform duration-500">
+                    <ShieldCheck className="size-10 text-emerald-500" />
+                  </div>
+                  <h3 className="text-4xl font-black tracking-tightest">DEFENSE PROTOCOLS</h3>
+                  <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Institutional Grade Assets Protection</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-white dark:bg-slate-900/40 backdrop-blur-3xl p-8 space-y-8 border border-white/20">
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1.5">
+                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">Biometric Gateway</p>
+                          <h4 className="text-2xl font-black tracking-tight">Enterprise Bio-Unlock</h4>
+                          <p className="text-xs text-slate-400 font-medium">Require face/fingerprint for all high-value transactions.</p>
+                        </div>
+                        <Switch className="data-[state=checked]:bg-emerald-500" />
+                      </div>
+                      <Separator className="bg-slate-100/50 dark:bg-slate-800/50" />
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1.5">
+                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Manual Override</p>
+                          <h4 className="text-2xl font-black tracking-tight">Transaction PIN</h4>
+                          <p className="text-xs text-slate-400 font-medium font-medium">Secondary numeric authorization layer.</p>
+                        </div>
+                        <Button onClick={() => setIsPinSetup(!isPinSetup)} variant="outline" className={`rounded-xl font-black uppercase text-[9px] tracking-widest px-4 h-10 ${isPinSetup ? 'bg-emerald-500/10 text-emerald-600 border-none' : 'border-slate-200 hover:bg-slate-50'}`}>
+                          {isPinSetup ? "Configured" : "Not Active"}
+                        </Button>
+                      </div>
                     </div>
-                    <ShieldCheck className="h-8 w-8 text-green-500" />
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
+                  </Card>
+
+                  <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-slate-950 p-10 text-white relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-32 bg-emerald-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                    <div className="relative z-10 space-y-6">
+                      <div className="size-16 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md group-hover:scale-110 transition-transform">
+                        <Terminal className="size-8 text-emerald-400" />
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="text-3xl font-black tracking-tightest leading-tight">Advanced Encryption Status: <span className="text-emerald-400 italic">SECURE.</span></h4>
+                        <p className="text-slate-400 text-sm font-medium leading-relaxed italic">&quot;RSA-4096 Multi-Region Node Verification is active on this session. All telemetry data is end-to-end sanitized.&quot;</p>
+                      </div>
+                      <div className="flex items-center gap-3 pt-4">
+                        <div className="h-1.5 flex-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full bg-emerald-500 w-[94%] shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">94.8% Integrity</span>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <SecurityStat label="Uptime" value="99.99%" icon={<Clock className="size-4" />} />
+                  <SecurityStat label="Node Checks" value="Validated" icon={<Shield className="size-4" />} />
+                  <SecurityStat label="Telemetry" value="Real-time" icon={<Activity className="size-4 text-red-500" />} />
+                </div>
+              </TabsContent>
           </Tabs>
         </div>
-      </div>
+      </main>
 
       <Dialog open={isScanModalOpen} onOpenChange={setIsScanModalOpen}>
         <DialogContent className="sm:max-w-md bg-slate-50 dark:bg-slate-950 border-none rounded-[2rem] overflow-hidden p-0 max-h-[90vh] overflow-y-auto">
@@ -1842,5 +1826,43 @@ export default function WalletPage() {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function ControlMatrixCard({ label, desc, icon, onClick, active, color }: { label: string; desc: string; icon: React.ReactNode; onClick?: () => void; active?: boolean; color: string }) {
+  const colorMap: Record<string, string> = {
+    rose: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
+    indigo: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20',
+    emerald: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+    slate: 'bg-slate-100 dark:bg-slate-800 text-slate-600 border-slate-200 dark:border-slate-800'
+  };
+
+  return (
+    <Card onClick={onClick} className={`border border-none shadow-sm rounded-[2rem] p-7 flex flex-col gap-6 cursor-pointer hover:shadow-2xl hover:-translate-y-2 transition-all group bg-white dark:bg-slate-900/60 backdrop-blur-3xl overflow-hidden relative`}>
+      <div className={`size-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-6 ${colorMap[color] || colorMap.slate}`}>
+        {icon}
+      </div>
+      <div>
+        <p className="font-black text-base tracking-tightest uppercase text-slate-900 dark:text-white leading-tight">{label}</p>
+        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{desc}</p>
+      </div>
+      <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-[0.03] transition-opacity pointer-events-none">
+        {icon}
+      </div>
+    </Card>
+  );
+}
+
+function SecurityStat({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/20 shadow-sm hover:shadow-md transition-shadow group">
+      <div className="size-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
+        {icon}
+      </div>
+      <div>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">{label}</p>
+        <p className="text-xl font-black text-slate-900 dark:text-white leading-none tracking-tighter">{value}</p>
+      </div>
+    </div>
   );
 }

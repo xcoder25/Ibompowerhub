@@ -13,6 +13,7 @@ type KycData = {
     identityVerified?: boolean;
     addressVerified?: boolean;
     faceVerified?: boolean;
+    originVerified?: boolean;
 };
 
 const STEPS = [
@@ -22,6 +23,7 @@ const STEPS = [
     { id: 'identityVerified' as keyof KycData, label: 'Identity Verification', desc: 'Upload an ID card', hasInfo: true, href: '/kyc/identity' },
     { id: 'addressVerified' as keyof KycData, label: 'Address Verification', desc: 'Verify your residential address', hasInfo: false, href: '/kyc/address' },
     { id: 'faceVerified' as keyof KycData, label: 'Face Capture', desc: 'Submit an image of yourself', hasInfo: false, href: '/kyc/face' },
+    { id: 'originVerified' as keyof KycData, label: 'Certificate of Origin', desc: 'Proof of Akwa Ibom State LGA Origin', hasInfo: true, href: '/kyc/origin' },
 ];
 
 export default function KycPage() {
@@ -42,6 +44,7 @@ export default function KycPage() {
         identityVerified: kycData?.identityVerified ?? false,
         addressVerified: kycData?.addressVerified ?? false,
         faceVerified: kycData?.faceVerified ?? false,
+        originVerified: kycData?.originVerified ?? false,
     };
 
     const completed = Object.values(effectiveKyc).filter(Boolean).length;
