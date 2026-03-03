@@ -1,12 +1,9 @@
-
 'use client';
 
 import Image from 'next/image';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ThumbsUp, MessageSquare } from 'lucide-react';
+import { ThumbsUp, MessageSquare, Bell, MapPin, Clock, AlertTriangle, Shield, CloudRain, HeartPulse, ChevronRight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
@@ -14,46 +11,94 @@ import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebas
 import { collection, addDoc, doc, updateDoc, increment, serverTimestamp, Timestamp, query, orderBy } from 'firebase/firestore';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Skeleton } from '@/components/ui/skeleton';
+import Link from 'next/link';
 
 type Alert = {
-  id: string;
-  type: string;
-  category: string;
-  location: string;
-  time: Timestamp;
-  description: string;
-  upvotes: number;
-  commentsCount: number;
-  userId: string;
-  status: string;
-  user: {
-    name: string;
-    avatarUrl: string;
-  }
+  id: string; type: string; category: string; location: string;
+  time: Timestamp; description: string; upvotes: number;
+  commentsCount: number; userId: string; status: string;
+  user: { name: string; avatarUrl: string };
+};
+type Comment = {
+  id: string; text: string; userId: string; timestamp: Timestamp;
+  user: { name: string; avatarUrl: string };
 };
 
-type Comment = {
-  id: string;
-  text: string;
-  userId: string;
-  timestamp: Timestamp;
-  user: {
-    name: string;
-    avatarUrl: string;
+const statusColors: Record<string, string> = {
+  New: 'bg-blue-100 text-blue-800 border-blue-200',
+  Verified: 'bg-amber-100 text-amber-800 border-amber-200',
+  'In Progress': 'bg-orange-100 text-orange-800 border-orange-200',
+  Resolved: 'bg-green-100 text-green-800 border-green-200',
+};
+
+function alertTypeIcon(type: string) {
+  switch (type?.toLowerCase()) {
+    case 'emergency': return <AlertTriangle className="size-4 text-red-500" />;
+    case 'weather': return <CloudRain className="size-4 text-blue-500" />;
+    case 'health': return <HeartPulse className="size-4 text-emerald-500" />;
+    case 'security': return <Shield className="size-4 text-amber-500" />;
+    default: return <Bell className="size-4 text-slate-400" />;
   }
 }
 
-const statusColors: { [key: string]: string } = {
-  New: 'bg-blue-100 text-blue-800 border-blue-300',
-  Verified: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-  'In Progress': 'bg-orange-100 text-orange-800 border-orange-300',
-  Resolved: 'bg-green-100 text-green-800 border-green-300',
-};
+function CommentSection({ alertId }: { alertId: string }) {
+  const [newComment, setNewComment] = useState('');
+  const firestore = useFirestore();
+  const { user } = useUser();
+  const commentsQuery = useMemoFirebase(() =>
+    firestore ? query(collection(firestore, 'reports', alertId, 'comments'), orderBy('timestamp', 'asc')) : null,
+    [firestore, alertId]
+  );
+  const { data: comments, isLoading } = useCollection<Comment>(commentsQuery);
+
+  const handleAddComment = async () => {
+    if (!user || !newComment.trim() || !firestore) return;
+    await addDoc(collection(firestore, 'reports', alertId, 'comments'), {
+      text: newComment, userId: user.uid, timestamp: serverTimestamp(),
+      user: { name: user.displayName, avatarUrl: user.photoURL }
+    });
+    await updateDoc(doc(firestore, 'reports', alertId), { commentsCount: increment(1) });
+    setNewComment('');
+  };
+
+  return (
+    <div className="border-t border-slate-100 bg-slate-50/50 p-5">
+      <h4 className="text-sm font-black text-slate-700 mb-4">Comments</h4>
+      <div className="space-y-3 mb-4">
+        {isLoading && [0, 1].map(i => (
+          <div key={i} className="flex gap-3"><Skeleton className="size-8 rounded-full flex-shrink-0" /><Skeleton className="flex-1 h-12 rounded-xl" /></div>
+        ))}
+        {comments?.map(c => (
+          <div key={c.id} className="flex gap-3">
+            <Avatar className="size-8 flex-shrink-0">
+              <AvatarImage src={c.user.avatarUrl} /><AvatarFallback>{c.user.name?.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="bg-white border border-slate-100 rounded-2xl px-3 py-2 flex-1">
+              <p className="text-xs font-black text-slate-700">{c.user.name}</p>
+              <p className="text-sm text-slate-600">{c.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <Avatar className="size-8 flex-shrink-0">
+          <AvatarImage src={user?.photoURL ?? undefined} /><AvatarFallback>Y</AvatarFallback>
+        </Avatar>
+        <Input
+          placeholder="Add a comment..." value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
+          className="rounded-xl border-slate-200 bg-white flex-1 text-sm"
+        />
+        <Button size="sm" onClick={handleAddComment} className="rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold">Post</Button>
+      </div>
+    </div>
+  );
+}
 
 export default function AlertsPage() {
-  const mapPreviewImage = PlaceHolderImages.find((img) => img.id === 'map-preview');
+  const mapPreviewImage = PlaceHolderImages.find(img => img.id === 'map-preview');
   const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
-
   const firestore = useFirestore();
   const { user } = useUser();
 
@@ -61,189 +106,128 @@ export default function AlertsPage() {
     firestore ? query(collection(firestore, 'reports'), orderBy('time', 'desc')) : null,
     [firestore]
   );
-  const { data: alerts, isLoading: alertsLoading } = useCollection<Alert>(alertsQuery);
+  const { data: alerts, isLoading } = useCollection<Alert>(alertsQuery);
 
   const handleUpvote = async (alertId: string) => {
     if (!user || !firestore) return;
-    const alertRef = doc(firestore, 'reports', alertId);
-    await updateDoc(alertRef, {
-      upvotes: increment(1)
-    });
+    await updateDoc(doc(firestore, 'reports', alertId), { upvotes: increment(1) });
   };
-
-  const toggleComments = (alertId: string) => {
-    setExpandedComments((prev) => ({ ...prev, [alertId]: !prev[alertId] }));
-  };
-
-  function CommentSection({ alertId }: { alertId: string }) {
-    const [newComment, setNewComment] = useState('');
-    const firestore = useFirestore();
-    const { user } = useUser();
-
-    const commentsQuery = useMemoFirebase(() =>
-      firestore ? query(collection(firestore, 'reports', alertId, 'comments'), orderBy('timestamp', 'asc')) : null,
-      [firestore, alertId]
-    );
-    const { data: comments, isLoading: commentsLoading } = useCollection<Comment>(commentsQuery);
-
-    const handleAddComment = async () => {
-      if (!user || !newComment.trim() || !firestore) return;
-
-      const commentsRef = collection(firestore, 'reports', alertId, 'comments');
-      await addDoc(commentsRef, {
-        text: newComment,
-        userId: user.uid,
-        timestamp: serverTimestamp(),
-        user: {
-          name: user.displayName,
-          avatarUrl: user.photoURL
-        }
-      });
-
-      const alertRef = doc(firestore, 'reports', alertId);
-      await updateDoc(alertRef, {
-        commentsCount: increment(1)
-      });
-
-      setNewComment('');
-    }
-
-    return (
-      <div className="p-4 border-t bg-muted/50">
-        <h4 className='text-sm font-semibold mb-3'>Comments</h4>
-        <div className='space-y-4'>
-          {commentsLoading && Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className='flex items-start gap-3'>
-              <Skeleton className='size-8 rounded-full' />
-              <div className='space-y-2'>
-                <Skeleton className='h-4 w-24' />
-                <Skeleton className='h-4 w-48' />
-              </div>
-            </div>
-          ))}
-          {comments?.map(comment => {
-            return (
-              <div key={comment.id} className='flex items-start gap-3'>
-                <Avatar className='size-8'>
-                  <AvatarImage src={comment.user.avatarUrl} alt={comment.user.name} />
-                  <AvatarFallback>{comment.user.name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className='flex items-center gap-2'>
-                    <p className='font-semibold text-sm'>{comment.user.name}</p>
-                    <p className='text-xs text-muted-foreground'>{comment.timestamp ? new Date(comment.timestamp?.toDate()).toLocaleTimeString() : ''}</p>
-                  </div>
-                  <p className='text-sm'>{comment.text}</p>
-                </div>
-              </div>
-            )
-          })}
-          <div className='flex flex-col sm:flex-row items-center gap-2 pt-2'>
-            <div className='flex items-center gap-2 w-full'>
-              <Avatar className='size-8'>
-                <AvatarImage src={user?.photoURL ?? undefined} alt="You" />
-                <AvatarFallback>Y</AvatarFallback>
-              </Avatar>
-              <Input
-                placeholder='Add a comment...'
-                className='bg-background flex-1'
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
-              />
-            </div>
-            <Button size='sm' className='w-full sm:w-auto' onClick={handleAddComment}>Post</Button>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
-    <div className="flex-1 p-4 sm:p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="font-headline text-3xl font-bold tracking-tight">Community Alerts</h1>
-        <p className="text-muted-foreground">
-          Live feed of reports from your community. Upvote to confirm.
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/30 to-orange-50/20 relative overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-40 right-0 w-[600px] h-[600px] rounded-full bg-red-300/15 blur-[130px]" />
+        <div className="absolute bottom-0 -left-40 w-[500px] h-[500px] rounded-full bg-green-300/15 blur-[130px]" />
       </div>
 
-      <div className="max-w-2xl mx-auto space-y-6">
-        {alertsLoading && Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i} glassy>
-            <CardHeader className="p-4">
-              <div className="flex items-start gap-4">
-                <Skeleton className='size-12 rounded-full' />
-                <div className='flex-1 space-y-2'>
-                  <Skeleton className='h-5 w-32' />
-                  <Skeleton className='h-4 w-24' />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className='px-4 space-y-3'>
-              <Skeleton className='h-5 w-4/5' />
-              <Skeleton className='h-36 w-full rounded-lg' />
-            </CardContent>
-            <CardFooter className='p-4 flex justify-end gap-2 border-t'>
-              <Skeleton className='h-9 w-20' />
-              <Skeleton className='h-9 w-20' />
-            </CardFooter>
-          </Card>
-        ))}
-        {alerts?.map((alert) => {
-          const isExpanded = expandedComments[alert.id];
-          return (
-            <Card key={alert.id} glassy className="overflow-hidden">
-              <CardHeader className="p-4">
-                <div className="flex items-start gap-4">
-                  <Avatar className='size-12'>
-                    <AvatarImage src={alert.user?.avatarUrl} alt={alert.user?.name} />
-                    <AvatarFallback>{alert.user?.name?.charAt(0)}</AvatarFallback>
+      <div className="relative z-10 p-4 sm:p-6 md:p-10 max-w-3xl mx-auto">
+
+        {/* Header */}
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-full px-4 py-1.5 mb-4 text-red-800 text-xs font-bold uppercase tracking-widest">
+            <Bell className="h-3.5 w-3.5" />
+            Live Community Alerts
+          </div>
+          <div className="flex items-end justify-between">
+            <div>
+              <h1 className="text-4xl font-black tracking-tight text-slate-900 mb-2">
+                Community{' '}
+                <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+                  Alerts
+                </span>
+              </h1>
+              <p className="text-slate-500">Real-time reports from citizens across Akwa Ibom State. Upvote to confirm.</p>
+            </div>
+            <Link href="/report">
+              <Button className="rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white font-bold shadow-md gap-2 hidden sm:flex">
+                <Bell className="size-4" /> Report Issue
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Feed */}
+        <div className="space-y-5">
+          {isLoading && Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white/80 backdrop-blur-md border border-white/90 rounded-3xl p-5 space-y-3">
+              <div className="flex gap-3"><Skeleton className="size-12 rounded-full" /><div className="space-y-2 flex-1"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-24" /></div></div>
+              <Skeleton className="h-16 w-full rounded-xl" />
+            </div>
+          ))}
+
+          {!isLoading && alerts?.length === 0 && (
+            <div className="text-center py-20">
+              <Bell className="size-16 text-slate-200 mx-auto mb-4" />
+              <p className="text-slate-500 font-bold">No alerts yet</p>
+              <p className="text-slate-400 text-sm">Be the first to report an issue in your area.</p>
+            </div>
+          )}
+
+          {alerts?.map((alert) => (
+            <div key={alert.id} className="bg-white/80 backdrop-blur-md border border-white/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+              {/* Card Header */}
+              <div className="p-5">
+                <div className="flex items-start gap-3 mb-4">
+                  <Avatar className="size-11 flex-shrink-0">
+                    <AvatarImage src={alert.user?.avatarUrl} /><AvatarFallback>{alert.user?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className="font-semibold">{alert.user?.name}</p>
-                      <p className="text-xs text-muted-foreground">{alert.time ? new Date(alert.time?.toDate()).toLocaleString() : ''}</p>
+                      <p className="font-black text-slate-900 truncate">{alert.user?.name}</p>
+                      <p className="text-xs text-slate-400 flex items-center gap-1 flex-shrink-0">
+                        <Clock className="size-3" /> {alert.time ? new Date(alert.time.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground">in {alert.location}</p>
+                    <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                      <MapPin className="size-3 text-orange-500" /> {alert.location}
+                    </p>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="px-4 space-y-3">
-                <div className='flex items-center gap-2 flex-wrap'>
-                  <Badge variant="outline" className='border-2'>
-                    {alert.category}
-                  </Badge>
-                  <Badge className={cn('border', statusColors[alert.status])}>{alert.status}</Badge>
+
+                {/* Badges */}
+                <div className="flex items-center gap-2 flex-wrap mb-3">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    {alertTypeIcon(alert.type)} {alert.category || alert.type}
+                  </span>
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${statusColors[alert.status] || 'bg-slate-100 text-slate-700 border-slate-200'}`}>
+                    {alert.status}
+                  </span>
                 </div>
-                <p>{alert.description}</p>
+
+                <p className="text-slate-700 text-sm leading-relaxed">{alert.description}</p>
+
                 {mapPreviewImage && (
-                  <div className="rounded-lg overflow-hidden border">
-                    <Image
-                      src={mapPreviewImage.imageUrl}
-                      alt="Map preview"
-                      width={600}
-                      height={150}
-                      className="object-cover w-full"
-                      data-ai-hint={mapPreviewImage.imageHint}
-                    />
+                  <div className="mt-4 rounded-2xl overflow-hidden border border-slate-100">
+                    <Image src={mapPreviewImage.imageUrl} alt="Map" width={600} height={150} className="object-cover w-full" />
                   </div>
                 )}
-              </CardContent>
-              <CardFooter className="p-4 flex justify-end gap-2 border-t">
-                <Button variant="ghost" size="sm" onClick={() => handleUpvote(alert.id)}>
-                  <ThumbsUp className="mr-2 h-4 w-4" />
-                  {alert.upvotes}
+              </div>
+
+              {/* Footer */}
+              <div className="px-5 py-3 border-t border-slate-100 flex items-center gap-3">
+                <Button
+                  variant="ghost" size="sm"
+                  onClick={() => handleUpvote(alert.id)}
+                  className="rounded-xl gap-2 text-slate-600 hover:bg-green-50 hover:text-green-700 font-bold"
+                >
+                  <ThumbsUp className="size-4" /> {alert.upvotes || 0}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => toggleComments(alert.id)}>
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  {alert.commentsCount}
+                <Button
+                  variant="ghost" size="sm"
+                  onClick={() => setExpandedComments(p => ({ ...p, [alert.id]: !p[alert.id] }))}
+                  className="rounded-xl gap-2 text-slate-600 hover:bg-orange-50 hover:text-orange-700 font-bold"
+                >
+                  <MessageSquare className="size-4" /> {alert.commentsCount || 0}
                 </Button>
-              </CardFooter>
-              {isExpanded && <CommentSection alertId={alert.id} />}
-            </Card>
-          );
-        })}
+                <Button variant="ghost" size="sm" className="rounded-xl gap-1 text-slate-400 hover:text-green-700 ml-auto text-xs font-bold">
+                  View <ChevronRight className="size-3" />
+                </Button>
+              </div>
+
+              {expandedComments[alert.id] && <CommentSection alertId={alert.id} />}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
