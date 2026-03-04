@@ -4,8 +4,9 @@ import Image from 'next/image';
 import { tourismSpots } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
-import { MapPin, Star, Camera, ChevronRight, Compass, Globe, Waves, Trees, ArrowRight } from 'lucide-react';
+import { MapPin, Star, Camera, ChevronRight, Compass, Globe, Waves, Trees, ArrowRight, PlayCircle } from 'lucide-react';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 
 const categories = ['All', 'Beach', 'Park', 'Cultural', 'Heritage', 'Waterfall'];
 
@@ -20,68 +21,70 @@ export default function TourismPage() {
   const [activeCategory, setActiveCategory] = useState('All');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/30 to-orange-50/20 relative overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 right-0 w-[700px] h-[700px] rounded-full bg-green-300/20 blur-[140px]" />
-        <div className="absolute bottom-0 -left-40 w-[600px] h-[600px] rounded-full bg-orange-300/15 blur-[140px]" />
-      </div>
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative overflow-hidden mesh-gradient">
+      {/* Cinematic Background Glows */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-sky-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
 
-      <div className="relative z-10 p-4 sm:p-6 md:p-10 max-w-7xl mx-auto">
+      <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-8 md:space-y-12 relative z-10 animate-in fade-in duration-1000">
 
-        {/* Hero Banner */}
-        <div className="relative overflow-hidden rounded-[2rem] min-h-[360px] mb-12 shadow-2xl">
+        {/* Hero Section */}
+        <section className="relative h-[400px] sm:h-[500px] w-full rounded-3xl overflow-hidden group shadow-lg border border-white/10">
           <Image
             src="https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=1500&auto=format&fit=crop"
             alt="Akwa Ibom Nature"
             fill
-            className="object-cover"
+            className="object-cover group-hover:scale-105 transition-transform duration-[4000ms] opacity-80"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-green-900/80 via-green-800/60 to-transparent" />
-          <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-14">
-            <div className="inline-flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-4 py-1.5 mb-5 text-white text-xs font-bold uppercase tracking-widest w-fit">
-              <Compass className="h-3.5 w-3.5 text-orange-300" />
-              Discover Akwa Ibom
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4 leading-tight tracking-tight">
-              Tourism &<br />
-              <span className="bg-gradient-to-r from-orange-300 to-amber-300 bg-clip-text text-transparent">
-                Culture Hub
-              </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent flex flex-col justify-end p-6 md:p-10 space-y-4 sm:space-y-6">
+            <Badge className="w-fit bg-emerald-600/20 text-emerald-400 backdrop-blur-xl border border-emerald-500/30 px-4 py-1.5 rounded-full font-black uppercase text-[10px] tracking-widest shadow-md">
+              Virtual Expedition
+            </Badge>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-none drop-shadow-xl">
+              LAND OF <span className="bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent italic">PROMISE.</span>
             </h1>
-            <p className="text-white/80 text-lg max-w-xl mb-8">
-              Explore the breathtaking beaches, lush forests, rich culture, and hidden gems of Akwa Ibom — the Land of Promise.
+            <p className="text-slate-300 text-base md:text-xl font-medium max-w-2xl leading-relaxed drop-shadow-md">
+              Immerse yourself in breathtaking coastal beaches, lush tropical reserves, and rich cultural heritage.
             </p>
-            <Button className="w-fit bg-orange-500 hover:bg-orange-400 text-white font-black rounded-2xl px-8 h-12 shadow-xl shadow-orange-500/30 gap-2">
-              Explore Destinations <ArrowRight className="size-5" />
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button className="h-12 md:h-14 px-6 md:px-8 bg-white hover:bg-emerald-500 text-slate-950 hover:text-white rounded-xl font-bold text-base transition-all shadow-md hover:shadow-lg active:scale-95 group/btn">
+                Begin Journey <ArrowRight className="ml-2 size-5 group-hover/btn:translate-x-1 transition-transform" />
+              </Button>
+              <Button variant="ghost" className="h-12 md:h-14 px-6 text-white hover:bg-white/10 rounded-xl font-bold text-base backdrop-blur-xl transition-all">
+                <PlayCircle className="mr-2 size-5" /> Watch Trailer
+              </Button>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Highlights */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        {/* Highlights Grid */}
+        <section className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {highlights.map(({ icon: Icon, label, value }) => (
-            <div key={label} className="bg-white/70 backdrop-blur-md border border-white/80 rounded-2xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
-              <div className="size-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20 flex-shrink-0">
-                <Icon className="size-5 text-white" />
+            <div key={label} className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-5 sm:p-6 rounded-2xl flex items-center gap-4 border border-white/20 shadow-sm hover:-translate-y-1 transition-transform group overflow-hidden relative">
+              <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-10 transition-opacity bg-white/5 pointer-events-none">
+                <Icon className="size-16" />
               </div>
-              <div>
-                <p className="text-xl font-black text-slate-900">{value}</p>
-                <p className="text-xs text-slate-500 font-medium">{label}</p>
+              <div className="size-12 rounded-xl bg-white dark:bg-slate-800 shadow-inner flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:-rotate-12 transition-all group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900">
+                <Icon className="size-6 text-emerald-500" />
+              </div>
+              <div className="relative z-10">
+                <p className="text-3xl font-black text-slate-950 dark:text-white tracking-tighter leading-none mb-1">{value}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
               </div>
             </div>
           ))}
-        </div>
+        </section>
 
         {/* Category Filters */}
-        <div className="flex gap-2 flex-wrap mb-8">
+        <div className="flex gap-2 flex-wrap bg-white/40 dark:bg-slate-900/40 p-2 rounded-xl border border-white/20 backdrop-blur-3xl w-fit mx-auto shadow-sm">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeCategory === cat
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25'
-                  : 'bg-white/70 text-slate-600 border border-white/80 hover:bg-white'
+              className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${activeCategory === cat
+                ? 'bg-slate-950 dark:bg-emerald-500 text-white shadow-md scale-105'
+                : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
             >
               {cat}
@@ -96,69 +99,49 @@ export default function TourismPage() {
             return (
               <div
                 key={spot.id}
-                className="group bg-white/80 backdrop-blur-md border border-white/90 rounded-3xl overflow-hidden shadow-md hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 hover:-translate-y-1"
+                className="group bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col"
               >
-                <div className="relative aspect-video w-full overflow-hidden">
-                  {image ? (
-                    <Image
-                      src={image.imageUrl}
-                      alt={spot.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
-                      <Trees className="size-16 text-white/30" />
+                <div className="relative h-[200px] md:h-[240px] w-full overflow-hidden p-1 pb-0">
+                  <div className="relative h-full w-full rounded-t-xl overflow-hidden shadow-inner hidden md:block" /> {/* Dummy div for spacing if needed; actual image replaces this */}
+                  <div className="relative h-full w-full rounded-t-xl overflow-hidden shadow-inner">
+                    {image ? (
+                      <Image
+                        src={image.imageUrl}
+                        alt={spot.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-[3000ms]"
+                      />
+                    ) : (
+                      <div className="h-full bg-slate-950 flex items-center justify-center">
+                        <Trees className="size-12 text-white/10" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80" />
+                    <div className="absolute top-4 right-4 flex items-center gap-1 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full px-2.5 py-1 shadow-md">
+                      <Star className="size-3 text-amber-400 fill-amber-400" />
+                      <span className="text-white text-[10px] font-bold">4.8</span>
                     </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  {/* Spot name overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="font-black text-white text-xl leading-tight">{spot.name}</h3>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <MapPin className="size-3.5 text-orange-300" />
-                      <span className="text-white/75 text-xs font-medium">Akwa Ibom State</span>
-                    </div>
-                  </div>
-                  {/* Rating badge */}
-                  <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/50 backdrop-blur border border-white/20 rounded-full px-2.5 py-1">
-                    <Star className="size-3 text-amber-400 fill-amber-400" />
-                    <span className="text-white text-xs font-bold">4.8</span>
                   </div>
                 </div>
 
-                <div className="p-5">
-                  <p className="text-sm text-slate-500 leading-relaxed line-clamp-2 mb-4">{spot.description}</p>
-                  <Button className="w-full rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold shadow-md shadow-orange-500/20 gap-2">
-                    <MapPin className="size-4" />
-                    Explore on Map
-                    <ChevronRight className="size-4 ml-auto" />
+                <div className="p-5 sm:p-6 flex-1 flex flex-col">
+                  <h3 className="font-black text-2xl text-slate-950 dark:text-white tracking-tight leading-none mb-2 group-hover:text-emerald-500 transition-colors">{spot.name}</h3>
+                  <div className="flex items-center gap-2 mb-3">
+                    <MapPin className="size-3.5 text-emerald-500" />
+                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Akwa Ibom State</span>
+                  </div>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium line-clamp-2 mb-6 flex-1">{spot.description}</p>
+
+                  <Button className="w-full h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-950 dark:text-white hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 font-bold uppercase tracking-widest text-xs transition-colors group/btn">
+                    Explore Details
+                    <ArrowRight className="size-4 ml-auto group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
                 </div>
               </div>
             );
           })}
         </div>
-
-        {/* CTA Banner */}
-        <div className="mt-12 bg-gradient-to-br from-green-800 to-green-900 rounded-3xl p-8 md:p-12 text-white text-center relative overflow-hidden shadow-2xl shadow-green-900/30">
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
-            backgroundSize: '32px 32px'
-          }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-orange-400/20 blur-3xl" />
-          <div className="relative z-10">
-            <Compass className="size-14 text-orange-300 mx-auto mb-4" />
-            <h3 className="text-3xl font-black mb-3">Plan Your AKS Adventure</h3>
-            <p className="text-white/70 max-w-md mx-auto mb-8">
-              Book guided tours, cultural experiences, and eco-adventures across the beautiful Land of Promise.
-            </p>
-            <Button className="bg-orange-500 hover:bg-orange-400 text-white font-black rounded-2xl px-10 h-12 shadow-xl shadow-orange-500/30 gap-2">
-              Book a Tour <ArrowRight className="size-5" />
-            </Button>
-          </div>
-        </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -49,43 +49,43 @@ export default function DirectoryPage() {
   return (
     <main className="min-h-screen pb-24 relative overflow-hidden mesh-gradient">
       {/* Cinematic Background Glows */}
-      <div className="absolute top-0 right-0 w-[1200px] h-[1200px] bg-emerald-500/10 rounded-full blur-[200px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
-      <div className="absolute bottom-0 left-0 w-[1000px] h-[1000px] bg-orange-500/10 rounded-full blur-[200px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-orange-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
 
-      <div className="container mx-auto p-4 md:p-12 space-y-16 relative z-10 animate-in fade-in duration-1000">
+      <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-8 md:space-y-12 relative z-10 animate-in fade-in duration-1000">
         <div className="space-y-4 text-center md:text-left">
-          <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-6 py-2 rounded-full uppercase tracking-[0.3em] text-[10px]">
+          <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-bold px-4 py-1.5 rounded-full uppercase tracking-widest text-[9px] shadow-sm">
             Ecosystem Directory
           </Badge>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tightest leading-none">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-none">
             Ibom <span className="bg-gradient-to-r from-emerald-500 to-orange-500 bg-clip-text text-transparent italic">Network.</span>
           </h1>
-          <p className="text-slate-500 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
+          <p className="text-slate-500 text-base md:text-lg font-medium max-w-2xl leading-relaxed">
             The neural interface to Akwa Ibom&apos;s commercial landscape. Discover elite services and state-validated enterprises.
           </p>
         </div>
 
-        <div className="w-full max-w-4xl mx-auto space-y-8">
+        <div className="w-full max-w-3xl mx-auto space-y-6">
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-orange-500 rounded-[2.5rem] blur opacity-25 group-focus-within:opacity-50 transition duration-700"></div>
-            <div className="relative bg-white/70 dark:bg-slate-900/70 backdrop-blur-3xl rounded-[2.5rem] p-4 flex flex-col md:flex-row items-center gap-4 border border-white/40 shadow-2xl">
+            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-orange-500 rounded-3xl blur opacity-25 group-focus-within:opacity-50 transition duration-500"></div>
+            <div className="relative bg-white/70 dark:bg-slate-900/70 backdrop-blur-3xl rounded-3xl p-3 flex flex-col md:flex-row items-center gap-3 border border-white/40 shadow-xl">
               <div className="relative flex-1 w-full">
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <Input
                   placeholder="Search the Ibom Network..."
-                  className="pl-16 h-18 text-xl font-bold bg-transparent border-none focus-visible:ring-0 placeholder:text-slate-400"
+                  className="pl-12 h-12 text-base md:text-lg font-bold bg-transparent border-none focus-visible:ring-0 placeholder:text-slate-400"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Separator orientation="vertical" className="hidden md:block h-12 bg-slate-200/50" />
-              <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center p-2">
+              <Separator orientation="vertical" className="hidden md:block h-8 bg-slate-200/50" />
+              <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center p-1">
                 {['All', ...businessCategories.slice(0, 3)].map(category => (
                   <Button
                     key={category}
                     variant={selectedCategory === category ? 'default' : 'ghost'}
                     onClick={() => setSelectedCategory(category)}
-                    className={`rounded-2xl font-black uppercase text-[10px] tracking-widest px-6 h-12 ${selectedCategory === category ? 'bg-slate-950 text-white shadow-xl' : 'text-slate-500 hover:text-slate-950'}`}
+                    className={`rounded-xl font-bold uppercase text-[9px] tracking-widest px-4 h-10 ${selectedCategory === category ? 'bg-slate-950 text-white shadow-md' : 'text-slate-500 hover:text-slate-950'}`}
                   >
                     {category}
                   </Button>
@@ -95,25 +95,25 @@ export default function DirectoryPage() {
           </div>
         </div>
 
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pt-8">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pt-6">
           {isLoading ? (
             Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="space-y-6">
-                <Skeleton className="h-[350px] w-full rounded-[3.5rem]" />
-                <div className="space-y-3 px-4">
-                  <Skeleton className="h-8 w-3/4" />
+              <div key={i} className="space-y-4">
+                <Skeleton className="h-[250px] w-full rounded-2xl" />
+                <div className="space-y-2 px-3">
+                  <Skeleton className="h-6 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
                 </div>
               </div>
             ))
           ) : filteredBusinesses.length === 0 ? (
-            <div className="col-span-full py-32 text-center space-y-6">
-              <div className="size-24 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-8">
-                <Search className="size-12 text-slate-300" />
+            <div className="col-span-full py-16 md:py-24 text-center space-y-4">
+              <div className="size-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                <Search className="size-8 text-slate-300" />
               </div>
-              <p className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white">Zero Connections Found</p>
-              <p className="text-xl text-slate-400 font-medium">Refine your search parameters to recalibrate the network.</p>
-              <Button onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }} variant="outline" className="rounded-2xl px-10 h-16 font-black uppercase tracking-widest border-slate-200">Reset Interface</Button>
+              <p className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Zero Connections Found</p>
+              <p className="text-base text-slate-400 font-medium">Refine your search parameters to recalibrate the network.</p>
+              <Button onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }} variant="outline" className="rounded-xl px-6 h-11 font-bold uppercase tracking-widest text-[10px] border-slate-200">Reset Interface</Button>
             </div>
           ) : (
             filteredBusinesses.map((business, idx) => {
@@ -121,11 +121,11 @@ export default function DirectoryPage() {
               return (
                 <Card
                   key={business.id}
-                  className="group relative border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] hover:shadow-[0_60px_120px_-30px_rgba(16,185,129,0.3)] transition-all duration-700 rounded-[3.5rem] overflow-hidden bg-white/80 dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:-translate-y-4 animate-in fade-in slide-in-from-bottom-10"
+                  className="group relative border border-white/20 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden bg-white/80 dark:bg-slate-900/60 backdrop-blur-3xl hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-5"
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
-                  <div className="absolute top-6 left-6 z-20">
-                    <Badge className="bg-white/90 backdrop-blur-xl text-slate-950 border-none font-black px-4 py-2 rounded-xl uppercase text-[9px] tracking-widest shadow-2xl">
+                  <div className="absolute top-4 left-4 z-20">
+                    <Badge className="bg-white/90 backdrop-blur-xl text-slate-950 border-none font-bold px-3 py-1 rounded-lg uppercase text-[8px] tracking-widest shadow-sm">
                       {business.category}
                     </Badge>
                   </div>
@@ -146,24 +146,24 @@ export default function DirectoryPage() {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
 
-                    <div className="absolute bottom-0 left-0 right-0 p-10 space-y-4 text-white translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
-                      <div className="space-y-1">
-                        <CardTitle className="text-4xl font-black tracking-tightest leading-none drop-shadow-2xl">{business.name}</CardTitle>
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-widest">
-                          <CheckCircle className="size-4" /> State Verified
+                    <div className="absolute bottom-0 left-0 right-0 p-5 space-y-3 text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                      <div className="space-y-0.5">
+                        <CardTitle className="text-2xl font-black tracking-tight leading-none drop-shadow-md">{business.name}</CardTitle>
+                        <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] uppercase tracking-widest">
+                          <CheckCircle className="size-3.5" /> State Verified
                         </div>
                       </div>
-                      <p className="text-slate-300 text-sm font-medium leading-relaxed line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">{business.description || "Elite commercial partner within the Ibom ecosystem. Committed to quality and the ARISE developmental agenda."}</p>
+                      <p className="text-slate-300 text-xs font-medium leading-relaxed line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{business.description || "Elite commercial partner within the Ibom ecosystem. Committed to quality and the ARISE developmental agenda."}</p>
 
-                      <div className="flex gap-3 pt-4">
-                        <Button asChild className="h-16 flex-1 bg-white text-slate-950 hover:bg-emerald-500 hover:text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-2xl active:scale-95">
+                      <div className="flex gap-2 pt-2">
+                        <Button asChild className="h-11 flex-1 bg-white text-slate-950 hover:bg-emerald-500 hover:text-white rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all shadow-md active:scale-95">
                           <a href={`tel:${business.phone}`}>
-                            <Phone className="mr-2 size-5" /> Contact
+                            <Phone className="mr-1.5 size-4" /> Contact
                           </a>
                         </Button>
-                        <Button asChild className="h-16 size-16 bg-white/10 backdrop-blur-md text-white hover:bg-white hover:text-slate-950 rounded-2xl p-0 transition-all border border-white/20 active:scale-95 shadow-2xl" variant="outline">
+                        <Button asChild className="h-11 size-11 bg-white/10 backdrop-blur-md text-white hover:bg-white hover:text-slate-950 rounded-xl p-0 transition-all border border-white/20 active:scale-95 shadow-md flex items-center justify-center shrink-0" variant="outline">
                           <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name + ', ' + business.address)}`} target="_blank" rel="noopener noreferrer">
-                            <MapPin className="size-6" />
+                            <MapPin className="size-5" />
                           </a>
                         </Button>
                       </div>

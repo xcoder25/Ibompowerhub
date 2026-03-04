@@ -50,10 +50,10 @@ export default function WastePage() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative overflow-hidden mesh-gradient">
       {/* Cinematic Background Glows */}
-      <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-emerald-500/10 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
-      <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-orange-500/5 rounded-full blur-[150px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
 
-      <div className="container mx-auto p-4 md:p-12 space-y-20 relative z-10 animate-in fade-in duration-1000">
+      <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-10 md:space-y-16 relative z-10 animate-in fade-in duration-1000">
 
         <WasteHero />
 
@@ -66,61 +66,61 @@ export default function WastePage() {
         </section>
 
         {/* Collectors Section */}
-        <section className="space-y-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-            <div className="space-y-2">
-              <Badge className="bg-emerald-600/10 text-emerald-600 border-none px-4 py-1 rounded-full font-black uppercase text-[10px] tracking-widest mb-2">
+        <section className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
+            <div className="space-y-1.5">
+              <Badge className="bg-emerald-600/10 text-emerald-600 border-none px-3 py-1 rounded-full font-bold uppercase text-[9px] tracking-widest mb-1.5">
                 Verified Partners
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tightest">LICENSED COLLECTORS</h2>
-              <p className="text-slate-500 font-medium max-w-xl text-lg">Official ARISE-certified waste management partners for residential and institutional logistics.</p>
+              <h2 className="text-3xl md:text-4xl font-black tracking-tight">LICENSED COLLECTORS</h2>
+              <p className="text-slate-500 font-medium max-w-xl text-base">Official ARISE-certified waste management partners for residential and institutional logistics.</p>
             </div>
-            <Button variant="ghost" className="hidden md:flex font-black uppercase text-[11px] tracking-[0.2em] group text-slate-400 hover:text-emerald-500 transition-colors">
-              Registration Portal <ArrowRight className="ml-2 size-4 group-hover:translate-x-1 transition-transform" />
+            <Button variant="ghost" className="hidden md:flex font-bold uppercase text-[10px] tracking-widest group text-slate-400 hover:text-emerald-500 transition-colors h-10 px-4">
+              Registration Portal <ArrowRight className="ml-2 size-3.5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
           <CollectorGrid collectors={privateWasteCollectors} />
         </section>
 
         {/* Schedule & Monitoring Area */}
-        <div className="grid lg:grid-cols-3 gap-16 pt-10">
-          <section className="lg:col-span-2 space-y-8">
-            <div className="flex items-center gap-4 px-4">
-              <Calendar className="size-10 text-emerald-600" />
-              <h3 className="text-3xl font-black tracking-tighter">Strategic Pickup Schedule</h3>
+        <div className="grid lg:grid-cols-3 gap-10 pt-6">
+          <section className="lg:col-span-2 space-y-6">
+            <div className="flex items-center gap-3 px-2">
+              <Calendar className="size-6 text-emerald-600" />
+              <h3 className="text-2xl md:text-3xl font-black tracking-tight">Strategic Pickup Schedule</h3>
             </div>
 
-            <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[3.5rem] overflow-hidden bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl border border-white/20">
+            <Card className="border border-white/20 shadow-sm rounded-3xl overflow-hidden bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl">
               <CardContent className="p-0">
                 <Table>
                   <TableHeader className="bg-slate-50 dark:bg-slate-950/50">
                     <TableRow className="border-slate-100 dark:border-slate-800">
-                      <TableHead className="font-black uppercase text-[11px] tracking-widest px-12 h-20">Designated Sector</TableHead>
-                      <TableHead className="font-black uppercase text-[11px] tracking-widest px-12 h-20">Operation Cycles</TableHead>
-                      <TableHead className="font-black uppercase text-[11px] tracking-widest px-12 h-20">Timeframe</TableHead>
-                      <TableHead className="font-black uppercase text-[11px] tracking-widest px-12 h-20">Status</TableHead>
+                      <TableHead className="font-bold uppercase text-[10px] tracking-widest px-6 h-12">Designated Sector</TableHead>
+                      <TableHead className="font-bold uppercase text-[10px] tracking-widest px-6 h-12">Operation Cycles</TableHead>
+                      <TableHead className="font-bold uppercase text-[10px] tracking-widest px-6 h-12">Timeframe</TableHead>
+                      <TableHead className="font-bold uppercase text-[10px] tracking-widest px-6 h-12">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {collectionSchedule.map((s, idx) => (
                       <TableRow key={s.area} className="border-slate-50 dark:border-slate-800/50 hover:bg-emerald-500/5 transition-colors group">
-                        <TableCell className="px-12 py-10">
-                          <div className="flex items-center gap-4">
-                            <div className="size-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                              <MapPin className="size-5" />
+                        <TableCell className="px-6 py-5">
+                          <div className="flex items-center gap-3">
+                            <div className="size-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
+                              <MapPin className="size-4" />
                             </div>
-                            <span className="font-black text-xl tracking-tight text-slate-900 dark:text-white">{s.area}</span>
+                            <span className="font-bold text-base tracking-tight text-slate-900 dark:text-white">{s.area}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="px-12 py-10 font-bold text-slate-500 dark:text-slate-400">{s.day}</TableCell>
-                        <TableCell className="px-12 py-10">
-                          <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl w-fit">
-                            <Clock className="size-4 text-emerald-500" />
-                            <span className="text-xs font-black tracking-widest uppercase">{s.time}</span>
+                        <TableCell className="px-6 py-5 font-bold text-slate-500 dark:text-slate-400 text-sm">{s.day}</TableCell>
+                        <TableCell className="px-6 py-5">
+                          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg w-fit shadow-inner">
+                            <Clock className="size-3 text-emerald-500" />
+                            <span className="text-[10px] font-bold tracking-widest uppercase">{s.time}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="px-12 py-10">
-                          <Badge className={`${s.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-orange-500/10 text-orange-600'} border-none px-4 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-widest`}>
+                        <TableCell className="px-6 py-5">
+                          <Badge className={`${s.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-orange-500/10 text-orange-600'} border-none px-3 py-1 rounded-md font-bold uppercase text-[9px] tracking-widest`}>
                             {s.status}
                           </Badge>
                         </TableCell>
@@ -132,27 +132,27 @@ export default function WastePage() {
             </Card>
           </section>
 
-          <section className="space-y-8">
-            <div className="flex items-center gap-4 px-4 text-orange-600">
-              <AlertCircle className="size-10" />
-              <h3 className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white">Citizen Intel</h3>
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-2 text-orange-600">
+              <AlertCircle className="size-6" />
+              <h3 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white">Citizen Intel</h3>
             </div>
 
-            <div className="grid gap-10">
+            <div className="grid gap-4">
               <InfoCard
                 title="Illegal Dumping"
                 desc="Report non-sanctioned waste disposal in your sector for immediate cleanup team deployment."
-                icon={<Trash2 className="size-10 text-red-500" />}
+                icon={<Trash2 className="size-6 text-red-500" />}
               />
               <InfoCard
                 title="Recycling Incentives"
                 desc="Learn about the Ibom Waste-to-Wealth initiative and earn credits for sorted recyclables."
-                icon={<Activity className="size-10 text-emerald-500" />}
+                icon={<Activity className="size-6 text-emerald-500" />}
               />
               <InfoCard
                 title="Compost Program"
                 desc="Official ARISE organic waste reduction protocols for residential agriculture."
-                icon={<ShieldCheck className="size-10 text-indigo-500" />}
+                icon={<ShieldCheck className="size-6 text-indigo-500" />}
               />
             </div>
           </section>
@@ -164,14 +164,14 @@ export default function WastePage() {
 
 function StatCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
   return (
-    <Card className="border-none shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-10 rounded-[3rem] hover:bg-slate-950 group transition-all duration-700 hover:-translate-y-4 relative overflow-hidden">
-      <div className="flex items-center gap-8 relative z-10">
-        <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800 group-hover:bg-white/10 transition-all shadow-inner group-hover:scale-110 group-hover:-rotate-12 group-hover:text-emerald-400">
+    <Card className="border border-white/20 shadow-sm bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-5 sm:p-6 rounded-2xl hover:bg-slate-950 group transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+      <div className="flex items-center gap-4 relative z-10">
+        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 group-hover:bg-white/10 transition-all shadow-inner group-hover:scale-105 group-hover:-rotate-6 group-hover:text-emerald-400">
           {icon}
         </div>
         <div>
-          <p className="text-[10px] uppercase font-black tracking-[0.4em] text-slate-400 group-hover:text-slate-500 mb-2 leading-none">{label}</p>
-          <p className="text-4xl font-black text-slate-950 dark:text-white group-hover:text-white leading-none tracking-tight">{value}</p>
+          <p className="text-[9px] uppercase font-bold tracking-widest text-slate-400 group-hover:text-slate-500 mb-1 leading-none">{label}</p>
+          <p className="text-2xl font-black text-slate-950 dark:text-white group-hover:text-white leading-none tracking-tight">{value}</p>
         </div>
       </div>
     </Card>
@@ -180,19 +180,19 @@ function StatCard({ label, value, icon }: { label: string; value: string; icon: 
 
 function InfoCard({ title, desc, icon }: { title: string; desc: string; icon: React.ReactNode }) {
   return (
-    <Card className="border-none shadow-sm rounded-[3rem] p-8 space-y-6 bg-white dark:bg-slate-900/60 backdrop-blur-3xl hover:shadow-2xl transition-all group border border-white/5">
-      <div className="flex items-center gap-6">
-        <div className="size-16 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
+    <Card className="border border-white/10 shadow-sm rounded-2xl p-5 space-y-4 bg-white/80 dark:bg-slate-900/60 backdrop-blur-3xl hover:shadow-md transition-all group">
+      <div className="flex items-center gap-4">
+        <div className="size-12 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:scale-105 transition-transform shadow-inner">
           {icon}
         </div>
         <div className="space-y-1">
-          <h4 className="text-2xl font-black tracking-tightest">{title}</h4>
-          <p className="text-[11px] text-slate-400 font-medium leading-relaxed uppercase tracking-widest">{desc.slice(0, 50)}...</p>
+          <h4 className="text-lg font-black tracking-tight">{title}</h4>
+          <p className="text-[9px] text-slate-400 font-bold leading-relaxed uppercase tracking-widest hidden sm:block">{desc.slice(0, 40)}...</p>
         </div>
       </div>
-      <p className="text-sm text-slate-500 leading-relaxed font-medium px-2">{desc}</p>
-      <Button className="w-full h-16 rounded-2xl bg-slate-950 text-white font-black uppercase text-xs tracking-widest hover:bg-emerald-600 transition-all shadow-xl active:scale-95">
-        Initiate Protocol <ArrowRight className="ml-2 size-4" />
+      <p className="text-sm text-slate-500 leading-relaxed font-medium px-1">{desc}</p>
+      <Button className="w-full h-11 rounded-xl bg-slate-950 text-white font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-600 transition-all shadow-md active:scale-95">
+        Initiate Protocol <ArrowRight className="ml-2 size-3.5" />
       </Button>
     </Card>
   );

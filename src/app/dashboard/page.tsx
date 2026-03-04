@@ -44,6 +44,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useUser } from '@/firebase';
+import { VoiceBankingWidget } from '@/components/voice-banking';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit, doc } from 'firebase/firestore';
 import {
@@ -545,31 +546,10 @@ export default function DashboardPage() {
 
 
 
-        {/* AI Assistant - gradient glass CTA */}
-        <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-r from-green-700 via-emerald-600 to-teal-600 text-white relative">
-          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
-          <CardContent className="relative p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-white/20 border border-white/30">
-                <Bot className="h-8 w-8" />
-              </div>
-              <div>
-                <h3 className="font-bold text-lg flex items-center gap-2">
-                  AI-Powered Assistant <Sparkles className="h-4 w-4 text-amber-300 animate-glow" />
-                </h3>
-                <p className="text-white/90 text-sm mt-0.5">Get instant help with any AKS government service</p>
-              </div>
-            </div>
-            <Button
-              size="lg"
-              className="bg-white text-green-700 hover:bg-green-50 rounded-xl shadow-lg"
-              onClick={() => alert('AI Assistant coming soon!')}
-            >
-              <MessageSquare className="mr-2 h-5 w-5" />
-              Chat Now
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Advanced Voice Banking Edge Widget */}
+        <div className="mb-10">
+          <VoiceBankingWidget />
+        </div>
 
       </div>
 

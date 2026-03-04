@@ -31,7 +31,6 @@ import {
   Lock,
   ShieldCheck,
   Fingerprint,
-  ArrowRight,
   Share2,
   Download,
   Filter,
@@ -44,7 +43,11 @@ import {
   PiggyBank,
   Snowflake,
   Zap,
-  AlertTriangle
+  AlertTriangle,
+  Terminal,
+  Clock,
+  Shield,
+  Activity
 } from 'lucide-react';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, updateDoc, where, getDocs } from 'firebase/firestore';
@@ -54,6 +57,27 @@ import { Copy, Check, Info } from 'lucide-react';
 import { WalletLock } from '@/components/wallet/wallet-lock';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { QRCodeSVG } from 'qrcode.react';
+
+const NIGERIAN_BANKS = [
+  { code: '044', name: 'Access Bank' },
+  { code: '050', name: 'Ecobank Nigeria' },
+  { code: '070', name: 'Fidelity Bank' },
+  { code: '011', name: 'First Bank of Nigeria' },
+  { code: '214', name: 'First City Monument Bank' },
+  { code: '058', name: 'Guaranty Trust Bank' },
+  { code: 'ibomx', name: 'Ibom X Wallet' },
+  { code: '082', name: 'Keystone Bank' },
+  { code: '100004', name: 'Opay' },
+  { code: '100033', name: 'Palmpay' },
+  { code: '076', name: 'Polaris Bank' },
+  { code: '221', name: 'Stanbic IBTC Bank' },
+  { code: '232', name: 'Sterling Bank' },
+  { code: '032', name: 'Union Bank of Nigeria' },
+  { code: '033', name: 'United Bank for Africa' },
+  { code: '215', name: 'Unity Bank' },
+  { code: '035', name: 'Wema Bank' },
+  { code: '057', name: 'Zenith Bank' },
+];
 
 type WalletData = {
   balance: number;
@@ -1406,147 +1430,138 @@ export default function WalletPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="history" className="space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-lg">Transaction Feed</h3>
-                <Button variant="ghost" size="sm" className="text-xs gap-2 rounded-full border border-slate-200">
-                  <Filter className="h-3 w-3" />
-                  Filter
-                </Button>
+            <TabsContent value="history" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
+                <div className="space-y-2">
+                  <Badge className="bg-slate-900/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Digital Ledger</Badge>
+                  <h3 className="text-4xl font-black tracking-tightest">TRANSACTION FEED</h3>
+                  <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Historical Telemetry & Settlements</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
+                    All Nodes
+                  </Button>
+                  <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
+                    Export CSV
+                  </Button>
+                </div>
               </div>
 
-              <TabsContent value="history" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-                  <div className="space-y-2">
-                    <Badge className="bg-slate-900/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Digital Ledger</Badge>
-                    <h3 className="text-4xl font-black tracking-tightest">TRANSACTION FEED</h3>
-                    <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Historical Telemetry & Settlements</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
-                      All Nodes
-                    </Button>
-                    <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
-                      Export CSV
-                    </Button>
-                  </div>
-                </div>
-
-                <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[3rem] overflow-hidden bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl border border-white/20">
-                  <CardContent className="p-4 sm:p-8">
-                    {transactions.length === 0 ? (
-                      <div className="text-center py-32 px-4 space-y-6">
-                        <div className="size-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto shadow-inner group animate-pulse">
-                          <History className="size-10 text-slate-300 dark:text-slate-600" />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-2xl font-black tracking-tightest text-slate-900 dark:text-white">NO FEED DETECTED</p>
-                          <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Current epoch has no transaction telemetry.</p>
-                        </div>
+              <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[3rem] overflow-hidden bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl border border-white/20">
+                <CardContent className="p-4 sm:p-8">
+                  {transactions.length === 0 ? (
+                    <div className="text-center py-32 px-4 space-y-6">
+                      <div className="size-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto shadow-inner group animate-pulse">
+                        <History className="size-10 text-slate-300 dark:text-slate-600" />
                       </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {transactions.map((txn, idx) => (
-                          <div key={txn.id} className="group relative">
-                            <div className="absolute inset-0 bg-slate-50/50 dark:bg-slate-800/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
-                            <div className="flex items-center justify-between p-6 cursor-pointer border-b border-slate-50 dark:border-slate-800/50 last:border-0 transition-all">
-                              <div className="flex items-center gap-6">
-                                <div className={`size-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 group-active:scale-90 ${txn.type === 'credit' ? 'bg-emerald-500/10 text-emerald-600 shadow-emerald-500/10' : 'bg-slate-950 text-white shadow-slate-950/10'}`}>
-                                  {txn.type === 'credit' ? <ArrowDownLeft className="size-7" /> : <ArrowUpRight className="size-7" />}
-                                </div>
-                                <div className="space-y-1">
-                                  <p className="font-black text-xl tracking-tightest uppercase text-slate-900 dark:text-white">{txn.description}</p>
-                                  <div className="flex items-center gap-2">
-                                    <Badge className="bg-slate-100 dark:bg-slate-800 text-[8px] font-black tracking-widest uppercase py-0.5 px-2 rounded-md border-none text-slate-400">Node ID: {txn.id.slice(-8).toUpperCase()}</Badge>
-                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                                      {txn.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} • {txn.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
-                                  </div>
-                                </div>
+                      <div className="space-y-1">
+                        <p className="text-2xl font-black tracking-tightest text-slate-900 dark:text-white">NO FEED DETECTED</p>
+                        <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Current epoch has no transaction telemetry.</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {transactions.map((txn, idx) => (
+                        <div key={txn.id} className="group relative">
+                          <div className="absolute inset-0 bg-slate-50/50 dark:bg-slate-800/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
+                          <div className="flex items-center justify-between p-6 cursor-pointer border-b border-slate-50 dark:border-slate-800/50 last:border-0 transition-all">
+                            <div className="flex items-center gap-6">
+                              <div className={`size-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 group-active:scale-90 ${txn.type === 'credit' ? 'bg-emerald-500/10 text-emerald-600 shadow-emerald-500/10' : 'bg-slate-950 text-white shadow-slate-950/10'}`}>
+                                {txn.type === 'credit' ? <ArrowDownLeft className="size-7" /> : <ArrowUpRight className="size-7" />}
                               </div>
-                              <div className="text-right space-y-2">
-                                <p className={`font-black text-2xl tracking-tighter ${txn.type === 'credit' ? 'text-emerald-500' : 'text-slate-950 dark:text-white'}`}>
-                                  {txn.type === 'credit' ? '+' : '-'}₦{txn.amount.toLocaleString()}
-                                </p>
-                                <div className="flex justify-end">
-                                  <Badge className="text-[9px] h-5 px-3 font-black border-none bg-emerald-500/10 text-emerald-600 uppercase tracking-[0.2em] rounded-lg">Settled ✓</Badge>
+                              <div className="space-y-1">
+                                <p className="font-black text-xl tracking-tightest uppercase text-slate-900 dark:text-white">{txn.description}</p>
+                                <div className="flex items-center gap-2">
+                                  <Badge className="bg-slate-100 dark:bg-slate-800 text-[8px] font-black tracking-widest uppercase py-0.5 px-2 rounded-md border-none text-slate-400">Node ID: {txn.id.slice(-8).toUpperCase()}</Badge>
+                                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                    {txn.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} • {txn.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
                                 </div>
                               </div>
                             </div>
+                            <div className="text-right space-y-2">
+                              <p className={`font-black text-2xl tracking-tighter ${txn.type === 'credit' ? 'text-emerald-500' : 'text-slate-950 dark:text-white'}`}>
+                                {txn.type === 'credit' ? '+' : '-'}₦{txn.amount.toLocaleString()}
+                              </p>
+                              <div className="flex justify-end">
+                                <Badge className="text-[9px] h-5 px-3 font-black border-none bg-emerald-500/10 text-emerald-600 uppercase tracking-[0.2em] rounded-lg">Settled ✓</Badge>
+                              </div>
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-                <div className="flex justify-center pt-4">
-                  <Button variant="ghost" className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] gap-3 px-8 h-12 hover:text-emerald-500 transition-colors group">
-                    <Download className="size-4 group-hover:-translate-y-1 transition-transform" />
-                    Request Full Session Statement PDF
-                  </Button>
-                </div>
-              </TabsContent>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              <div className="flex justify-center pt-4">
+                <Button variant="ghost" className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] gap-3 px-8 h-12 hover:text-emerald-500 transition-colors group">
+                  <Download className="size-4 group-hover:-translate-y-1 transition-transform" />
+                  Request Full Session Statement PDF
+                </Button>
+              </div>
+            </TabsContent>
 
-              <TabsContent value="security" className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
-                <div className="text-center space-y-3 pb-4">
-                  <div className="size-20 rounded-[2rem] bg-slate-950 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20 group hover:rotate-12 transition-transform duration-500">
-                    <ShieldCheck className="size-10 text-emerald-500" />
+            <TabsContent value="security" className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
+              <div className="text-center space-y-3 pb-4">
+                <div className="size-20 rounded-[2rem] bg-slate-950 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20 group hover:rotate-12 transition-transform duration-500">
+                  <ShieldCheck className="size-10 text-emerald-500" />
+                </div>
+                <h3 className="text-4xl font-black tracking-tightest">DEFENSE PROTOCOLS</h3>
+                <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Institutional Grade Assets Protection</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-white dark:bg-slate-900/40 backdrop-blur-3xl p-8 space-y-8 border border-white/20">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1.5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">Biometric Gateway</p>
+                        <h4 className="text-2xl font-black tracking-tight">Enterprise Bio-Unlock</h4>
+                        <p className="text-xs text-slate-400 font-medium">Require face/fingerprint for all high-value transactions.</p>
+                      </div>
+                      <Switch className="data-[state=checked]:bg-emerald-500" />
+                    </div>
+                    <Separator className="bg-slate-100/50 dark:bg-slate-800/50" />
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1.5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Manual Override</p>
+                        <h4 className="text-2xl font-black tracking-tight">Transaction PIN</h4>
+                        <p className="text-xs text-slate-400 font-medium font-medium">Secondary numeric authorization layer.</p>
+                      </div>
+                      <Button onClick={() => setIsPinSetup(!isPinSetup)} variant="outline" className={`rounded-xl font-black uppercase text-[9px] tracking-widest px-4 h-10 ${isPinSetup ? 'bg-emerald-500/10 text-emerald-600 border-none' : 'border-slate-200 hover:bg-slate-50'}`}>
+                        {isPinSetup ? "Configured" : "Not Active"}
+                      </Button>
+                    </div>
                   </div>
-                  <h3 className="text-4xl font-black tracking-tightest">DEFENSE PROTOCOLS</h3>
-                  <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Institutional Grade Assets Protection</p>
-                </div>
+                </Card>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-white dark:bg-slate-900/40 backdrop-blur-3xl p-8 space-y-8 border border-white/20">
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1.5">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">Biometric Gateway</p>
-                          <h4 className="text-2xl font-black tracking-tight">Enterprise Bio-Unlock</h4>
-                          <p className="text-xs text-slate-400 font-medium">Require face/fingerprint for all high-value transactions.</p>
-                        </div>
-                        <Switch className="data-[state=checked]:bg-emerald-500" />
-                      </div>
-                      <Separator className="bg-slate-100/50 dark:bg-slate-800/50" />
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1.5">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Manual Override</p>
-                          <h4 className="text-2xl font-black tracking-tight">Transaction PIN</h4>
-                          <p className="text-xs text-slate-400 font-medium font-medium">Secondary numeric authorization layer.</p>
-                        </div>
-                        <Button onClick={() => setIsPinSetup(!isPinSetup)} variant="outline" className={`rounded-xl font-black uppercase text-[9px] tracking-widest px-4 h-10 ${isPinSetup ? 'bg-emerald-500/10 text-emerald-600 border-none' : 'border-slate-200 hover:bg-slate-50'}`}>
-                          {isPinSetup ? "Configured" : "Not Active"}
-                        </Button>
-                      </div>
+                <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-slate-950 p-10 text-white relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-32 bg-emerald-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                  <div className="relative z-10 space-y-6">
+                    <div className="size-16 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md group-hover:scale-110 transition-transform">
+                      <Terminal className="size-8 text-emerald-400" />
                     </div>
-                  </Card>
-
-                  <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-slate-950 p-10 text-white relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-32 bg-emerald-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                    <div className="relative z-10 space-y-6">
-                      <div className="size-16 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md group-hover:scale-110 transition-transform">
-                        <Terminal className="size-8 text-emerald-400" />
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="text-3xl font-black tracking-tightest leading-tight">Advanced Encryption Status: <span className="text-emerald-400 italic">SECURE.</span></h4>
-                        <p className="text-slate-400 text-sm font-medium leading-relaxed italic">&quot;RSA-4096 Multi-Region Node Verification is active on this session. All telemetry data is end-to-end sanitized.&quot;</p>
-                      </div>
-                      <div className="flex items-center gap-3 pt-4">
-                        <div className="h-1.5 flex-1 bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full bg-emerald-500 w-[94%] shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">94.8% Integrity</span>
-                      </div>
+                    <div className="space-y-2">
+                      <h4 className="text-3xl font-black tracking-tightest leading-tight">Advanced Encryption Status: <span className="text-emerald-400 italic">SECURE.</span></h4>
+                      <p className="text-slate-400 text-sm font-medium leading-relaxed italic">&quot;RSA-4096 Multi-Region Node Verification is active on this session. All telemetry data is end-to-end sanitized.&quot;</p>
                     </div>
-                  </Card>
-                </div>
+                    <div className="flex items-center gap-3 pt-4">
+                      <div className="h-1.5 flex-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-emerald-500 w-[94%] shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">94.8% Integrity</span>
+                    </div>
+                  </div>
+                </Card>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <SecurityStat label="Uptime" value="99.99%" icon={<Clock className="size-4" />} />
-                  <SecurityStat label="Node Checks" value="Validated" icon={<Shield className="size-4" />} />
-                  <SecurityStat label="Telemetry" value="Real-time" icon={<Activity className="size-4 text-red-500" />} />
-                </div>
-              </TabsContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <SecurityStat label="Uptime" value="99.99%" icon={<Clock className="size-4" />} />
+                <SecurityStat label="Node Checks" value="Validated" icon={<Shield className="size-4" />} />
+                <SecurityStat label="Telemetry" value="Real-time" icon={<Activity className="size-4 text-red-500" />} />
+              </div>
+            </TabsContent>
           </Tabs>
         </div>
       </main>
