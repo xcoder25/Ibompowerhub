@@ -128,7 +128,6 @@ export default function EventsPage() {
                       </div>
                     </div>
                   )}
-                  )}
                   <div className="p-4 sm:p-5 flex-1 flex flex-col">
                     <h3 className="font-black text-slate-900 text-lg mb-2 leading-tight group-hover:text-green-600 transition-colors">{event.title}</h3>
                     <div className="space-y-1.5 mb-3">

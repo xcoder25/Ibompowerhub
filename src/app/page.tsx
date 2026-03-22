@@ -32,7 +32,7 @@ const ONBOARDING_SLIDES = [
     title: 'Everything Akwa Ibom,',
     titleHighlight: 'In One App.',
     desc: 'Pay bills, verify your identity, explore services, and connect with your community — all powered by the ARISE agenda.',
-    imageSrc: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=1200&auto=format&fit=crop',
+    imageSrc: '/uyop.png',
   },
   {
     id: 1,
@@ -49,24 +49,25 @@ const ONBOARDING_SLIDES = [
     title: 'Send Money,',
     titleHighlight: 'Pay Bills, Grow.',
     desc: 'Top up your Ibom X Wallet and send money to any bank in Nigeria. Pay electricity, fuel, flights and more — instantly.',
-    imageSrc: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1200&auto=format&fit=crop',
+    imageSrc: '/mon.png',
   },
   {
     id: 2,
-    bg: 'from-[#160a06] via-[#1a0c08] to-[#040d06]',
-    accentBg: 'bg-amber-600/20',
-    accent: 'text-amber-400',
-    accentBorder: 'border-amber-500/40',
-    accentBg2: 'bg-amber-500/15',
-    gradFrom: 'from-amber-400',
-    gradTo: 'to-orange-300',
+    bg: 'from-[#071a0c] via-[#0a2213] to-[#040d06]',
+    accentBg: 'bg-emerald-600/20',
+    accent: 'text-emerald-400',
+    accentBorder: 'border-emerald-500/40',
+    accentBg2: 'bg-emerald-500/15',
+    gradFrom: 'from-emerald-400',
+    gradTo: 'to-teal-300',
     icon: Shield,
-    iconBg: 'bg-amber-500',
+    iconBg: 'bg-emerald-500',
     badge: 'Bank-Grade Security',
     title: 'Your Identity,',
     titleHighlight: 'Verified & Safe.',
     desc: 'Complete KYC in minutes using Smile ID biometrics and BVN. Unlock full wallet features with enterprise-level security.',
-    imageSrc: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&auto=format&fit=crop',
+    imageSrc: '/governor.png',
+    imageClass: 'object-contain object-top scale-[0.85] translate-y-[10%]',
   },
 ];
 
@@ -139,7 +140,7 @@ function MobileOnboarding() {
           src={slide.imageSrc}
           alt="background"
           fill
-          className={`object-cover transition-opacity duration-500 ${animating ? 'opacity-0' : 'opacity-100'}`}
+          className={`${(slide as any).imageClass || 'object-cover'} transition-opacity duration-500 ${animating ? 'opacity-0' : 'opacity-100'}`}
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/90" />
@@ -188,7 +189,7 @@ function MobileOnboarding() {
         {isLast ? (
           <div className="space-y-3">
             <Link href="/auth/signup" className="block">
-              <button className="w-full h-14 rounded-2xl bg-amber-500 hover:bg-amber-400 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(245,158,11,0.3)]">
+              <button className="w-full h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(16,185,129,0.3)]">
                 Create Free Account
                 <ArrowRight className="h-5 w-5" />
               </button>

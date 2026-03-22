@@ -842,24 +842,23 @@ export default function WalletPage() {
   return (
     <>
       {!isUnlocked && <WalletLock onUnlock={handleUnlock} />}
-      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative overflow-hidden mesh-gradient">
-        {/* Cinematic Background Glows */}
-        <div className="absolute top-0 right-0 w-[1200px] h-[1200px] bg-emerald-500/10 rounded-full blur-[200px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
-        <div className="absolute bottom-0 left-0 w-[1000px] h-[1000px] bg-orange-500/10 rounded-full blur-[200px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative overflow-x-hidden">
+        {/* Background - Simplified for mobile stability */}
+        <div className="fixed inset-0 bg-slate-50 dark:bg-slate-950 z-0" />
 
-        <div className="container mx-auto p-4 md:p-12 space-y-12 relative z-10">
+        <div className="w-full max-w-full mx-auto px-4 sm:px-12 pt-0 sm:pt-12 pb-4 sm:pb-12 flex flex-col gap-6 sm:gap-12 relative z-10 overflow-hidden isolate">
 
-          {/* Header - Premium Look */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="size-14 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/20">
-                <Wallet className="size-8 text-white" />
+          {/* Header - Premium Look - Hidden on mobile to save space */}
+          <div className="hidden sm:flex items-center justify-between">
+            <div className="flex items-center gap-3 sm:gap-4 shrink-0 overflow-hidden pr-2">
+              <div className="size-10 sm:size-14 rounded-xl sm:rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/20 shrink-0">
+                <Wallet className="size-5 sm:size-8 text-white" />
               </div>
-              <div>
-                <h1 className="text-4xl font-black tracking-tighter flex items-center gap-3">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-4xl font-black tracking-tighter flex items-center gap-1.5 sm:gap-3 truncate">
                   Ibom <span className="bg-gradient-to-r from-emerald-500 to-orange-500 bg-clip-text text-transparent italic tracking-tightest">Pay.</span>
                 </h1>
-                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.4em]">Official ARISE Ecosystem</p>
+                <p className="text-[8px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] sm:tracking-[0.4em] truncate">Official ARISE</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" className="rounded-full bg-slate-100 dark:bg-slate-900">
@@ -868,8 +867,8 @@ export default function WalletPage() {
           </div>
 
           {/* Premium Wallet Card - Modern Card UI */}
-          <div className="relative group perspective-1000">
-            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+          <div className="relative group perspective-1000 overflow-hidden py-4">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-[2.5rem] blur opacity-10 sm:opacity-25 transition duration-1000"></div>
 
             <div
               className={`relative w-full transition-transform duration-700 preserve-3d cursor-pointer ${isCardFlipped ? 'rotate-y-180' : ''}`}
@@ -883,17 +882,17 @@ export default function WalletPage() {
               }}
             >
               {/* Front side elements */}
-              <Card className="relative bg-slate-950 text-white rounded-[2.5rem] overflow-hidden border-none shadow-2xl backface-hidden">
-                <CardContent className="p-8 sm:p-10 relative z-10">
-                  <div className="flex justify-between items-start mb-10">
-                    <div className="space-y-1.5">
+              <Card className="relative bg-slate-950 text-white rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border-none shadow-2xl backface-hidden">
+                <CardContent className="p-5 sm:p-10 relative z-10">
+                  <div className="flex justify-between items-start mb-6 sm:mb-10">
+                    <div className="space-y-1.5 min-w-0 pr-2">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Live Balance</p>
+                        <div className="shrink-0 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] truncate">Live Balance</p>
                       </div>
-                      <div className="flex items-center gap-2 max-w-full overflow-hidden">
+                      <div className="flex items-center gap-1 sm:gap-2 max-w-full overflow-hidden">
                         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tighter truncate">
-                          {isBalanceVisible ? `₦${balance.toLocaleString()}` : '••••••'}
+                          {isBalanceVisible ? `₦${balance.toLocaleString()}` : '••••••••'}
                         </h2>
                         <div
                           className="bg-white/10 p-1.5 mx-1 rounded-xl border border-white/20 pointer-events-auto cursor-pointer hover:bg-white/20 transition-all shrink-0 shadow-lg relative group"
@@ -952,8 +951,8 @@ export default function WalletPage() {
               </Card>
 
               {/* Back side elements (Flipped Card) */}
-              <Card className="absolute inset-0 bg-slate-900 border-none shadow-2xl rounded-[2.5rem] overflow-hidden text-white backface-hidden rotate-y-180">
-                <CardContent className="p-8 sm:p-10 relative z-10 h-full flex flex-col justify-between">
+              <Card className="absolute inset-0 bg-slate-900 border-none shadow-2xl rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden text-white backface-hidden rotate-y-180">
+                <CardContent className="p-6 sm:p-10 relative z-10 h-full flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start mb-6">
                       <div className="flex items-center gap-2">
@@ -970,7 +969,7 @@ export default function WalletPage() {
                         <div className="space-y-1">
                           <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">Bank Account Number</p>
                           <div className="flex items-center gap-3 flex-wrap">
-                            <h3 className="text-2xl sm:text-3xl font-black font-mono tracking-widest text-white">{walletData.dva.account_number}</h3>
+                            <h3 className="text-xl sm:text-3xl font-black font-mono tracking-widest text-white break-all">{walletData?.dva?.account_number}</h3>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -1021,7 +1020,8 @@ export default function WalletPage() {
 
 
           {/* Quick Actions Bar */}
-          <div className="flex overflow-x-auto gap-4 sm:gap-5 pb-5 pt-1 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 relative w-[calc(100%+2rem)] sm:w-auto">
+          <div className="w-full overflow-hidden">
+            <div className="flex overflow-x-auto gap-3 sm:gap-5 pb-5 pt-1 no-scrollbar w-full snap-x snap-mandatory">
             {[
               { id: 'topup', icon: Plus, label: 'Add', color: 'bg-emerald-500', shadow: 'shadow-emerald-500/20' },
               { id: 'transfer', icon: Send, label: 'Send', color: 'bg-slate-900', shadow: 'shadow-slate-900/20' },
@@ -1032,13 +1032,13 @@ export default function WalletPage() {
               const content = (
                 <div
                   key={action.id}
-                  className={`flex flex-col items-center gap-2.5 min-w-[75px] group cursor-pointer ${index === array.length - 1 ? 'pr-4 sm:pr-0' : ''}`}
+                  className={`flex flex-col items-center gap-2.5 min-w-[70px] sm:min-w-[75px] group cursor-pointer snap-center ${index === array.length - 1 ? 'pr-4 sm:pr-0' : ''}`}
                   onClick={() => {
                     if (action.id === 'scan') setIsScanModalOpen(true);
                   }}
                 >
-                  <div className={`${action.color} p-5 rounded-[1.75rem] text-white shadow-xl ${action.shadow} group-active:scale-90 transition-all duration-300`}>
-                    <action.icon className="h-6 w-6" />
+                  <div className={`${action.color} p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[1.75rem] text-white shadow-xl ${action.shadow} group-active:scale-90 transition-all duration-300`}>
+                    <action.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
                   <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">{action.label}</span>
                 </div>
@@ -1049,54 +1049,55 @@ export default function WalletPage() {
                 </Link>
               ) : content;
             })}
+            </div>
           </div>
 
-          <Tabs defaultValue="manage" className="space-y-6">
-            <div className="overflow-x-auto no-scrollbar pb-1">
+          <Tabs defaultValue="manage" className="space-y-6 w-full max-w-full min-w-0">
+            <div className="w-full overflow-x-auto no-scrollbar pb-1">
               <TabsList className="flex w-max min-w-full bg-slate-100 dark:bg-slate-900 rounded-2xl p-1.5 h-14 gap-1">
-                <TabsTrigger value="manage" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">Transact</TabsTrigger>
-                <TabsTrigger value="cards" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">Cards</TabsTrigger>
-                <TabsTrigger value="vaults" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">Vault</TabsTrigger>
-                <TabsTrigger value="history" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">History</TabsTrigger>
-                <TabsTrigger value="security" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">Security</TabsTrigger>
+                <TabsTrigger value="manage" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">Transact</TabsTrigger>
+                <TabsTrigger value="cards" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">Cards</TabsTrigger>
+                <TabsTrigger value="vaults" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">Vault</TabsTrigger>
+                <TabsTrigger value="history" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">History</TabsTrigger>
+                <TabsTrigger value="security" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">Security</TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent value="manage" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+            <TabsContent value="manage" className="space-y-10 w-full max-w-full min-w-0">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* Institutional Deposit Protocol */}
-                <Card className="border-none shadow-[0_80px_160px_-30px_rgba(16,185,129,0.15)] rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(16,185,129,0.25)] transition-all duration-700">
-                  <CardHeader className="p-10 pb-0">
+                <Card className="border-none shadow-xl sm:shadow-[0_80px_160px_-30px_rgba(16,185,129,0.15)] rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(16,185,129,0.25)] transition-all duration-700">
+                  <CardHeader className="p-6 sm:p-10 pb-0">
                     <div className="flex items-center justify-between">
-                      <div className="space-y-2">
-                        <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Inbound Protocol</Badge>
-                        <CardTitle className="text-4xl font-black tracking-tightest">DEPOSIT</CardTitle>
+                      <div className="space-y-1 sm:space-y-2">
+                        <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-3 sm:px-4 py-1 rounded-full uppercase text-[8px] sm:text-[9px] tracking-widest">Inbound Protocol</Badge>
+                        <CardTitle className="text-2xl sm:text-4xl font-black tracking-tightest">DEPOSIT</CardTitle>
                       </div>
-                      <div className="size-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center shadow-inner">
-                        <Plus className="size-8 text-emerald-600" />
+                      <div className="size-12 sm:size-16 bg-emerald-500/10 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner shrink-0">
+                        <Plus className="size-6 sm:size-8 text-emerald-600" />
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-10 space-y-10">
+                  <CardContent className="p-6 sm:p-10 space-y-6 sm:space-y-10">
                     <div className="space-y-4">
                       <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Quantum of Injection</Label>
                       <div className="relative group">
-                        <span className="absolute left-8 top-1/2 -translate-y-1/2 font-black text-slate-300 text-3xl transition-colors group-focus-within:text-emerald-500">₦</span>
+                        <span className="absolute left-6 sm:left-8 top-1/2 -translate-y-1/2 font-black text-slate-300 text-2xl sm:text-3xl transition-colors group-focus-within:text-emerald-500">₦</span>
                         <Input
                           type="number"
                           placeholder="0.00"
-                          className="pl-16 h-24 text-4xl font-black rounded-3xl border-none bg-slate-50 dark:bg-slate-950/50 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-inner tracking-tighter"
+                          className="pl-14 sm:pl-16 h-20 sm:h-24 text-3xl sm:text-4xl font-black rounded-3xl border-none bg-slate-50 dark:bg-slate-950/50 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-inner tracking-tighter"
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
                         />
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-3 gap-2 sm:gap-4">
                         {['5000', '10000', '25000'].map(val => (
                           <Button
                             key={val}
                             variant="outline"
                             onClick={() => setAmount(val)}
-                            className="rounded-2xl border-slate-100 dark:border-slate-800 py-8 font-black text-xs uppercase tracking-widest hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all shadow-sm"
+                            className="rounded-xl sm:rounded-2xl border-slate-100 dark:border-slate-800 py-6 sm:py-8 font-black text-[10px] sm:text-xs uppercase tracking-widest hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all shadow-sm"
                           >
                             ₦{parseInt(val).toLocaleString()}
                           </Button>
@@ -1132,8 +1133,8 @@ export default function WalletPage() {
                                 <Banknote className="size-6 text-emerald-400" />
                               </div>
                             </div>
-                            <div className="flex items-center gap-4">
-                              <h3 className="text-3xl font-black font-mono tracking-[0.15em] text-white group-hover:text-emerald-400 transition-colors">{walletData.dva.account_number}</h3>
+                            <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
+                              <h3 className="text-lg sm:text-3xl font-black font-mono tracking-widest sm:tracking-[0.15em] text-white group-hover:text-emerald-400 transition-colors truncate">{walletData?.dva?.account_number}</h3>
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -1151,9 +1152,9 @@ export default function WalletPage() {
                           </div>
                         </div>
                       ) : (
-                        <div className="bg-slate-50 dark:bg-slate-950/50 p-10 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 text-center space-y-4 group hover:border-emerald-500/50 transition-all">
-                          <div className="size-20 rounded-full bg-slate-100 dark:bg-slate-900 mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500 transition-all">
-                            <Lock className="size-10 text-slate-300 group-hover:text-white" />
+                        <div className="bg-slate-50 dark:bg-slate-950/50 p-6 sm:p-10 rounded-3xl sm:rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 text-center space-y-4 group hover:border-emerald-500/50 transition-all">
+                          <div className="size-16 sm:size-20 rounded-full bg-slate-100 dark:bg-slate-900 mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500 transition-all">
+                            <Lock className="size-8 sm:size-10 text-slate-300 group-hover:text-white" />
                           </div>
                           <div className="space-y-1">
                             <p className="text-xl font-black tracking-tighter">Vault Uninitialized</p>
@@ -1169,19 +1170,19 @@ export default function WalletPage() {
                 </Card>
 
                 {/* Tactical Outbound Protocol */}
-                <Card className="border-none shadow-[0_80px_160px_-30px_rgba(15,23,42,0.15)] rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(15,23,42,0.25)] transition-all duration-700">
-                  <CardHeader className="p-10 pb-0">
+                <Card className="border-none shadow-xl sm:shadow-[0_80px_160px_-30px_rgba(15,23,42,0.15)] rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(15,23,42,0.25)] transition-all duration-700">
+                  <CardHeader className="p-6 sm:p-10 pb-0">
                     <div className="flex items-center justify-between">
-                      <div className="space-y-2">
-                        <Badge className="bg-slate-950/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Outbound Protocol</Badge>
-                        <CardTitle className="text-4xl font-black tracking-tightest">TRANSFER</CardTitle>
+                      <div className="space-y-1 sm:space-y-2">
+                        <Badge className="bg-slate-950/10 text-slate-500 border-none font-black px-3 sm:px-4 py-1 rounded-full uppercase text-[8px] sm:text-[9px] tracking-widest">Outbound Protocol</Badge>
+                        <CardTitle className="text-2xl sm:text-4xl font-black tracking-tightest">TRANSFER</CardTitle>
                       </div>
-                      <div className="size-16 bg-slate-950 text-white rounded-2xl flex items-center justify-center shadow-xl">
-                        <Send className="size-8" />
+                      <div className="size-12 sm:size-16 shrink-0 bg-slate-950 text-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <Send className="size-6 sm:size-8" />
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-10 space-y-8">
+                  <CardContent className="p-6 sm:p-10 space-y-6 sm:space-y-8">
                     <div className="space-y-6">
                       <div className="space-y-4">
                         <div className="flex items-center justify-between px-2">
@@ -1202,11 +1203,11 @@ export default function WalletPage() {
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                        <div className="space-y-3 sm:space-y-4">
                           <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Gateway</Label>
                           <Select value={recipientBank} onValueChange={setRecipientBank}>
-                            <SelectTrigger className="h-16 rounded-2xl border-none bg-slate-50/50 font-black uppercase text-[10px] tracking-widest px-6 shadow-inner">
+                            <SelectTrigger className="h-14 sm:h-16 rounded-2xl border-none bg-slate-50/50 font-black uppercase text-[9px] sm:text-[10px] tracking-widest px-3 sm:px-6 shadow-inner">
                               <SelectValue placeholder="GATEWAY" />
                             </SelectTrigger>
                             <SelectContent className="rounded-2xl border-none shadow-2xl">
@@ -1218,14 +1219,14 @@ export default function WalletPage() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Liquidity</Label>
                           <div className="relative group">
-                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-black text-sm group-focus-within:text-slate-950 transition-colors">₦</span>
+                            <span className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 font-black text-sm group-focus-within:text-slate-950 transition-colors">₦</span>
                             <Input
                               type="number"
                               placeholder="0.00"
-                              className="h-16 pl-10 rounded-2xl border-none bg-slate-50/50 font-black text-xl shadow-inner focus:bg-white transition-all"
+                              className="h-14 sm:h-16 pl-8 sm:pl-10 rounded-2xl border-none bg-slate-50/50 font-black text-lg sm:text-xl shadow-inner focus:bg-white transition-all"
                               value={transferAmount}
                               onChange={(e) => setTransferAmount(e.target.value)}
                             />
@@ -1269,13 +1270,13 @@ export default function WalletPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="cards" className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
+            <TabsContent value="cards" className="space-y-12 animate-in fade-in duration-700 w-full max-w-full overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Ultra-Premium Virtual Card */}
-                <div className="relative group perspective-2000">
-                  <div className="absolute -inset-2 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-[3.5rem] blur-2xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                <div className="relative group perspective-2000 overflow-hidden p-2">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-[3.5rem] blur-2xl opacity-10 sm:opacity-20 transition duration-1000"></div>
 
-                  <Card className={`relative border-none shadow-[0_80px_160px_-30px_rgba(0,0,0,0.4)] rounded-[3.5rem] overflow-hidden bg-slate-950 text-white min-h-[380px] flex flex-col justify-between p-12 transition-all duration-700 ${walletData?.isCardFrozen ? 'grayscale opacity-60' : 'hover:-translate-y-4 hover:rotate-1'}`}>
+                  <Card className={`relative border-none shadow-xl sm:shadow-[0_80px_160px_-30px_rgba(0,0,0,0.4)] rounded-[2.5rem] sm:rounded-[3.5rem] overflow-hidden bg-slate-950 text-white min-h-[320px] sm:min-h-[380px] flex flex-col justify-between p-6 sm:p-12 transition-all duration-700 ${walletData?.isCardFrozen ? 'grayscale opacity-60' : 'hover:-translate-y-4 hover:rotate-1'}`}>
                     {/* Advanced Mesh / Holographic Background */}
                     <div className="absolute top-[-20%] right-[-10%] w-[80%] h-[80%] bg-indigo-500/30 blur-[120px] rounded-full animate-pulse" />
                     <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-500/20 blur-[100px] rounded-full animate-pulse " style={{ animationDelay: '1s' }} />
@@ -1291,9 +1292,9 @@ export default function WalletPage() {
                       </div>
                     </div>
 
-                    <div className="relative z-10 space-y-4">
+                    <div className="relative z-10 space-y-2 sm:space-y-4">
                       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">Global Terminal Identifier</p>
-                      <h3 className="text-3xl sm:text-4xl font-black font-mono tracking-[0.2em] drop-shadow-2xl">4092 • 8820 • 0012 • 9024</h3>
+                      <h3 className="text-base sm:text-4xl font-black font-mono tracking-tight sm:tracking-[0.2em] drop-shadow-2xl truncate">4092 • 8820 • 0012 • 9024</h3>
                     </div>
 
                     <div className="relative z-10 flex justify-between items-end">
@@ -1359,7 +1360,7 @@ export default function WalletPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="vaults" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+            <TabsContent value="vaults" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700 w-full max-w-full overflow-hidden">
               <div className="flex items-center justify-between px-2">
                 <div className="space-y-1">
                   <h3 className="text-3xl font-black tracking-tighter">Strategic Vaults</h3>
@@ -1370,29 +1371,29 @@ export default function WalletPage() {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 min-w-0">
                 {vaults.map((vault, idx) => {
                   const percentage = Math.min(100, Math.round((vault.currentAmount / vault.targetAmount) * 100));
                   return (
-                    <Card key={vault.id} className="group relative border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] hover:shadow-[0_60px_120px_-30px_rgba(16,185,129,0.3)] transition-all duration-700 rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${idx * 100}ms` }}>
-                      <CardContent className="p-8 space-y-8">
+                    <Card key={vault.id} className="group relative border-none shadow-lg sm:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] hover:shadow-2xl transition-all duration-700 rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${idx * 100}ms` }}>
+                      <CardContent className="p-6 sm:p-8 space-y-6 sm:space-y-8">
                         <div className="flex justify-between items-start">
-                          <div className="space-y-2">
-                            <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1.5 rounded-xl uppercase text-[9px] tracking-widest shadow-sm">
+                          <div className="space-y-1 sm:space-y-2 min-w-0 pr-2">
+                            <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1.5 rounded-xl uppercase text-[9px] tracking-widest shadow-sm truncate">
                               ID: {vault.id.slice(0, 8).toUpperCase()}
                             </Badge>
-                            <CardTitle className="text-3xl font-black tracking-tightest leading-none">{vault.name}</CardTitle>
+                            <CardTitle className="text-2xl sm:text-3xl font-black tracking-tightest leading-none truncate">{vault.name}</CardTitle>
                           </div>
-                          <div className="size-16 bg-slate-50 dark:bg-emerald-950 rounded-[1.5rem] flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform duration-500">
-                            <PiggyBank className="size-8 text-emerald-500" />
+                          <div className="size-12 sm:size-16 shrink-0 bg-slate-50 dark:bg-emerald-950 rounded-xl sm:rounded-[1.5rem] flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform duration-500">
+                            <PiggyBank className="size-6 sm:size-8 text-emerald-500" />
                           </div>
                         </div>
 
                         <div className="space-y-4">
                           <div className="flex justify-between items-end">
-                            <div className="space-y-1">
+                            <div className="space-y-1 min-w-0 overflow-hidden">
                               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Preserved Capital</p>
-                              <h4 className="text-4xl font-black font-mono tracking-tight text-slate-950 dark:text-white">₦{vault.currentAmount.toLocaleString()}</h4>
+                              <h4 className="text-2xl sm:text-4xl font-black font-mono tracking-tight text-slate-950 dark:text-white truncate">₦{vault.currentAmount.toLocaleString()}</h4>
                             </div>
                             <div className="flex flex-col items-end">
                               <span className="text-lg font-black text-emerald-500">₦{vault.targetAmount.toLocaleString()}</span>
@@ -1431,17 +1432,17 @@ export default function WalletPage() {
             </TabsContent>
 
             <TabsContent value="history" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-                <div className="space-y-2">
-                  <Badge className="bg-slate-900/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Digital Ledger</Badge>
-                  <h3 className="text-4xl font-black tracking-tightest">TRANSACTION FEED</h3>
-                  <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Historical Telemetry & Settlements</p>
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 px-2 sm:px-4">
+                <div className="space-y-1 sm:space-y-2 min-w-0">
+                  <Badge className="bg-slate-900/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[8px] sm:text-[9px] tracking-widest">Digital Ledger</Badge>
+                  <h3 className="text-2xl sm:text-4xl font-black tracking-tightest truncate">TRANSACTION FEED</h3>
+                  <p className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest truncate">Historical Telemetry & Settlements</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap shrink-0">
+                  <Button variant="outline" className="rounded-xl sm:rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[8px] sm:text-[9px] tracking-widest px-4 sm:px-6 h-10 sm:h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
                     All Nodes
                   </Button>
-                  <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
+                  <Button variant="outline" className="rounded-xl sm:rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[8px] sm:text-[9px] tracking-widest px-4 sm:px-6 h-10 sm:h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
                     Export CSV
                   </Button>
                 </div>
@@ -1464,22 +1465,22 @@ export default function WalletPage() {
                       {transactions.map((txn, idx) => (
                         <div key={txn.id} className="group relative">
                           <div className="absolute inset-0 bg-slate-50/50 dark:bg-slate-800/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
-                          <div className="flex items-center justify-between p-6 cursor-pointer border-b border-slate-50 dark:border-slate-800/50 last:border-0 transition-all">
-                            <div className="flex items-center gap-6">
-                              <div className={`size-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 group-active:scale-90 ${txn.type === 'credit' ? 'bg-emerald-500/10 text-emerald-600 shadow-emerald-500/10' : 'bg-slate-950 text-white shadow-slate-950/10'}`}>
-                                {txn.type === 'credit' ? <ArrowDownLeft className="size-7" /> : <ArrowUpRight className="size-7" />}
+                          <div className="flex items-center justify-between p-4 sm:p-6 cursor-pointer border-b border-slate-50 dark:border-slate-800/50 last:border-0 transition-all">
+                            <div className="flex items-center gap-3 sm:gap-6 min-w-0 pr-2">
+                              <div className={`size-10 sm:size-14 shrink-0 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 group-active:scale-90 ${txn.type === 'credit' ? 'bg-emerald-500/10 text-emerald-600 shadow-emerald-500/10' : 'bg-slate-950 text-white shadow-slate-950/10'}`}>
+                                {txn.type === 'credit' ? <ArrowDownLeft className="size-5 sm:size-7" /> : <ArrowUpRight className="size-5 sm:size-7" />}
                               </div>
-                              <div className="space-y-1">
-                                <p className="font-black text-xl tracking-tightest uppercase text-slate-900 dark:text-white">{txn.description}</p>
-                                <div className="flex items-center gap-2">
-                                  <Badge className="bg-slate-100 dark:bg-slate-800 text-[8px] font-black tracking-widest uppercase py-0.5 px-2 rounded-md border-none text-slate-400">Node ID: {txn.id.slice(-8).toUpperCase()}</Badge>
-                                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                              <div className="space-y-0.5 sm:space-y-1 min-w-0">
+                                <p className="font-black text-sm sm:text-xl tracking-tightest uppercase text-slate-900 dark:text-white truncate">{txn.description}</p>
+                                <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                                  <Badge className="bg-slate-100 dark:bg-slate-800 text-[8px] font-black tracking-widest uppercase py-0.5 px-2 rounded-md border-none text-slate-400 truncate">Node ID: {txn.id.slice(-8).toUpperCase()}</Badge>
+                                  <span className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">
                                     {txn.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} • {txn.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </span>
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right space-y-2">
+                            <div className="text-right space-y-1 sm:space-y-2 shrink-0">
                               <p className={`font-black text-2xl tracking-tighter ${txn.type === 'credit' ? 'text-emerald-500' : 'text-slate-950 dark:text-white'}`}>
                                 {txn.type === 'credit' ? '+' : '-'}₦{txn.amount.toLocaleString()}
                               </p>
@@ -1502,17 +1503,17 @@ export default function WalletPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="security" className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
-              <div className="text-center space-y-3 pb-4">
-                <div className="size-20 rounded-[2rem] bg-slate-950 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20 group hover:rotate-12 transition-transform duration-500">
-                  <ShieldCheck className="size-10 text-emerald-500" />
+            <TabsContent value="security" className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
+              <div className="text-center space-y-2 sm:space-y-3 pb-2 sm:pb-4 px-2">
+                <div className="size-16 sm:size-20 rounded-[1.5rem] sm:rounded-[2rem] bg-slate-950 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20 group hover:rotate-12 transition-transform duration-500">
+                  <ShieldCheck className="size-8 sm:size-10 text-emerald-500" />
                 </div>
-                <h3 className="text-4xl font-black tracking-tightest">DEFENSE PROTOCOLS</h3>
-                <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Institutional Grade Assets Protection</p>
+                <h3 className="text-2xl sm:text-4xl font-black tracking-tightest leading-none">DEFENSE PROTOCOLS</h3>
+                <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] sm:tracking-[0.3em]">Institutional Grade Assets</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-white dark:bg-slate-900/40 backdrop-blur-3xl p-8 space-y-8 border border-white/20">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2rem] sm:rounded-[2.5rem] bg-white dark:bg-slate-900/40 backdrop-blur-3xl p-6 sm:p-8 space-y-6 sm:space-y-8 border border-white/20">
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1.5">
@@ -1567,7 +1568,7 @@ export default function WalletPage() {
       </main>
 
       <Dialog open={isScanModalOpen} onOpenChange={setIsScanModalOpen}>
-        <DialogContent className="sm:max-w-md bg-slate-50 dark:bg-slate-950 border-none rounded-[2rem] overflow-hidden p-0 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-slate-50 dark:bg-slate-950 border-none rounded-[2rem] overflow-hidden p-0 max-h-[90vh] overflow-y-auto">
           <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 p-8 flex flex-col items-center text-white relative">
             <ScanLine className="h-10 w-10 mb-3 opacity-90" />
             <DialogTitle className="text-2xl font-black uppercase tracking-widest text-white">Ibom X Scan</DialogTitle>
@@ -1689,7 +1690,7 @@ export default function WalletPage() {
       </Dialog>
 
       <Dialog open={isIbomAskModalOpen} onOpenChange={setIsIbomAskModalOpen}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2rem] overflow-hidden p-8 text-center">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2rem] overflow-hidden p-8 text-center uppercase">
           <div className="mx-auto bg-emerald-100 dark:bg-emerald-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
             <ScanLine className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
           </div>
@@ -1728,7 +1729,7 @@ export default function WalletPage() {
 
       {/* Vault Creation Dialog */}
       <Dialog open={isCreateVaultOpen} onOpenChange={setIsCreateVaultOpen}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8">
           <DialogTitle className="text-2xl font-black uppercase tracking-widest text-slate-900 dark:text-white mb-2">New Vault</DialogTitle>
           <DialogDescription className="text-sm font-medium text-slate-500 mb-6">Create a new savings target to lock away funds securely.</DialogDescription>
 
@@ -1771,7 +1772,7 @@ export default function WalletPage() {
 
       {/* Vault Top-Up Dialog */}
       <Dialog open={topUpVaultId !== null} onOpenChange={(open) => !open && setTopUpVaultId(null)}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8">
           <DialogTitle className="text-2xl font-black uppercase tracking-widest text-slate-900 dark:text-white mb-2">Fund Vault</DialogTitle>
           <DialogDescription className="text-sm font-medium text-slate-500 mb-6">Transfer money instantly from your main balance to this vault.</DialogDescription>
 
@@ -1807,7 +1808,7 @@ export default function WalletPage() {
 
       {/* Simulator Dialog for Starter restriction */}
       <Dialog open={showSimulatePrompt} onOpenChange={setShowSimulatePrompt}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8 text-center">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8 text-center">
           <div className="mx-auto bg-amber-100 dark:bg-amber-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
             <AlertTriangle className="h-8 w-8 text-amber-600 dark:text-amber-400" />
           </div>
@@ -1853,7 +1854,7 @@ function ControlMatrixCard({ label, desc, icon, onClick, active, color }: { labe
   };
 
   return (
-    <Card onClick={onClick} className={`border border-none shadow-sm rounded-[2rem] p-7 flex flex-col gap-6 cursor-pointer hover:shadow-2xl hover:-translate-y-2 transition-all group bg-white dark:bg-slate-900/60 backdrop-blur-3xl overflow-hidden relative`}>
+    <Card onClick={onClick} className={`border border-none shadow-sm rounded-[2rem] p-5 sm:p-7 flex flex-col gap-4 sm:gap-6 cursor-pointer hover:shadow-2xl hover:-translate-y-2 transition-all group bg-white dark:bg-slate-900/60 backdrop-blur-3xl overflow-hidden relative`}>
       <div className={`size-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-6 ${colorMap[color] || colorMap.slate}`}>
         {icon}
       </div>
@@ -1870,7 +1871,7 @@ function ControlMatrixCard({ label, desc, icon, onClick, active, color }: { labe
 
 function SecurityStat({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/20 shadow-sm hover:shadow-md transition-shadow group">
+    <div className="flex items-center gap-3 sm:gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-4 sm:p-6 rounded-[2.25rem] sm:rounded-[2rem] border border-white/20 shadow-sm hover:shadow-md transition-shadow group">
       <div className="size-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
         {icon}
       </div>

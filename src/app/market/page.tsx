@@ -18,6 +18,13 @@ import { useFirestore } from '@/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import Link from 'next/link';
 
+const featuredProducts = [
+  { id: 'fp-1', name: 'Fresh Waterleaf (Bundle)', category: 'Vegetables', price: 800, sellerName: 'Ibom Organic Farms', imageId: 'seller-vegetables', description: 'Freshly harvested waterleaf from our organic beds.' },
+  { id: 'fp-2', name: 'Oron Jumbo Crayfish', category: 'Seafood', price: 4500, sellerName: 'Oron Seafood Direct', imageId: 'seller-seafood', description: 'Sun-dried jumbo crayfish straight from Oron waters.' },
+  { id: 'fp-3', name: 'Itam Yellow Garri', category: 'Tubers & Grains', price: 2000, sellerName: 'Itam Market Tubers', imageId: 'seller-tubers', description: 'Crispy yellow garri perfectly fried in Itam.' },
+  { id: 'fp-4', name: 'Live Broiler Chicken', category: 'Poultry', price: 12000, sellerName: 'Ikot Ekpene Poultry', imageId: 'seller-poultry', description: 'Healthy, well-fed broiler chicken ready for preparation.' }
+];
+
 export default function MarketPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -119,9 +126,9 @@ export default function MarketPage() {
   };
 
   return (
-    <div className="flex-1 bg-slate-50/50 dark:bg-slate-950">
+    <div className="flex-1 w-full max-w-[100vw] bg-slate-50/50 dark:bg-slate-950">
       {/* Premium Hero Section */}
-      <div className="relative h-[20vh] sm:h-[25vh] md:h-[30vh] lg:h-[40vh] overflow-hidden">
+      <div className="relative w-full max-w-[100vw] h-[20vh] sm:h-[25vh] md:h-[30vh] lg:h-[40vh] overflow-hidden">
         <Image
           src="/heromk.png"
           alt="Ibom Market Banner"
@@ -199,16 +206,16 @@ export default function MarketPage() {
         )}
 
         {/* Ultra Premium Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+        <div className="flex w-full max-w-full overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 pb-4 no-scrollbar">
           {/* Hardcoded Merchants */}
           {sellers.map((seller) => {
             const image = PlaceHolderImages.find((img) => img.id === seller.imageId);
             return (
               <Card
                 key={seller.id}
-                className="group overflow-hidden border-none shadow-xl shadow-slate-200/50 dark:shadow-none bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[2rem] transition-all hover:scale-[1.02]"
+                className="group shrink-0 snap-center w-[55vw] sm:w-[220px] md:w-auto overflow-hidden border-none shadow-xl shadow-slate-200/50 dark:shadow-none bg-white dark:bg-slate-900 rounded-2xl transition-all hover:scale-[1.02]"
               >
-                <div className="relative aspect-square sm:aspect-[4/3] w-full overflow-hidden">
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
                   {image && (
                     <Image
                       src={image.imageUrl}
@@ -224,43 +231,54 @@ export default function MarketPage() {
                     </Badge>
                   </div>
                 </div>
-                <CardHeader className="p-3 sm:pb-2">
+                <CardHeader className="p-2 sm:p-3 sm:pb-1">
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-1">
-                    <CardTitle className="text-sm sm:text-xl font-black leading-tight tracking-tight line-clamp-1">{seller.name}</CardTitle>
+                    <CardTitle className="text-sm sm:text-base font-black leading-tight tracking-tight line-clamp-1">{seller.name}</CardTitle>
                     <Badge variant="outline" className="border-primary/20 text-primary bg-primary/5 font-black text-[8px] sm:text-[10px] uppercase px-1 sm:px-2">
                       {seller.category}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="px-3 pb-3 sm:pb-4">
-                  <p className="text-[10px] sm:text-sm font-bold text-slate-500 dark:text-slate-400 line-clamp-1">
+                <CardContent className="px-2 sm:px-3 pb-2 sm:pb-3">
+                  <p className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 line-clamp-1">
                     {seller.products.join(', ')}
                   </p>
-                  <p className="text-sm sm:text-lg font-black text-slate-900 dark:text-white mt-1">{seller.priceRange}</p>
+                  <p className="text-sm sm:text-base font-black text-slate-900 dark:text-white mt-1">{seller.priceRange}</p>
                 </CardContent>
-                <CardFooter className="p-3 pt-0 sm:pb-6 sm:px-6">
+                <CardFooter className="p-2 pt-0 sm:pb-3 sm:px-3">
                   <Button
                     variant="default"
-                    className="w-full h-10 sm:h-12 rounded-xl sm:rounded-[1.25rem] font-black text-[10px] sm:text-sm shadow-lg shadow-primary/20 active:scale-95 transition-all px-2"
+                    className="w-full h-8 sm:h-10 rounded-lg sm:rounded-xl font-black text-[10px] sm:text-xs shadow-md shadow-primary/20 active:scale-95 transition-all px-2"
                     onClick={() => handleAddToCart(seller, seller.products[0])}
                   >
-                    <ShoppingCart className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    <ShoppingCart className="mr-1.5 h-3 w-3" />
                     Express
                   </Button>
                 </CardFooter>
               </Card>
             );
           })}
+        </div>
 
-          {/* Approved Producers */}
-          {approvedProducts.map((product) => {
-            const image = PlaceHolderImages.find((img) => img.id === 'seller-vegetables');
+        {/* Featured Products Section */}
+        <div className="flex items-center justify-between mt-8 sm:mt-12">
+          <h2 className="text-xl font-black tracking-tight flex items-center gap-2">
+            <ShoppingCart className="h-5 w-5 text-primary" />
+            Top Products
+          </h2>
+          <span className="text-xs font-bold text-primary uppercase tracking-widest cursor-pointer hover:underline">View All</span>
+        </div>
+
+        {/* Products Grid */}
+        <div className="flex w-full max-w-full overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 pb-4 no-scrollbar mt-4 sm:mt-6">
+          {[...featuredProducts, ...approvedProducts].map((product) => {
+            const image = PlaceHolderImages.find((img) => img.id === (product.imageId || 'seller-vegetables'));
             return (
               <Card
                 key={product.id}
-                className="group overflow-hidden border-none shadow-xl shadow-slate-200/50 dark:shadow-none bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[2rem] transition-all hover:scale-[1.02]"
+                className="group shrink-0 snap-center w-[55vw] sm:w-[220px] md:w-auto overflow-hidden border-none shadow-xl shadow-slate-200/50 dark:shadow-none bg-white dark:bg-slate-900 rounded-2xl transition-all hover:scale-[1.02] flex flex-col"
               >
-                <div className="relative aspect-square sm:aspect-[4/3] w-full overflow-hidden">
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
                   {image && (
                     <Image
                       src={image.imageUrl}
@@ -274,28 +292,29 @@ export default function MarketPage() {
                     <Badge className="bg-primary text-white border-none font-black shadow-lg text-[8px] sm:text-[10px]">DIRECT</Badge>
                   </div>
                 </div>
-                <CardHeader className="p-3 sm:pb-2">
+                <CardHeader className="p-2 sm:p-3 sm:pb-1">
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-1">
-                    <CardTitle className="text-sm sm:text-xl font-black leading-tight tracking-tight line-clamp-1">{product.name}</CardTitle>
-                    <Badge variant="secondary" className="font-bold text-[8px] sm:text-[10px] uppercase tracking-tighter px-1 sm:px-2">
+                    <CardTitle className="text-xs sm:text-base font-black leading-tight tracking-tight line-clamp-1">{product.name}</CardTitle>
+                    <Badge variant="secondary" className="font-bold text-[7px] sm:text-[9px] uppercase tracking-tighter px-1">
                       {product.category}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="px-3 pb-3 sm:pb-4">
-                  <p className="text-[8px] sm:text-xs font-bold text-primary uppercase mb-1 sm:mb-2 line-clamp-1">Vendor: {product.sellerName}</p>
-                  <p className="text-base sm:text-2xl font-black text-slate-900 dark:text-white">₦{product.price.toLocaleString()}</p>
-                  <p className="hidden sm:block text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 font-medium">
+                <CardContent className="px-2 sm:px-3 pb-2 sm:pb-3 flex-1 flex flex-col justify-end">
+                  <p className="text-[8px] sm:text-[10px] font-bold text-primary uppercase mb-0.5 line-clamp-1">Vendor: {product.sellerName}</p>
+                  <p className="text-sm sm:text-xl font-black text-slate-900 dark:text-white mb-1">₦{product.price.toLocaleString()}</p>
+                  <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-2 font-medium">
                     {product.description}
                   </p>
                 </CardContent>
-                <CardFooter className="p-3 pt-0 sm:pb-6 sm:px-6">
+                <CardFooter className="p-2 pt-0 sm:pb-3 sm:px-3">
                   <Button
                     variant="default"
-                    className="w-full h-10 sm:h-12 rounded-xl sm:rounded-[1.25rem] font-black text-[10px] sm:text-sm shadow-lg shadow-primary/20 active:scale-95 transition-all bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-2"
+                    className="w-full h-8 sm:h-10 rounded-lg sm:rounded-xl font-black text-[10px] sm:text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition-all bg-emerald-500 hover:bg-emerald-600 text-white px-2 gap-1.5"
                     onClick={() => handleAddToCart(product)}
                   >
-                    Add
+                    <ShoppingCart className="h-3.5 w-3.5" />
+                    Order
                   </Button>
                 </CardFooter>
               </Card>

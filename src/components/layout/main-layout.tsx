@@ -114,6 +114,9 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
     }
 
     const isMapPage = pathname === '/map';
+    const isMarketPage = pathname === '/market';
+    const isFlightPage = pathname.startsWith('/flights');
+    const isWalletPage = pathname === '/wallet';
     const showNav = !noNavRoutes.includes(pathname) && !authRoutes.includes(pathname);
 
     if (!showNav) {
@@ -130,9 +133,9 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
             <div className={cn("flex min-h-screen", isDashboard ? "bg-slate-50" : "bg-background")}>
                 {!isMobile && <AppSidebar />}
                 <div className="flex flex-col flex-1">
-                    <AppHeader />
-                    <SidebarInset>
-                        <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0")}>
+                    {!(isMapPage || isFlightPage || isWalletPage || (isMarketPage && isMobile)) && <AppHeader />}
+                    <SidebarInset className="flex flex-col">
+                        <main className={cn("flex-1 flex flex-col relative h-full w-full", "pb-[80px] md:pb-0")}>
                             {children}
                         </main>
                     </SidebarInset>

@@ -38,6 +38,7 @@ import {
   Store,
   ArrowRight,
   ShieldCheck,
+  Home,
 } from 'lucide-react';
 import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -111,7 +112,7 @@ const services = [
   { id: 'education', title: 'Education', icon: GraduationCap, href: '/education', color: 'from-emerald-500/20 to-emerald-600/10', iconColor: 'text-emerald-600', borderColor: 'border-emerald-200/60' },
   { id: 'flights', title: 'Flights', icon: Plane, href: '/flights', color: 'from-indigo-500/20 to-indigo-600/10', iconColor: 'text-indigo-600', borderColor: 'border-indigo-200/60' },
   { id: 'market', title: 'Market', icon: ShoppingBag, href: '/market', color: 'from-teal-500/20 to-teal-600/10', iconColor: 'text-teal-600', borderColor: 'border-teal-200/60' },
-  { id: 'safety', title: 'Safety', icon: Shield, href: '/safety', color: 'from-slate-500/20 to-slate-600/10', iconColor: 'text-slate-600', borderColor: 'border-slate-200/60' },
+  { id: 'home-x', title: 'Home-x', icon: Home, href: '/home-x', color: 'from-blue-500/20 to-blue-600/10', iconColor: 'text-blue-600', borderColor: 'border-blue-200/60' },
 ];
 
 const stats = [

@@ -107,6 +107,15 @@
 
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+  }
+
+  html {
+    overflow-x: hidden;
+    width: 100%;
+    overscroll-behavior-x: none;
   }
 }
 

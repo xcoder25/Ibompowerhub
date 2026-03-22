@@ -138,19 +138,19 @@ export function VoiceBankingWidget() {
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
             </div>
 
-            <CardContent className="relative z-10 p-8 sm:p-10 flex flex-col md:flex-row items-center gap-10">
+            <CardContent className="relative z-10 p-4 sm:p-10 flex flex-col md:flex-row items-center gap-4 md:gap-10">
 
                 <div className="flex-1 text-center md:text-left">
-                    <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors mb-4 px-3 py-1 font-bold tracking-widest uppercase text-[10px]">
+                    <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors mb-2 md:mb-4 px-3 py-1 font-bold tracking-widest uppercase text-[10px]">
                         <Sparkles className="h-3 w-3 mr-1.5" /> Edge Voice AI
                     </Badge>
 
-                    <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-4">
-                        Dialect-Aware <br />
+                    <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight mb-2 md:mb-4">
+                        Dialect-Aware <br className="hidden sm:block" />
                         <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400 bg-clip-text text-transparent">Voice Banking</span>
                     </h2>
 
-                    <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-8 max-w-md mx-auto md:mx-0 font-medium">
+                    <p className="text-slate-400 text-xs sm:text-base leading-relaxed mb-4 md:mb-8 max-w-md mx-auto md:mx-0 font-medium">
                         Speak naturally in English, Yoruba, Igbo, Hausa, or Pidgin. Authorize transfers with your unique voice print, and ask your "Audio CFO" for insights.
                     </p>
 
@@ -167,9 +167,9 @@ export function VoiceBankingWidget() {
                     </div>
                 </div>
 
-                <div className="flex-1 w-full max-w-sm flex flex-col items-center justify-center min-h-[300px]">
+                <div className="flex-1 w-full max-w-sm flex flex-col items-center justify-center min-h-[160px] md:min-h-[300px]">
 
-                    <div className="h-[200px] w-full flex items-end justify-center mb-6">
+                    <div className="h-[75px] md:h-[200px] w-full flex items-end justify-center mb-4 md:mb-6">
                         {actionPreview}
                         {state === 'LISTENING' && transcript && (
                             <p className="text-white text-lg font-serif italic text-center animate-in fade-in slide-in-from-bottom-2">
@@ -182,7 +182,7 @@ export function VoiceBankingWidget() {
                             </p>
                         )}
                         {state === 'IDLE' && (
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">
+                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] md:text-xs">
                                 Tap the microphone
                             </p>
                         )}
@@ -200,7 +200,7 @@ export function VoiceBankingWidget() {
                         <Button
                             onClick={handleMicClick}
                             className={cn(
-                                "relative z-10 w-24 h-24 rounded-full shadow-2xl transition-all duration-500 flex items-center justify-center overflow-hidden",
+                                "relative z-10 w-16 h-16 md:w-24 md:h-24 rounded-full shadow-2xl transition-all duration-500 flex items-center justify-center overflow-hidden",
                                 state === 'IDLE'
                                     ? "bg-slate-800 hover:bg-slate-700 hover:scale-105 border border-white/10"
                                     : state === 'SUCCESS' || state === 'INSIGHTS'
@@ -210,17 +210,17 @@ export function VoiceBankingWidget() {
                                             : "bg-emerald-500 scale-110 shadow-[0_0_50px_rgba(16,185,129,0.4)]"
                             )}
                         >
-                            {state === 'IDLE' && <Mic className="h-10 w-10 text-white" />}
+                            {state === 'IDLE' && <Mic className="h-6 w-6 md:h-10 md:w-10 text-white" />}
                             {state === 'LISTENING' && (
-                                <div className="flex items-center gap-1.5">
+                                <div className="flex items-center gap-1 md:gap-1.5">
                                     {[1, 2, 3, 4, 5].map(i => (
-                                        <div key={i} className="w-1.5 bg-white rounded-full animate-pulse" style={{ height: `${20 + Math.random() * 20}px`, animationDelay: `${i * 0.1}s` }} />
+                                        <div key={i} className="w-1 md:w-1.5 bg-white rounded-full animate-pulse" style={{ height: `${10 + Math.random() * 15}px`, animationDelay: `${i * 0.1}s` }} />
                                     ))}
                                 </div>
                             )}
-                            {state === 'PROCESSING' && <Loader2 className="h-10 w-10 text-white animate-spin" />}
-                            {state === 'BIOMETRICS' && <Fingerprint className="h-10 w-10 text-white animate-pulse" />}
-                            {(state === 'SUCCESS' || state === 'INSIGHTS') && <CheckCircle2 className="h-10 w-10 text-white" />}
+                            {state === 'PROCESSING' && <Loader2 className="h-6 w-6 md:h-10 md:w-10 text-white animate-spin" />}
+                            {state === 'BIOMETRICS' && <Fingerprint className="h-6 w-6 md:h-10 md:w-10 text-white animate-pulse" />}
+                            {(state === 'SUCCESS' || state === 'INSIGHTS') && <CheckCircle2 className="h-6 w-6 md:h-10 md:w-10 text-white" />}
                         </Button>
                     </div>
 

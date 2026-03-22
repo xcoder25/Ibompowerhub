@@ -43,7 +43,7 @@ export default function MapPage() {
           <div className="absolute inset-0 rounded-full border-t-4 border-primary animate-spin"></div>
           <MapPin className="absolute inset-0 m-auto h-8 w-8 text-primary animate-bounce" />
         </div>
-        <p className="text-muted-foreground font-medium animate-pulse">Initializing CRS Maps...</p>
+        <p className="text-muted-foreground font-medium animate-pulse">Initializing AKS Maps...</p>
       </div>
     );
   }
@@ -75,7 +75,7 @@ export default function MapPage() {
               <Search className="h-5 w-5 text-muted-foreground" />
               <input
                 className="bg-transparent border-none focus:ring-0 text-sm w-full outline-none font-medium"
-                placeholder="Search Cross River State..."
+                placeholder="Ask me for directions in Akwa Ibom..."
                 readOnly
                 onClick={() => {/* Trigger AI search focus */ }}
               />

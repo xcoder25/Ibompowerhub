@@ -24,6 +24,11 @@ service cloud.firestore {
       match /transactions/{transactionId} {
         allow read, write: if isSignedIn() && request.auth.uid == userId;
       }
+      
+      // Rules for vaults subcollection
+      match /vaults/{vaultId} {
+        allow read, write: if isSignedIn() && request.auth.uid == userId;
+      }
     }
 
     // Rules for the 'sellers' collection
