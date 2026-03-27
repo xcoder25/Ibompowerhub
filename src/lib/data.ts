@@ -195,9 +195,10 @@ export const emergencyContacts = [
 ];
 
 export const waterSchedule = [
-  { area: '8 Miles', days: 'Mon, Wed, Fri', time: '6am - 12pm' },
-  { area: 'State Housing', days: 'Tue, Thu, Sat', time: '6am - 12pm' },
-  { area: 'Marian', days: 'Daily', time: '5am - 10am' },
+  { area: 'Shelter Afrique', days: 'Mon, Wed, Fri', time: '6am - 11am' },
+  { area: 'Ewet Housing Estate', days: 'Tue, Thu, Sat', time: '6am - 11am' },
+  { area: 'Uyo Metropolis (Plaza)', days: 'Daily', time: '5am - 9am' },
+  { area: 'D-Line / Abak Road', days: 'Mon, Wed, Fri', time: '7am - 12pm' },
 ];
 
 export const powerSchedule = [

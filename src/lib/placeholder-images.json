@@ -278,20 +278,20 @@
     },
     {
       "id": "waste-management-hero",
-      "description": "A clean city street with recycling bins.",
-      "imageUrl": "https://images.unsplash.com/photo-1582456784142-d21262f0c13b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "description": "A stunning view of Uyo, Akwa Ibom.",
+      "imageUrl": "/images/akwa_ibom_hero.png",
       "imageHint": "clean city"
     },
     {
       "id": "waste-collector-1",
-      "description": "A waste collection truck on a street.",
-      "imageUrl": "https://images.unsplash.com/photo-1621452342323-424b3a4f6a73?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "description": "A waste collection truck in Akwa Ibom.",
+      "imageUrl": "/images/collector_1.png",
       "imageHint": "waste truck"
     },
     {
       "id": "waste-collector-2",
-      "description": "A worker in uniform collecting trash.",
-      "imageUrl": "https://images.unsplash.com/photo-1583501037373-b31525a72037?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "description": "A waste collection team in Akwa Ibom.",
+      "imageUrl": "/images/collector_2.png",
       "imageHint": "waste worker"
     },
     {

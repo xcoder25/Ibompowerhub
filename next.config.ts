@@ -4,7 +4,7 @@ require('dotenv').config({ path: './.env' });
 
 
 const nextConfig: NextConfig = {
-  // output: 'export',
+  output: 'standalone',
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,

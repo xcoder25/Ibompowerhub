@@ -842,33 +842,54 @@ export default function WalletPage() {
   return (
     <>
       {!isUnlocked && <WalletLock onUnlock={handleUnlock} />}
-      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative overflow-x-hidden">
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-28 relative overflow-x-hidden">
         {/* Background - Simplified for mobile stability */}
         <div className="fixed inset-0 bg-slate-50 dark:bg-slate-950 z-0" />
 
-        <div className="w-full max-w-full mx-auto px-4 sm:px-12 pt-0 sm:pt-12 pb-4 sm:pb-12 flex flex-col gap-6 sm:gap-12 relative z-10 overflow-hidden isolate">
-
-          {/* Header - Premium Look - Hidden on mobile to save space */}
-          <div className="hidden sm:flex items-center justify-between">
-            <div className="flex items-center gap-3 sm:gap-4 shrink-0 overflow-hidden pr-2">
-              <div className="size-10 sm:size-14 rounded-xl sm:rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/20 shrink-0">
+        <div className="w-full max-w-full mx-auto px-4 sm:px-12 pt-5 sm:pt-12 pb-6 sm:pb-12 flex flex-col gap-4 sm:gap-12 relative z-10 overflow-hidden isolate">
+          {/* App Header - Native Feel */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 sm:gap-4 shrink-0 pr-2">
+              <div
+                className="size-11 sm:size-14 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 shrink-0 cursor-pointer active:scale-90 transition-transform"
+                onClick={() => {
+                  if (navigator.vibrate) navigator.vibrate(10);
+                }}
+              >
                 <Wallet className="size-5 sm:size-8 text-white" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-4xl font-black tracking-tighter flex items-center gap-1.5 sm:gap-3 truncate">
+                <h1 className="text-[22px] sm:text-4xl font-black tracking-tighter flex items-center gap-1.5 sm:gap-3">
                   Ibom <span className="bg-gradient-to-r from-emerald-500 to-orange-500 bg-clip-text text-transparent italic tracking-tightest">Pay.</span>
                 </h1>
-                <p className="text-[8px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] sm:tracking-[0.4em] truncate">Official ARISE</p>
+                <p className="text-[8px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] sm:tracking-[0.4em] truncate">Official Arise Node</p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="rounded-full bg-slate-100 dark:bg-slate-900">
-              <Share2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full bg-slate-100 dark:bg-slate-900 h-9 w-9 sm:h-12 sm:w-12 active:scale-90 transition-all"
+                onClick={() => {
+                   if (navigator.vibrate) navigator.vibrate(5);
+                }}
+              >
+                <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
+              <div className="sm:hidden size-9 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center overflow-hidden">
+                {user?.photoURL ? (
+                  <img src={user.photoURL} alt="Profile" className="size-full object-cover" />
+                ) : (
+                  <div className="font-black text-[11px] text-emerald-600">{user?.displayName?.[0] || 'U'}</div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Premium Wallet Card - Modern Card UI */}
-          <div className="relative group perspective-1000 overflow-hidden py-4">
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-[2.5rem] blur opacity-10 sm:opacity-25 transition duration-1000"></div>
+          <div className="relative group perspective-1000 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-[2rem] sm:rounded-[2.5rem] blur opacity-10 sm:opacity-25 transition duration-1000"></div>
+
 
             <div
               className={`relative w-full transition-transform duration-700 preserve-3d cursor-pointer ${isCardFlipped ? 'rotate-y-180' : ''}`}
@@ -884,33 +905,36 @@ export default function WalletPage() {
               {/* Front side elements */}
               <Card className="relative bg-slate-950 text-white rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border-none shadow-2xl backface-hidden">
                 <CardContent className="p-5 sm:p-10 relative z-10">
-                  <div className="flex justify-between items-start mb-6 sm:mb-10">
-                    <div className="space-y-1.5 min-w-0 pr-2">
-                      <div className="flex items-center gap-2 mb-1">
+
+                  <div className="flex justify-between items-start mb-5 sm:mb-10">
+                    <div className="space-y-1 min-w-0 pr-2">
+                      <div className="flex items-center gap-2 mb-1.5">
                         <div className="shrink-0 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] truncate">Live Balance</p>
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Live Balance</p>
                       </div>
-                      <div className="flex items-center gap-1 sm:gap-2 max-w-full overflow-hidden">
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tighter truncate">
+                      <div className="flex items-center gap-2 max-w-full overflow-hidden">
+                        <h2 className="text-[28px] sm:text-4xl lg:text-5xl font-black font-mono tracking-tighter truncate">
                           {isBalanceVisible ? `₦${balance.toLocaleString()}` : '••••••••'}
                         </h2>
-                        <div
-                          className="bg-white/10 p-1.5 mx-1 rounded-xl border border-white/20 pointer-events-auto cursor-pointer hover:bg-white/20 transition-all shrink-0 shadow-lg relative group"
-                          onClick={(e) => { e.stopPropagation(); setScanTab('my-qr'); setIsScanModalOpen(true); }}
-                        >
-                          <QrCode className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 group-hover:scale-110 transition-transform" />
+                        <div className="flex items-center gap-1 ml-1 shrink-0">
+                          <div
+                            className="bg-white/10 p-1.5 rounded-xl border border-white/20 pointer-events-auto cursor-pointer hover:bg-white/20 transition-all shadow-md"
+                            onClick={(e) => { e.stopPropagation(); setScanTab('my-qr'); setIsScanModalOpen(true); }}
+                          >
+                            <QrCode className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsBalanceVisible(!isBalanceVisible);
+                            }}
+                            className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-8 w-8 transition-colors z-20"
+                          >
+                            {isBalanceVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsBalanceVisible(!isBalanceVisible);
-                          }}
-                          className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-10 w-10 transition-colors z-20"
-                        >
-                          {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                        </Button>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
@@ -924,21 +948,21 @@ export default function WalletPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-end mt-4">
-                    <div className="space-y-1">
-                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-[0.2em] mb-1">Card Holder</p>
-                      <p className="text-base sm:text-lg font-bold tracking-tight uppercase truncate max-w-[150px] sm:max-w-[300px]">{user?.displayName || 'PowerHub User'}</p>
+                  <div className="flex justify-between items-end mt-3 sm:mt-4">
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="text-slate-500 text-[9px] uppercase font-black tracking-[0.2em]">Card Holder</p>
+                      <p className="text-sm sm:text-lg font-bold tracking-tight uppercase truncate max-w-[140px] sm:max-w-[300px]">{user?.displayName || 'PowerHub User'}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="flex -space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-emerald-600/80 border-2 border-slate-950 flex items-center justify-center backdrop-blur-sm">
-                          <ShieldCheck className="h-5 w-5 text-white" />
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <div className="flex -space-x-2.5">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600/80 border-2 border-slate-950 flex items-center justify-center backdrop-blur-sm">
+                          <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-amber-500/80 border-2 border-slate-950 flex items-center justify-center backdrop-blur-sm shadow-xl">
-                          <TrendingUp className="h-5 w-5 text-white" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-500/80 border-2 border-slate-950 flex items-center justify-center backdrop-blur-sm shadow-xl">
+                          <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                       </div>
-                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Powered by ARISE</p>
+                      <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Powered by ARISE</p>
                     </div>
                   </div>
                 </CardContent>
@@ -1021,10 +1045,10 @@ export default function WalletPage() {
 
           {/* Quick Actions Bar */}
           <div className="w-full overflow-hidden">
-            <div className="flex overflow-x-auto gap-3 sm:gap-5 pb-5 pt-1 no-scrollbar w-full snap-x snap-mandatory">
+            <div className="grid grid-cols-5 gap-2 sm:flex sm:overflow-x-auto sm:gap-5 sm:pb-5 sm:pt-1 sm:no-scrollbar w-full">
             {[
               { id: 'topup', icon: Plus, label: 'Add', color: 'bg-emerald-500', shadow: 'shadow-emerald-500/20' },
-              { id: 'transfer', icon: Send, label: 'Send', color: 'bg-slate-900', shadow: 'shadow-slate-900/20' },
+              { id: 'transfer', icon: Send, label: 'Send', color: 'bg-slate-900 dark:bg-slate-700', shadow: 'shadow-slate-900/20' },
               { id: 'flights', icon: Plane, label: 'Flights', color: 'bg-indigo-600', shadow: 'shadow-indigo-600/20', href: '/flights' },
               { id: 'bills', icon: Smartphone, label: 'Bills', color: 'bg-amber-600', shadow: 'shadow-amber-600/20' },
               { id: 'withdraw', icon: ArrowUpRight, label: 'Cash Out', color: 'bg-slate-500', shadow: 'shadow-slate-500/20' },
@@ -1032,15 +1056,15 @@ export default function WalletPage() {
               const content = (
                 <div
                   key={action.id}
-                  className={`flex flex-col items-center gap-2.5 min-w-[70px] sm:min-w-[75px] group cursor-pointer snap-center ${index === array.length - 1 ? 'pr-4 sm:pr-0' : ''}`}
+                  className={`flex flex-col items-center gap-2 sm:min-w-[75px] group cursor-pointer`}
                   onClick={() => {
                     if (action.id === 'scan') setIsScanModalOpen(true);
                   }}
                 >
-                  <div className={`${action.color} p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[1.75rem] text-white shadow-xl ${action.shadow} group-active:scale-90 transition-all duration-300`}>
+                  <div className={`${action.color} p-3.5 sm:p-5 rounded-2xl sm:rounded-[1.75rem] text-white shadow-lg ${action.shadow} group-active:scale-90 transition-all duration-300 w-full flex justify-center sm:w-auto`}>
                     <action.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
-                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">{action.label}</span>
+                  <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors text-center">{action.label}</span>
                 </div>
               );
               return action.href ? (
@@ -1052,22 +1076,23 @@ export default function WalletPage() {
             </div>
           </div>
 
-          <Tabs defaultValue="manage" className="space-y-6 w-full max-w-full min-w-0">
-            <div className="w-full overflow-x-auto no-scrollbar pb-1">
-              <TabsList className="flex w-max min-w-full bg-slate-100 dark:bg-slate-900 rounded-2xl p-1.5 h-14 gap-1">
-                <TabsTrigger value="manage" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">Transact</TabsTrigger>
-                <TabsTrigger value="cards" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">Cards</TabsTrigger>
-                <TabsTrigger value="vaults" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">Vault</TabsTrigger>
-                <TabsTrigger value="history" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">History</TabsTrigger>
-                <TabsTrigger value="security" className="rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] sm:flex-1 min-w-[80px] sm:min-w-[100px]">Security</TabsTrigger>
+          <Tabs defaultValue="manage" className="space-y-5 sm:space-y-6 w-full max-w-full min-w-0">
+            <div className="w-full overflow-x-auto no-scrollbar pb-0.5">
+              <TabsList className="flex w-full bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl p-1 h-12 sm:h-14 gap-1 shadow-inner">
+                <TabsTrigger value="manage" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">Transact</TabsTrigger>
+                <TabsTrigger value="cards" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">Cards</TabsTrigger>
+                <TabsTrigger value="vaults" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">Vault</TabsTrigger>
+                <TabsTrigger value="history" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">History</TabsTrigger>
+                <TabsTrigger value="security" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">Security</TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent value="manage" className="space-y-10 w-full max-w-full min-w-0">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <TabsContent value="manage" className="space-y-5 sm:space-y-10 w-full max-w-full min-w-0">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-10">
                 {/* Institutional Deposit Protocol */}
-                <Card className="border-none shadow-xl sm:shadow-[0_80px_160px_-30px_rgba(16,185,129,0.15)] rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(16,185,129,0.25)] transition-all duration-700">
-                  <CardHeader className="p-6 sm:p-10 pb-0">
+                <Card className="border-none shadow-lg sm:shadow-[0_80px_160px_-30px_rgba(16,185,129,0.15)] rounded-2xl sm:rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(16,185,129,0.25)] transition-all duration-700">
+
+                  <CardHeader className="p-5 sm:p-10 pb-0">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1 sm:space-y-2">
                         <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-3 sm:px-4 py-1 rounded-full uppercase text-[8px] sm:text-[9px] tracking-widest">Inbound Protocol</Badge>
@@ -1078,7 +1103,7 @@ export default function WalletPage() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-6 sm:p-10 space-y-6 sm:space-y-10">
+                  <CardContent className="p-5 sm:p-10 space-y-5 sm:space-y-10">
                     <div className="space-y-4">
                       <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Quantum of Injection</Label>
                       <div className="relative group">
@@ -1086,10 +1111,11 @@ export default function WalletPage() {
                         <Input
                           type="number"
                           placeholder="0.00"
-                          className="pl-14 sm:pl-16 h-20 sm:h-24 text-3xl sm:text-4xl font-black rounded-3xl border-none bg-slate-50 dark:bg-slate-950/50 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-inner tracking-tighter"
+                          className="pl-14 sm:pl-16 h-16 sm:h-24 text-2xl sm:text-4xl font-black rounded-2xl sm:rounded-3xl border-none bg-slate-50 dark:bg-slate-950/50 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-inner tracking-tighter"
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
                         />
+
                       </div>
                       <div className="grid grid-cols-3 gap-2 sm:gap-4">
                         {['5000', '10000', '25000'].map(val => (
@@ -1107,12 +1133,13 @@ export default function WalletPage() {
 
                     <Button
                       onClick={addFunds}
-                      className="w-full h-20 rounded-3xl text-sm font-black uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(16,185,129,0.4)] bg-emerald-600 hover:bg-emerald-500 transition-all hover:scale-[1.02] active:scale-[0.95] py-6"
+                      className="w-full h-16 sm:h-20 rounded-2xl sm:rounded-3xl text-xs sm:text-sm font-black uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(16,185,129,0.4)] bg-emerald-600 hover:bg-emerald-500 transition-all hover:scale-[1.02] active:scale-[0.95] py-6"
                       disabled={!amount || parseFloat(amount) <= 0 || isAddingFunds}
                     >
-                      {isAddingFunds ? <Loader2 className="mr-3 size-6 animate-spin" /> : <CreditCard className="mr-3 size-6" />}
+                      {isAddingFunds ? <Loader2 className="mr-3 size-5 sm:size-6 animate-spin" /> : <CreditCard className="mr-3 size-5 sm:size-6" />}
                       {isAddingFunds ? 'CALIBRATING...' : 'INITIATE SECURE PAY'}
                     </Button>
+
 
                     <Separator className="bg-slate-100/50 dark:bg-slate-800/50" />
 
@@ -1170,8 +1197,9 @@ export default function WalletPage() {
                 </Card>
 
                 {/* Tactical Outbound Protocol */}
-                <Card className="border-none shadow-xl sm:shadow-[0_80px_160px_-30px_rgba(15,23,42,0.15)] rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(15,23,42,0.25)] transition-all duration-700">
-                  <CardHeader className="p-6 sm:p-10 pb-0">
+                <Card className="border-none shadow-lg sm:shadow-[0_80px_160px_-30px_rgba(15,23,42,0.15)] rounded-2xl sm:rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(15,23,42,0.25)] transition-all duration-700">
+
+                  <CardHeader className="p-5 sm:p-10 pb-0">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1 sm:space-y-2">
                         <Badge className="bg-slate-950/10 text-slate-500 border-none font-black px-3 sm:px-4 py-1 rounded-full uppercase text-[8px] sm:text-[9px] tracking-widest">Outbound Protocol</Badge>
@@ -1182,7 +1210,7 @@ export default function WalletPage() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-6 sm:p-10 space-y-6 sm:space-y-8">
+                  <CardContent className="p-5 sm:p-10 space-y-5 sm:space-y-8">
                     <div className="space-y-6">
                       <div className="space-y-4">
                         <div className="flex items-center justify-between px-2">
@@ -1196,11 +1224,13 @@ export default function WalletPage() {
                           </Button>
                         </div>
                         <Input
+                          id="recipient-account-input"
                           placeholder="RECIPIENT ACCOUNT"
-                          className="h-20 rounded-3xl bg-slate-50/50 border-none focus:bg-white font-mono text-2xl tracking-[0.2em] px-8 shadow-inner"
+                          className="h-14 sm:h-20 rounded-2xl sm:rounded-3xl bg-slate-50/50 border-none focus:bg-white font-mono text-lg sm:text-2xl tracking-[0.1em] sm:tracking-[0.2em] px-6 sm:px-8 shadow-inner"
                           value={recipientAccount}
                           onChange={(e) => setRecipientAccount(e.target.value)}
                         />
+
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 sm:gap-6">
@@ -1258,12 +1288,13 @@ export default function WalletPage() {
 
                       <Button
                         onClick={withdrawFunds}
-                        className="w-full h-20 rounded-3xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase tracking-[0.3em] shadow-[0_40px_80px_-20px_rgba(15,23,42,0.3)] active:scale-95 py-6"
+                        className="w-full h-16 sm:h-20 rounded-2xl sm:rounded-3xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase tracking-[0.3em] shadow-[0_40px_80px_-20px_rgba(15,23,42,0.3)] active:scale-95 py-6"
                         disabled={isTransferring || !transferAmount || parseFloat(transferAmount) > balance || (!recipientName && !recipientBank.toLowerCase().includes('ibom'))}
                       >
-                        {isTransferring ? <Loader2 className="mr-3 size-6 animate-spin" /> : <ArrowUpRight className="mr-3 size-6" />}
+                        {isTransferring ? <Loader2 className="mr-3 size-5 sm:size-6 animate-spin" /> : <ArrowUpRight className="mr-3 size-5 sm:size-6" />}
                         {isTransferring ? 'SYNCHRONIZING...' : 'EXECUTE X-TRANSFER'}
                       </Button>
+
                     </div>
                   </CardContent>
                 </Card>
@@ -1448,8 +1479,8 @@ export default function WalletPage() {
                 </div>
               </div>
 
-              <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[3rem] overflow-hidden bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl border border-white/20">
-                <CardContent className="p-4 sm:p-8">
+              <Card className="border-none shadow-lg sm:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-2xl sm:rounded-[3rem] overflow-hidden bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl border border-white/20">
+                <CardContent className="p-3 sm:p-8">
                   {transactions.length === 0 ? (
                     <div className="text-center py-32 px-4 space-y-6">
                       <div className="size-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto shadow-inner group animate-pulse">
@@ -1465,28 +1496,26 @@ export default function WalletPage() {
                       {transactions.map((txn, idx) => (
                         <div key={txn.id} className="group relative">
                           <div className="absolute inset-0 bg-slate-50/50 dark:bg-slate-800/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
-                          <div className="flex items-center justify-between p-4 sm:p-6 cursor-pointer border-b border-slate-50 dark:border-slate-800/50 last:border-0 transition-all">
+                          <div className="flex items-center justify-between p-3 sm:p-6 cursor-pointer border-b border-slate-50 dark:border-slate-800/50 last:border-0 transition-opacity active:opacity-50">
                             <div className="flex items-center gap-3 sm:gap-6 min-w-0 pr-2">
-                              <div className={`size-10 sm:size-14 shrink-0 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 group-active:scale-90 ${txn.type === 'credit' ? 'bg-emerald-500/10 text-emerald-600 shadow-emerald-500/10' : 'bg-slate-950 text-white shadow-slate-950/10'}`}>
-                                {txn.type === 'credit' ? <ArrowDownLeft className="size-5 sm:size-7" /> : <ArrowUpRight className="size-5 sm:size-7" />}
+                              <div className={`size-9 sm:size-14 shrink-0 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-md transition-transform group-hover:scale-110 ${txn.type === 'credit' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-slate-950 text-white'}`}>
+                                {txn.type === 'credit' ? <ArrowDownLeft className="size-4 sm:size-7" /> : <ArrowUpRight className="size-4 sm:size-7" />}
                               </div>
-                              <div className="space-y-0.5 sm:space-y-1 min-w-0">
-                                <p className="font-black text-sm sm:text-xl tracking-tightest uppercase text-slate-900 dark:text-white truncate">{txn.description}</p>
-                                <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                                  <Badge className="bg-slate-100 dark:bg-slate-800 text-[8px] font-black tracking-widest uppercase py-0.5 px-2 rounded-md border-none text-slate-400 truncate">Node ID: {txn.id.slice(-8).toUpperCase()}</Badge>
-                                  <span className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">
-                                    {txn.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} • {txn.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              <div className="min-w-0">
+                                <p className="font-black text-[12px] sm:text-xl tracking-tight uppercase text-slate-900 dark:text-white truncate leading-tight mb-0.5">{txn.description}</p>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                                    {txn.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric' })} · {txn.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </span>
+                                  {txn.isSimulated && <Badge className="bg-amber-500/10 text-amber-600 text-[6px] px-1 h-3.5 uppercase border-none">Demo</Badge>}
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right space-y-1 sm:space-y-2 shrink-0">
-                              <p className={`font-black text-2xl tracking-tighter ${txn.type === 'credit' ? 'text-emerald-500' : 'text-slate-950 dark:text-white'}`}>
+                            <div className="text-right shrink-0">
+                              <p className={`font-black text-sm sm:text-2xl tracking-tight leading-none mb-0.5 ${txn.type === 'credit' ? 'text-emerald-500' : 'text-slate-950 dark:text-white'}`}>
                                 {txn.type === 'credit' ? '+' : '-'}₦{txn.amount.toLocaleString()}
                               </p>
-                              <div className="flex justify-end">
-                                <Badge className="text-[9px] h-5 px-3 font-black border-none bg-emerald-500/10 text-emerald-600 uppercase tracking-[0.2em] rounded-lg">Settled ✓</Badge>
-                              </div>
+                              <p className="text-[8px] font-black text-emerald-600/60 uppercase tracking-widest">Success</p>
                             </div>
                           </div>
                         </div>
@@ -1841,6 +1870,63 @@ export default function WalletPage() {
           <p className="text-[10px] text-slate-400 mt-6 font-medium">Use Simulation to test the wallet flow until your Paystack account is upgraded.</p>
         </DialogContent>
       </Dialog>
+      {/* Native Bottom Navigation Bar for Mobile */}
+      <div className="fixed bottom-0 left-0 right-0 z-[60] pb-safe pt-3 px-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border-t border-slate-200/60 dark:border-white/[0.06] sm:hidden shadow-[0_-4px_30px_rgba(0,0,0,0.06)]">
+        <div className="flex justify-between items-end pb-3">
+          {[
+            { id: 'topup', icon: Plus, label: 'Add', action: () => {
+              const tab = document.querySelector('[value="manage"]') as HTMLElement;
+              tab?.click();
+              if (navigator.vibrate) navigator.vibrate(10);
+            }},
+            { id: 'send', icon: Send, label: 'Send', action: () => {
+              const tab = document.querySelector('[value="manage"]') as HTMLElement;
+              tab?.click();
+              if (navigator.vibrate) navigator.vibrate(10);
+              setTimeout(() => {
+                document.getElementById('recipient-account-input')?.focus();
+              }, 100);
+            }},
+            { id: 'scan', icon: ScanLine, label: 'Scan', action: () => {
+              setScanTab('scan');
+              setIsScanModalOpen(true);
+              if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
+            }},
+            { id: 'cards', icon: CreditCard, label: 'Card', action: () => {
+              const tab = document.querySelector('[value="cards"]') as HTMLElement;
+              tab?.click();
+              if (navigator.vibrate) navigator.vibrate(10);
+            }},
+            { id: 'history', icon: History, label: 'History', action: () => {
+              const tab = document.querySelector('[value="history"]') as HTMLElement;
+              tab?.click();
+              if (navigator.vibrate) navigator.vibrate(10);
+            }},
+          ].map((item) => {
+            const isScan = item.id === 'scan';
+            return (
+              <button
+                key={item.id}
+                onClick={item.action}
+                className={`flex flex-col items-center gap-1 transition-all active:scale-75 focus:outline-none ${isScan ? '-mt-8' : ''}`}
+              >
+                {isScan ? (
+                  <div className="size-14 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/40 border-4 border-white dark:border-slate-950">
+                    <item.icon className="size-6 text-white" />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="size-10 rounded-xl flex items-center justify-center bg-slate-50 dark:bg-slate-900 transition-colors">
+                      <item.icon className="size-5 text-slate-600 dark:text-slate-300" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">{item.label}</span>
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </>
   );
 }
