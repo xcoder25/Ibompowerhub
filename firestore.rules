@@ -101,5 +101,16 @@ service cloud.firestore {
     match /kyc/{userId} {
       allow read, write: if isSignedIn() && isOwner(userId);
     }
+
+    // Rules for Nearby AirSend
+    match /air_receivers/{document=**} {
+      allow read, write: if isSignedIn();
+    }
+    match /air_requesters/{document=**} {
+      allow read, write: if isSignedIn();
+    }
+    match /air_transfers/{document=**} {
+      allow read, write: if isSignedIn();
+    }
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -57,6 +57,7 @@ import { Copy, Check, Info } from 'lucide-react';
 import { WalletLock } from '@/components/wallet/wallet-lock';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { QRCodeSVG } from 'qrcode.react';
+import { NearbyAirSend } from '@/components/wallet/nearby-airsend';
 
 const NIGERIAN_BANKS = [
   { code: '044', name: 'Access Bank' },
@@ -157,6 +158,7 @@ export default function WalletPage() {
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [isIbomAskModalOpen, setIsIbomAskModalOpen] = useState(false);
   const [scanTab, setScanTab] = useState<'scan' | 'my-qr'>('scan');
+  const [isAirSendOpen, setIsAirSendOpen] = useState(false);
 
   // Rate limit scanner errors so it doesn't flood the UI
   const lastScanErrorTime = useRef(0);
@@ -842,237 +844,212 @@ export default function WalletPage() {
   return (
     <>
       {!isUnlocked && <WalletLock onUnlock={handleUnlock} />}
-      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-28 relative overflow-x-hidden">
-        {/* Background - Simplified for mobile stability */}
-        <div className="fixed inset-0 bg-slate-50 dark:bg-slate-950 z-0" />
+      <main className="min-h-screen bg-[#f0f2f7] dark:bg-[#060810] pb-32 relative overflow-x-hidden">
+        {/* Premium layered background */}
+        <div className="fixed inset-0 bg-[#f0f2f7] dark:bg-[#060810] z-0" />
+        <div className="fixed top-0 left-0 right-0 h-72 bg-gradient-to-b from-emerald-600 to-transparent opacity-[0.07] dark:opacity-[0.12] z-0" />
+        <div className="fixed top-[-120px] right-[-80px] w-72 h-72 rounded-full bg-emerald-400/20 dark:bg-emerald-500/10 blur-[100px] z-0" />
+        <div className="fixed top-[200px] left-[-100px] w-80 h-80 rounded-full bg-indigo-400/10 dark:bg-indigo-500/10 blur-[120px] z-0" />
 
-        <div className="w-full max-w-full mx-auto px-4 sm:px-12 pt-5 sm:pt-12 pb-6 sm:pb-12 flex flex-col gap-4 sm:gap-12 relative z-10 overflow-hidden isolate">
-          {/* App Header - Native Feel */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 sm:gap-4 shrink-0 pr-2">
-              <div
-                className="size-11 sm:size-14 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 shrink-0 cursor-pointer active:scale-90 transition-transform"
-                onClick={() => {
-                  if (navigator.vibrate) navigator.vibrate(10);
-                }}
-              >
-                <Wallet className="size-5 sm:size-8 text-white" />
+        <div className="w-full max-w-full mx-auto px-4 sm:px-12 pt-4 sm:pt-12 pb-4 sm:pb-12 flex flex-col gap-3 sm:gap-12 relative z-10 overflow-hidden isolate">
+          {/* ── Header ── */}
+          <div className="flex items-center justify-between pt-safe pt-2">
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="size-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-600/30 shrink-0">
+                <Wallet className="size-5 text-white" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-[22px] sm:text-4xl font-black tracking-tighter flex items-center gap-1.5 sm:gap-3">
-                  Ibom <span className="bg-gradient-to-r from-emerald-500 to-orange-500 bg-clip-text text-transparent italic tracking-tightest">Pay.</span>
+                <h1 className="text-xl sm:text-4xl font-black tracking-tight flex items-center gap-1">
+                  Ibom <span className="bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent">Pay</span>
                 </h1>
-                <p className="text-[8px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] sm:tracking-[0.4em] truncate">Official Arise Node</p>
+                <p className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.25em]">Arise Wallet</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full bg-slate-100 dark:bg-slate-900 h-9 w-9 sm:h-12 sm:w-12 active:scale-90 transition-all"
-                onClick={() => {
-                   if (navigator.vibrate) navigator.vibrate(5);
-                }}
+                className="rounded-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-md h-9 w-9 border border-slate-200/60 dark:border-slate-800 shadow-sm active:scale-90 transition-all"
+                onClick={() => { if (navigator.vibrate) navigator.vibrate(5); }}
               >
-                <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Share2 className="h-4 w-4 text-slate-600 dark:text-slate-300" />
               </Button>
-              <div className="sm:hidden size-9 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center overflow-hidden">
+              <div className="size-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center overflow-hidden shadow-md border-2 border-white dark:border-slate-900">
                 {user?.photoURL ? (
                   <img src={user.photoURL} alt="Profile" className="size-full object-cover" />
                 ) : (
-                  <div className="font-black text-[11px] text-emerald-600">{user?.displayName?.[0] || 'U'}</div>
+                  <div className="font-black text-[11px] text-white">{user?.displayName?.[0] || 'U'}</div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Premium Wallet Card - Modern Card UI */}
-          <div className="relative group perspective-1000 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-[2rem] sm:rounded-[2.5rem] blur opacity-10 sm:opacity-25 transition duration-1000"></div>
-
+          {/* ── Premium Wallet Card ── */}
+          <div className="relative">
+            {/* Glow behind card */}
+            <div className="absolute -inset-2 bg-gradient-to-br from-emerald-500/30 via-emerald-400/10 to-indigo-500/20 rounded-[2.5rem] blur-2xl opacity-60 dark:opacity-40" />
 
             <div
               className={`relative w-full transition-transform duration-700 preserve-3d cursor-pointer ${isCardFlipped ? 'rotate-y-180' : ''}`}
               onDoubleClick={(e) => {
                 e.preventDefault();
                 setIsCardFlipped(!isCardFlipped);
-                // Also trigger haptic feedback if available for mobile feel
-                if (typeof navigator !== 'undefined' && navigator.vibrate) {
-                  navigator.vibrate(50);
-                }
+                if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(50);
               }}
             >
-              {/* Front side elements */}
-              <Card className="relative bg-slate-950 text-white rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border-none shadow-2xl backface-hidden">
-                <CardContent className="p-5 sm:p-10 relative z-10">
+              {/* FRONT */}
+              <Card className="relative overflow-hidden border-none shadow-2xl backface-hidden rounded-[1.75rem] sm:rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white">
+                <CardContent className="p-5 sm:p-8 relative z-10">
 
-                  <div className="flex justify-between items-start mb-5 sm:mb-10">
-                    <div className="space-y-1 min-w-0 pr-2">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <div className="shrink-0 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Live Balance</p>
+                  {/* Top row */}
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">Live Balance</span>
                       </div>
-                      <div className="flex items-center gap-2 max-w-full overflow-hidden">
-                        <h2 className="text-[28px] sm:text-4xl lg:text-5xl font-black font-mono tracking-tighter truncate">
-                          {isBalanceVisible ? `₦${balance.toLocaleString()}` : '••••••••'}
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-[30px] sm:text-5xl font-black font-mono tracking-tight leading-none">
+                          {isBalanceVisible ? `₦${balance.toLocaleString()}` : '₦ ••••••'}
                         </h2>
-                        <div className="flex items-center gap-1 ml-1 shrink-0">
-                          <div
-                            className="bg-white/10 p-1.5 rounded-xl border border-white/20 pointer-events-auto cursor-pointer hover:bg-white/20 transition-all shadow-md"
+                        <div className="flex flex-col gap-1.5 ml-1">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setIsBalanceVisible(!isBalanceVisible); }}
+                            className="size-7 rounded-xl bg-white/10 flex items-center justify-center border border-white/15 hover:bg-white/20 transition-all"
+                          >
+                            {isBalanceVisible ? <EyeOff className="size-3.5 text-slate-300" /> : <Eye className="size-3.5 text-slate-300" />}
+                          </button>
+                          <button
                             onClick={(e) => { e.stopPropagation(); setScanTab('my-qr'); setIsScanModalOpen(true); }}
+                            className="size-7 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
                           >
-                            <QrCode className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsBalanceVisible(!isBalanceVisible);
-                            }}
-                            className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-8 w-8 transition-colors z-20"
-                          >
-                            {isBalanceVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </Button>
+                            <QrCode className="size-3.5 text-emerald-400" />
+                          </button>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <div className="bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/30 backdrop-blur-md">
-                        <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Premium Tier</p>
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="bg-emerald-500/15 border border-emerald-500/25 px-2.5 py-1 rounded-full">
+                        <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Premium</p>
                       </div>
-                      <div className="flex items-center gap-1 mt-1 opacity-60">
-                        <RefreshCw className="h-3 w-3 animate-spin duration-[3000ms]" />
-                        <span className="text-[8px] uppercase font-bold tracking-widest">Double-Tap to Flip</span>
+                      <div className="flex items-center gap-1 opacity-50">
+                        <RefreshCw className="size-2.5 animate-spin" style={{ animationDuration: '3s' }} />
+                        <span className="text-[7px] uppercase font-bold tracking-widest">Tap×2 Flip</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-end mt-3 sm:mt-4">
-                    <div className="space-y-0.5 min-w-0">
-                      <p className="text-slate-500 text-[9px] uppercase font-black tracking-[0.2em]">Card Holder</p>
-                      <p className="text-sm sm:text-lg font-bold tracking-tight uppercase truncate max-w-[140px] sm:max-w-[300px]">{user?.displayName || 'PowerHub User'}</p>
+                  {/* Bottom row */}
+                  <div className="flex justify-between items-end">
+                    <div className="space-y-0.5">
+                      <p className="text-[8px] text-slate-500 font-black uppercase tracking-[0.25em]">Cardholder</p>
+                      <p className="text-sm font-bold uppercase tracking-wide truncate max-w-[160px] sm:max-w-xs">{user?.displayName || 'IbomX User'}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <div className="flex -space-x-2.5">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600/80 border-2 border-slate-950 flex items-center justify-center backdrop-blur-sm">
-                          <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="flex -space-x-2">
+                        <div className="size-7 rounded-full bg-emerald-500/80 border-2 border-slate-950 flex items-center justify-center">
+                          <ShieldCheck className="size-3.5 text-white" />
                         </div>
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-500/80 border-2 border-slate-950 flex items-center justify-center backdrop-blur-sm shadow-xl">
-                          <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                        <div className="size-7 rounded-full bg-amber-500/80 border-2 border-slate-950 flex items-center justify-center">
+                          <TrendingUp className="size-3.5 text-white" />
                         </div>
                       </div>
-                      <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Powered by ARISE</p>
+                      <p className="text-[7px] font-black text-slate-600 uppercase tracking-widest">ARISE Node</p>
                     </div>
                   </div>
                 </CardContent>
 
-                {/* Advanced visual flare / Mesh background for Front */}
-                <div className="absolute top-[-30%] right-[-10%] w-[70%] h-[70%] bg-emerald-500/30 blur-[100px] rounded-full"></div>
-                <div className="absolute bottom-[-30%] left-[-10%] w-[60%] h-[60%] bg-emerald-400/20 blur-[80px] rounded-full"></div>
-                <div className="absolute top-[20%] left-[30%] w-[40%] h-[40%] bg-amber-500/10 blur-[120px] rounded-full"></div>
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat"></div>
+                {/* Mesh glows */}
+                <div className="absolute -top-12 -right-12 size-48 bg-emerald-500/25 blur-[80px] rounded-full" />
+                <div className="absolute -bottom-10 -left-10 size-40 bg-indigo-500/15 blur-[70px] rounded-full" />
+                <div className="absolute inset-0 opacity-[0.025] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" />
               </Card>
 
-              {/* Back side elements (Flipped Card) */}
-              <Card className="absolute inset-0 bg-slate-900 border-none shadow-2xl rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden text-white backface-hidden rotate-y-180">
-                <CardContent className="p-6 sm:p-10 relative z-10 h-full flex flex-col justify-between">
+              {/* BACK */}
+              <Card className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-950 border-none shadow-2xl rounded-[1.75rem] sm:rounded-[2.5rem] overflow-hidden text-white backface-hidden rotate-y-180">
+                <CardContent className="p-5 sm:p-8 relative z-10 h-full flex flex-col justify-between">
                   <div>
-                    <div className="flex justify-between items-start mb-6">
+                    <div className="flex justify-between items-start mb-5">
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Account Info</p>
+                        <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
+                        <p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">Account Info</p>
                       </div>
-                      <div className="bg-white/5 p-2 rounded-xl backdrop-blur-md">
-                        <Banknote className="h-5 w-5 text-amber-500" />
+                      <div className="size-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <Banknote className="size-4 text-amber-400" />
                       </div>
                     </div>
 
                     {walletData?.dva ? (
-                      <div className="space-y-4">
-                        <div className="space-y-1">
-                          <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">Bank Account Number</p>
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <h3 className="text-xl sm:text-3xl font-black font-mono tracking-widest text-white break-all">{walletData?.dva?.account_number}</h3>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                copyToClipboard(walletData.dva.account_number);
-                              }}
-                              className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-8 w-8 z-20"
-                            >
-                              {hasCopied ? <Check className="h-4 w-4 text-amber-500" /> : <Copy className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </div>
-
+                      <div className="space-y-3">
+                        <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">Account Number</p>
                         <div className="flex items-center gap-2">
-                          <p className="text-xs sm:text-sm font-bold text-slate-300 uppercase tracking-widest">{walletData.dva.bank_name}</p>
-                          <div className="w-1 h-1 rounded-full bg-slate-600"></div>
-                          <p className="text-xs sm:text-sm font-medium text-slate-400">{walletData.dva.account_name}</p>
+                          <h3 className="text-xl sm:text-3xl font-black font-mono tracking-widest text-white">{walletData?.dva?.account_number}</h3>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); copyToClipboard(walletData.dva.account_number); }}
+                            className="size-8 rounded-xl bg-white/10 flex items-center justify-center border border-white/15 hover:bg-white/20 transition-all"
+                          >
+                            {hasCopied ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5 text-slate-300" />}
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2 pt-1">
+                          <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{walletData.dva.bank_name}</span>
+                          <span className="size-1 rounded-full bg-slate-700" />
+                          <span className="text-xs text-slate-500">{walletData.dva.account_name}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
-                        <Lock className="h-8 w-8 text-slate-600" />
-                        <div>
-                          <p className="text-sm font-bold text-slate-300">Account Not Ready</p>
-                          <p className="text-xs text-slate-500 mt-1 max-w-[200px] mx-auto">Complete KYC to unlock your direct top-up account.</p>
-                        </div>
+                      <div className="flex flex-col items-center justify-center py-4 text-center space-y-2">
+                        <Lock className="size-7 text-slate-600" />
+                        <p className="text-sm font-bold text-slate-300">KYC Required</p>
+                        <p className="text-[10px] text-slate-500 max-w-[180px]">Complete identity sync to unlock direct top-up.</p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex justify-between items-end mt-4 pt-4 border-t border-white/10">
-                    <p className="text-[10px] text-slate-500 uppercase font-black tracking-[0.2em]">Direct Top-up</p>
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest opacity-80 flex items-center gap-1">
-                      <RefreshCw className="h-3 w-3" />
-                      Double-Tap to Return
-                    </p>
+                  <div className="flex justify-between items-end pt-3 border-t border-white/[0.07]">
+                    <p className="text-[8px] text-slate-600 font-black uppercase tracking-widest">Direct Reserve Node</p>
+                    <div className="flex items-center gap-1 opacity-50">
+                      <RefreshCw className="size-2.5" />
+                      <span className="text-[7px] uppercase font-bold tracking-widest">Tap×2 Return</span>
+                    </div>
                   </div>
                 </CardContent>
-
-                {/* Back Card Flare */}
-                <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-amber-500/10 blur-[80px] rounded-full"></div>
-                <div className="absolute bottom-0 left-0 w-[60%] h-[60%] bg-slate-700/20 blur-[100px] rounded-full"></div>
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat"></div>
+                <div className="absolute top-0 right-0 size-40 bg-amber-500/10 blur-[70px] rounded-full" />
+                <div className="absolute bottom-0 left-0 size-48 bg-slate-700/20 blur-[80px] rounded-full" />
               </Card>
             </div>
           </div>
 
 
-          {/* Quick Actions Bar */}
-          <div className="w-full overflow-hidden">
-            <div className="grid grid-cols-5 gap-2 sm:flex sm:overflow-x-auto sm:gap-5 sm:pb-5 sm:pt-1 sm:no-scrollbar w-full">
-            {[
-              { id: 'topup', icon: Plus, label: 'Add', color: 'bg-emerald-500', shadow: 'shadow-emerald-500/20' },
-              { id: 'transfer', icon: Send, label: 'Send', color: 'bg-slate-900 dark:bg-slate-700', shadow: 'shadow-slate-900/20' },
-              { id: 'flights', icon: Plane, label: 'Flights', color: 'bg-indigo-600', shadow: 'shadow-indigo-600/20', href: '/flights' },
-              { id: 'bills', icon: Smartphone, label: 'Bills', color: 'bg-amber-600', shadow: 'shadow-amber-600/20' },
-              { id: 'withdraw', icon: ArrowUpRight, label: 'Cash Out', color: 'bg-slate-500', shadow: 'shadow-slate-500/20' },
-            ].map((action, index, array) => {
-              const content = (
-                <div
-                  key={action.id}
-                  className={`flex flex-col items-center gap-2 sm:min-w-[75px] group cursor-pointer`}
-                  onClick={() => {
-                    if (action.id === 'scan') setIsScanModalOpen(true);
-                  }}
-                >
-                  <div className={`${action.color} p-3.5 sm:p-5 rounded-2xl sm:rounded-[1.75rem] text-white shadow-lg ${action.shadow} group-active:scale-90 transition-all duration-300 w-full flex justify-center sm:w-auto`}>
-                    <action.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+          {/* ── Quick Actions Pill Bar ── */}
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[1.5rem] border border-white/60 dark:border-slate-800/80 shadow-sm overflow-hidden">
+            <div className="grid grid-cols-6 gap-0 sm:flex sm:overflow-x-auto sm:no-scrollbar">
+              {[
+                { id: 'topup', icon: Plus, label: 'Add', bg: 'bg-emerald-500/10 dark:bg-emerald-500/15', icon_color: 'text-emerald-600 dark:text-emerald-400' },
+                { id: 'transfer', icon: Send, label: 'Send', bg: 'bg-slate-100 dark:bg-slate-800', icon_color: 'text-slate-700 dark:text-slate-200' },
+                { id: 'airsend', icon: Wifi, label: 'AirDrop', bg: 'bg-indigo-500/10 dark:bg-indigo-500/15', icon_color: 'text-indigo-600 dark:text-indigo-400' },
+                { id: 'flights', icon: Plane, label: 'Flights', bg: 'bg-sky-500/10 dark:bg-sky-500/15', icon_color: 'text-sky-600 dark:text-sky-400', href: '/flights' },
+                { id: 'bills', icon: Smartphone, label: 'Bills', bg: 'bg-amber-500/10 dark:bg-amber-500/15', icon_color: 'text-amber-600 dark:text-amber-400' },
+                { id: 'withdraw', icon: ArrowUpRight, label: 'Cash Out', bg: 'bg-rose-500/10 dark:bg-rose-500/15', icon_color: 'text-rose-600 dark:text-rose-400' },
+              ].map((action) => {
+                const inner = (
+                  <div
+                    key={action.id}
+                    className="flex flex-col items-center gap-1.5 py-4 px-1 sm:min-w-[90px] sm:px-5 group cursor-pointer active:scale-90 transition-transform"
+                    onClick={() => {
+                      if (action.id === 'airsend') setIsAirSendOpen(true);
+                    }}
+                  >
+                    <div className={`size-10 sm:size-11 rounded-2xl ${action.bg} flex items-center justify-center transition-all group-hover:scale-110`}>
+                      <action.icon className={`size-4.5 sm:size-5 ${action.icon_color}`} />
+                    </div>
+                    <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider ${action.icon_color.split(' ')[0].replace('text-', 'text-')} opacity-70`}>{action.label}</span>
                   </div>
-                  <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors text-center">{action.label}</span>
-                </div>
-              );
-              return action.href ? (
-                <Link href={action.href} key={action.id}>
-                  {content}
-                </Link>
-              ) : content;
-            })}
+                );
+                return action.href ? (
+                  <Link href={action.href} key={action.id} className="contents">{inner}</Link>
+                ) : <React.Fragment key={action.id}>{inner}</React.Fragment>;
+              })}
             </div>
           </div>
 
@@ -1870,63 +1847,63 @@ export default function WalletPage() {
           <p className="text-[10px] text-slate-400 mt-6 font-medium">Use Simulation to test the wallet flow until your Paystack account is upgraded.</p>
         </DialogContent>
       </Dialog>
-      {/* Native Bottom Navigation Bar for Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 z-[60] pb-safe pt-3 px-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border-t border-slate-200/60 dark:border-white/[0.06] sm:hidden shadow-[0_-4px_30px_rgba(0,0,0,0.06)]">
-        <div className="flex justify-between items-end pb-3">
-          {[
-            { id: 'topup', icon: Plus, label: 'Add', action: () => {
-              const tab = document.querySelector('[value="manage"]') as HTMLElement;
-              tab?.click();
-              if (navigator.vibrate) navigator.vibrate(10);
-            }},
-            { id: 'send', icon: Send, label: 'Send', action: () => {
-              const tab = document.querySelector('[value="manage"]') as HTMLElement;
-              tab?.click();
-              if (navigator.vibrate) navigator.vibrate(10);
-              setTimeout(() => {
-                document.getElementById('recipient-account-input')?.focus();
-              }, 100);
-            }},
-            { id: 'scan', icon: ScanLine, label: 'Scan', action: () => {
-              setScanTab('scan');
-              setIsScanModalOpen(true);
-              if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
-            }},
-            { id: 'cards', icon: CreditCard, label: 'Card', action: () => {
-              const tab = document.querySelector('[value="cards"]') as HTMLElement;
-              tab?.click();
-              if (navigator.vibrate) navigator.vibrate(10);
-            }},
-            { id: 'history', icon: History, label: 'History', action: () => {
-              const tab = document.querySelector('[value="history"]') as HTMLElement;
-              tab?.click();
-              if (navigator.vibrate) navigator.vibrate(10);
-            }},
-          ].map((item) => {
-            const isScan = item.id === 'scan';
-            return (
-              <button
-                key={item.id}
-                onClick={item.action}
-                className={`flex flex-col items-center gap-1 transition-all active:scale-75 focus:outline-none ${isScan ? '-mt-8' : ''}`}
-              >
-                {isScan ? (
-                  <div className="size-14 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/40 border-4 border-white dark:border-slate-950">
-                    <item.icon className="size-6 text-white" />
+      {/* ── Premium Native Bottom Nav ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-[60] sm:hidden">
+        {/* AirSend FAB */}
+        <div className="absolute left-1/2 -translate-x-1/2 -top-7 z-10">
+          <button
+            onClick={() => { setIsAirSendOpen(true); if (navigator.vibrate) navigator.vibrate([10, 20, 10]); }}
+            className="size-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-2xl shadow-indigo-500/50 border-[3px] border-white dark:border-slate-950 active:scale-90 transition-all"
+          >
+            <Wifi className="size-6 text-white" />
+          </button>
+        </div>
+        <div className="bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/[0.05] shadow-[0_-8px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_40px_rgba(0,0,0,0.3)]">
+          <div className="flex justify-around items-center px-2 pt-2 pb-safe" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+            {[
+              { id: 'topup', icon: Plus, label: 'Add', color: 'text-emerald-600 dark:text-emerald-400', action: () => {
+                (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+                if (navigator.vibrate) navigator.vibrate(8);
+              }},
+              { id: 'send', icon: Send, label: 'Send', color: 'text-slate-600 dark:text-slate-300', action: () => {
+                (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+                setTimeout(() => document.getElementById('recipient-account-input')?.focus(), 100);
+                if (navigator.vibrate) navigator.vibrate(8);
+              }},
+              { id: 'airsend-mid', icon: Wifi, label: '', color: '', action: () => {} }, // placeholder for FAB
+              { id: 'cards', icon: CreditCard, label: 'Cards', color: 'text-indigo-600 dark:text-indigo-400', action: () => {
+                (document.querySelector('[value="cards"]') as HTMLElement)?.click();
+                if (navigator.vibrate) navigator.vibrate(8);
+              }},
+              { id: 'history', icon: History, label: 'History', color: 'text-slate-600 dark:text-slate-300', action: () => {
+                (document.querySelector('[value="history"]') as HTMLElement)?.click();
+                if (navigator.vibrate) navigator.vibrate(8);
+              }},
+            ].map((item) => {
+              if (item.id === 'airsend-mid') {
+                return <div key={item.id} className="w-16" />; // gap for FAB
+              }
+              return (
+                <button
+                  key={item.id}
+                  onClick={item.action}
+                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl active:scale-75 transition-all focus:outline-none group"
+                >
+                  <div className="size-8 rounded-xl flex items-center justify-center transition-all group-active:bg-slate-100 dark:group-active:bg-slate-800">
+                    <item.icon className={`size-5 ${item.color} transition-colors`} />
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="size-10 rounded-xl flex items-center justify-center bg-slate-50 dark:bg-slate-900 transition-colors">
-                      <item.icon className="size-5 text-slate-600 dark:text-slate-300" />
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">{item.label}</span>
-                  </div>
-                )}
-              </button>
-            );
-          })}
+                  <span className={`text-[8px] font-black uppercase tracking-widest ${item.color} opacity-80`}>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
+      <NearbyAirSend 
+        open={isAirSendOpen}
+        onOpenChange={setIsAirSendOpen}
+        currentBalance={balance}
+      />
     </>
   );
 }
