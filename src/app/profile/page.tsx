@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { useUser, useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { signOut, updateProfile } from 'firebase/auth';
-import { doc, updateDoc, collection, addDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { doc, collection, addDoc, query, orderBy, limit, onSnapshot, setDoc } from 'firebase/firestore';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
@@ -99,19 +99,18 @@ export default function ProfilePage() {
     const kycTotal = 6;
     const isFullyVerified = kycCompletedCount === kycTotal;
 
-    // Local state for immediate UI updates (optimistic UI) across sessions in this demo
     const [localProfile, setLocalProfile] = useState<Partial<UserProfile>>({});
+    // Blob preview URL while background upload is running
+    const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null);
     const [amount, setAmount] = useState('');
     const [transactions, setTransactions] = useState<Transaction[]>([]);
 
+    // Sync Firestore profile into local state (Firestore is source of truth after save)
     useEffect(() => {
         if (userProfile) {
             setLocalProfile(userProfile);
         } else if (user) {
-            setLocalProfile({
-                name: user.displayName || 'User',
-                role: 'Resident'
-            })
+            setLocalProfile({ name: user.displayName || 'User', role: 'Resident' });
         }
     }, [userProfile, user]);
 
@@ -144,32 +143,29 @@ export default function ProfilePage() {
         signOut(auth);
     };
 
-    const handleUpdateProfile = async (updates: any) => {
-        setLocalProfile(prev => ({ ...prev, ...updates }));
-
+    const handleUpdateProfile = async (updates: { name?: string; bio?: string; location?: string }) => {
         if (!user || !userDocRef) return;
-
+        setLocalProfile(prev => ({ ...prev, ...updates }));
         try {
-            // Update Firestore document
-            await updateDoc(userDocRef, updates);
-
-            // Update Auth profile if name changed
+            await setDoc(userDocRef, updates, { merge: true });
             if (updates.name && updates.name !== user.displayName) {
                 await updateProfile(user, { displayName: updates.name });
             }
-
-            toast({
-                title: 'Profile Saved',
-                description: 'Your changes have been synced to your account.',
-            });
         } catch (error) {
-            console.error('Error saving profile:', error);
-            toast({
-                variant: 'destructive',
-                title: 'Save Failed',
-                description: 'Could not sync changes to the database.',
-            });
+            console.error('Error saving profile to Firestore:', error);
+            toast({ variant: 'destructive', title: 'Save Failed', description: 'Could not sync changes. Please try again.' });
+            throw error;
         }
+    };
+
+    /** Called by dialog when background image upload finishes with the real URL */
+    const handleImageSaved = (url: string) => {
+        setLocalProfile(prev => ({ ...prev, profileImageUrl: url }));
+        setPendingImageUrl(null);
+    };
+
+    const handlePreviewImage = (url: string | null) => {
+        setPendingImageUrl(url);
     };
 
     const handleLanguageChange = (language: string) => {
@@ -251,6 +247,8 @@ export default function ProfilePage() {
     const currentName = localProfile?.name ?? user?.displayName ?? 'User';
     const currentBio = localProfile?.bio ?? 'Community Member';
     const currentLocation = localProfile?.location ?? 'Uyo, Akwa Ibom';
+    // Blob preview takes priority while uploading; falls back to Firestore URL then Auth photoURL
+    const currentProfileImageUrl = pendingImageUrl ?? localProfile?.profileImageUrl ?? user?.photoURL ?? undefined;
 
 
     return (
@@ -265,7 +263,7 @@ export default function ProfilePage() {
                     <CardContent className="relative pt-0 px-6 sm:px-8 pb-8">
                         <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 -mt-12 mb-6">
                             <Avatar className="h-24 w-24 sm:h-32 sm:w-32 border-4 border-background shadow-lg text-4xl">
-                                <AvatarImage src={localProfile?.profileImageUrl ?? userProfile?.profileImageUrl ?? user?.photoURL ?? undefined} alt={currentName} />
+                                <AvatarImage src={currentProfileImageUrl} alt={currentName} />
                                 <AvatarFallback>{currentName.charAt(0)}</AvatarFallback>
                             </Avatar>
 
@@ -281,13 +279,14 @@ export default function ProfilePage() {
                             <div className="mb-2 shrink-0">
                                 <EditProfileDialog
                                     user={{
-                                        ...localProfile,
                                         name: currentName,
                                         bio: currentBio,
                                         location: currentLocation,
-                                        profileImageUrl: localProfile?.profileImageUrl ?? userProfile?.profileImageUrl ?? user?.photoURL ?? undefined
+                                        profileImageUrl: currentProfileImageUrl
                                     }}
                                     onUpdateProfile={handleUpdateProfile}
+                                    onImageSaved={handleImageSaved}
+                                    onPreviewImage={handlePreviewImage}
                                 />
                             </div>
                         </div>
