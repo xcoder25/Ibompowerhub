@@ -13,7 +13,22 @@ service cloud.firestore {
 
     // Rules for the 'users' collection
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Rules for the 'artisans' collection
+    match /artisans/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /artisans/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    
+    match /users/{document=**} {
+        allow read, write: if isSignedIn();
     }
 
     // Rules for the 'wallets' collection

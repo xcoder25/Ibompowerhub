@@ -21,6 +21,7 @@ import { useState } from 'react';
 import { Eye, EyeOff, ChevronLeft } from 'lucide-react';
 import { useLoading } from '@/context/loading-context';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   email: z.string().email('Please enter a valid email address.'),
@@ -39,6 +40,7 @@ export default function LoginPage() {
   const { setIsLoading } = useLoading();
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,9 +52,22 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed", error);
       setIsLoading(false);
+      
+      let message = "An error occurred during sign in.";
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        message = "Incorrect email or password. Please try again.";
+      } else if (error.code === 'auth/too-many-requests') {
+        message = "Too many failed attempts. Please try again later.";
+      }
+
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: message,
+      });
     }
   }
 
@@ -62,9 +77,14 @@ export default function LoginPage() {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Google sign-in failed", error);
       setIsLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Sign-in Failed",
+        description: error.message || "Failed to sign in with Google.",
+      });
     }
   };
 

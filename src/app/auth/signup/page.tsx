@@ -21,6 +21,7 @@ import { useState } from 'react';
 import { Eye, EyeOff, ChevronLeft } from 'lucide-react';
 import { useLoading } from '@/context/loading-context';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -45,6 +46,7 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,9 +59,22 @@ export default function SignupPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       await updateProfile(userCredential.user, { displayName: values.fullName });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup failed", error);
       setIsLoading(false);
+      
+      let message = "An error occurred during sign up.";
+      if (error.code === 'auth/email-already-in-use') {
+        message = "This email is already registered. Please sign in instead.";
+      } else if (error.code === 'auth/weak-password') {
+        message = "The password is too weak.";
+      }
+
+      toast({
+        variant: "destructive",
+        title: "Signup Failed",
+        description: message,
+      });
     }
   }
 
@@ -69,9 +84,14 @@ export default function SignupPage() {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Google sign-in failed", error);
       setIsLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Sign-in Failed",
+        description: error.message || "Failed to sign in with Google.",
+      });
     }
   };
 

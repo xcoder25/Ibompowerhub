@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { artisans as initialArtisans } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Star, MapPin, Search, HardHat, ShieldCheck, Zap, ArrowRight, Sparkles } from 'lucide-react';
+import { Star, MapPin, Search, HardHat, ShieldCheck, Zap, ArrowRight, Sparkles, LayoutDashboard } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
@@ -17,11 +17,23 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { useLoading } from '@/context/loading-context';
 
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+
 export default function SkillsPage() {
+  const { user } = useUser();
+  const firestore = useFirestore();
   const [artisans, setArtisans] = useState(initialArtisans);
   const { location, error: geoError, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { isLoading, setIsLoading } = useLoading();
+
+  const userDocRef = useMemoFirebase(
+    () => (user && firestore ? doc(firestore, 'users', user.uid) : null),
+    [firestore, user]
+  );
+  const { data: profile } = useDoc<{ role?: string }>(userDocRef);
+  const isArtisan = profile?.role === 'Artisan';
 
   const handleSortByDistance = () => {
     setIsLoading(true);
@@ -73,9 +85,18 @@ export default function SkillsPage() {
             </p>
           </div>
           <Button asChild className="h-12 px-6 bg-slate-950 dark:bg-white text-white dark:text-slate-950 hover:bg-emerald-600 hover:text-white rounded-xl font-bold transition-all shadow-xl active:scale-95 group w-full md:w-auto">
-            <Link href="/skills/register">
-              <HardHat className="mr-3 size-5" />
-              Become a Pro <ArrowRight className="ml-2 size-5 group-hover:translate-x-1 transition-transform" />
+            <Link href={isArtisan ? "/skills/dashboard" : "/skills/register"}>
+              {isArtisan ? (
+                <>
+                  <LayoutDashboard className="mr-3 size-5" />
+                  My Dashboard <ArrowRight className="ml-2 size-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              ) : (
+                <>
+                  <HardHat className="mr-3 size-5" />
+                  Become a Pro <ArrowRight className="ml-2 size-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </Link>
           </Button>
         </div>

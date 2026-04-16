@@ -33,6 +33,7 @@ import {
   Newspaper,
   Wallet,
   Navigation,
+  LayoutDashboard,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -99,7 +100,13 @@ export function AppSidebar() {
     [firestore, user]
   );
 
+  const userProfileDocRef = useMemoFirebase(
+    () => (user && firestore ? doc(firestore, 'users', user.uid) : null),
+    [firestore, user]
+  );
+
   const { data: walletData } = useDoc(walletDocRef);
+  const { data: profile } = useDoc<{ role?: string }>(userProfileDocRef);
   const balance = walletData?.balance ?? 0;
 
 
@@ -178,6 +185,28 @@ export function AppSidebar() {
         )}
         {renderNavGroup(mainNav, 'Main')}
         <SidebarSeparator />
+
+        {!isAdminLoading && profile?.role === 'Artisan' && (
+          <>
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-emerald-600 font-bold uppercase tracking-widest text-[10px]">Artisan Pro</SidebarGroupLabel>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.startsWith('/skills/dashboard')}
+                  className="bg-emerald-50/50 hover:bg-emerald-100/50 text-emerald-700"
+                >
+                  <Link href="/skills/dashboard">
+                    <LayoutDashboard className="size-4" />
+                    <span className="font-bold">Artisan Dashboard</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarGroup>
+            <SidebarSeparator />
+          </>
+        )}
+
         {renderNavGroup(servicesNav, 'Services')}
         <SidebarSeparator />
         {renderNavGroup(communityNav, 'Community')}
