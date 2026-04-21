@@ -8,10 +8,8 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 const AppSidebar = dynamic(() => import('./app-sidebar').then(mod => mod.AppSidebar));
 const AppMobileNav = dynamic(() => import('./app-mobile-nav').then(mod => mod.AppMobileNav));
 const AppHeader = dynamic(() => import('./app-header').then(mod => mod.AppHeader));
-import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState, useRef } from 'react';
-import { AssistantWidget } from '../assistant-widget';
+import { NeuralHUD } from '../neural-hud';
 import { Toaster } from '../ui/toaster';
 import { useUser, useFirestore } from '@/firebase';
 import { SplashScreen } from '../splash-screen';
@@ -113,7 +111,6 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
         return (
             <main className="flex-1 flex flex-col relative">
                 {children}
-                {!isWalletPage && <AssistantWidget />}
             </main>
         );
     }
@@ -126,7 +123,6 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
         return (
             <main className="flex-1 flex flex-col relative">
                 {children}
-                {!isWalletPage && <AssistantWidget />}
             </main>
         );
     }
@@ -140,10 +136,10 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
                     {!(isMapPage || isFlightPage || isWalletPage || (isMarketPage && isMobile)) && <AppHeader />}
                     <SidebarInset className="flex flex-col">
                         <main className={cn("flex-1 flex flex-col relative h-full w-full", "pb-[80px] md:pb-0")}>
+                            <NeuralHUD />
                             {children}
                         </main>
                     </SidebarInset>
-                    {!isWalletPage && <AssistantWidget />}
                     {isMobile && <AppMobileNav />}
                 </div>
             </div>

@@ -4,26 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { propertyListings } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Building2, Search, SlidersHorizontal, MapPin, BedDouble, Bath, Maximize, ChevronRight, Home, TrendingUp, Key, Tag } from 'lucide-react';
+import { 
+  Building2, Search, SlidersHorizontal, MapPin, 
+  BedDouble, Bath, Maximize, ChevronRight, Home, 
+  TrendingUp, Key, Tag, Sparkles, Brain, 
+  ShieldCheck, ArrowRight, Zap, Droplets
+} from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Button as Btn } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 const typeColors: Record<string, string> = {
-  Rent: 'bg-green-100 text-green-800 border-green-200',
-  Sale: 'bg-orange-100 text-orange-700 border-orange-200',
-  'Short-let': 'bg-blue-100 text-blue-700 border-blue-200',
+  Rent: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+  Sale: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
+  'Short-let': 'bg-blue-500/10 text-blue-600 border-blue-500/20',
 };
-
-const stats = [
-  { label: 'Listings', value: '800+', icon: Building2 },
-  { label: 'For Rent', value: '400+', icon: Home },
-  { label: 'For Sale', value: '300+', icon: Key },
-  { label: 'Avg. Price', value: '₦85k/m', icon: TrendingUp },
-];
-
-const propertyTypes = ['All', 'Rent', 'Sale', 'Short-let'];
 
 export default function PropertyPage() {
   const { toast } = useToast();
@@ -37,153 +34,156 @@ export default function PropertyPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/30 to-orange-50/20 relative overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 right-0 w-[600px] h-[600px] rounded-full bg-green-300/20 blur-[130px]" />
-        <div className="absolute bottom-0 -left-40 w-[500px] h-[500px] rounded-full bg-orange-300/15 blur-[130px]" />
-      </div>
+    <main className="min-h-screen bg-white dark:bg-slate-950 pb-32 relative overflow-hidden">
+      {/* Background Dynamics */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[1200px] h-[800px] bg-emerald-600/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      
+      <div className="container mx-auto px-4 sm:px-8 py-10 md:py-16 space-y-12 relative z-10 animate-in fade-in duration-1000">
 
-      <div className="relative z-10 p-4 sm:p-6 md:p-10 max-w-7xl mx-auto">
-
-        {/* Header */}
-        <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-green-900 via-green-800 to-green-900 text-white p-8 md:p-12 mb-10 shadow-2xl shadow-green-900/30">
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-          <div className="absolute right-0 top-0 w-72 h-72 rounded-full bg-orange-400/20 blur-3xl" />
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-4 py-1.5 mb-5 text-white text-xs font-bold uppercase tracking-widest">
-              <Building2 className="h-3.5 w-3.5 text-orange-300" />
-              AKS Property Listings
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-3 leading-tight">
-              Find Your Perfect
-              <br />
-              <span className="bg-gradient-to-r from-orange-300 to-amber-300 bg-clip-text text-transparent">
-                Home in AKS
-              </span>
-            </h1>
-            <p className="text-white/75 text-lg max-w-xl">
-              Browse hundreds of property listings for rent, sale, and short-let across Akwa Ibom State.
-            </p>
-          </div>
+        {/* ── Futuristic Header ── */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+           <div className="space-y-5 max-w-3xl">
+              <div className="flex items-center gap-3">
+                 <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-sm">
+                    <Building2 className="size-5 text-emerald-600" />
+                 </div>
+                 <Badge className="bg-emerald-600/10 text-emerald-600 border-none px-4 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-sm">
+                   Property Ledger V2.4
+                 </Badge>
+              </div>
+              <h1 className="text-5xl md:text-8xl font-black tracking-tightest text-slate-950 dark:text-white leading-none">
+                SHELTER<span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent italic">MATRIX</span>
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed max-w-xl">
+                 Verified real estate listings with integrated ARISE utility telemetry and AI-driven valuation.
+              </p>
+           </div>
+           
+           <div className="flex flex-col md:flex-row gap-4 items-center">
+              <div className="relative group w-full md:w-80">
+                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+                 <input 
+                    type="search" 
+                    placeholder="Search Metropolis..." 
+                    className="w-full pl-12 pr-4 h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl font-bold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                 />
+              </div>
+           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          {stats.map(({ label, value, icon: Icon }) => (
-            <div key={label} className="bg-white/70 backdrop-blur-md border border-white/80 rounded-2xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
-              <div className="size-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20 flex-shrink-0">
-                <Icon className="size-5 text-white" />
-              </div>
-              <div>
-                <p className="text-xl font-black text-slate-900">{value}</p>
-                <p className="text-xs text-slate-500 font-medium">{label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Search + Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="relative flex-1 max-w-lg">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-            <input
-              type="search"
-              placeholder="Search by location, property type..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/80 backdrop-blur border border-white/90 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 shadow-sm"
-            />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {propertyTypes.map((type) => (
-              <button
+        {/* ── Category Filters ── */}
+        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
+           {['All', 'Rent', 'Sale', 'Short-let'].map(type => (
+             <button 
                 key={type}
                 onClick={() => setActiveType(type)}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeType === type
-                    ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg shadow-green-500/25'
-                    : 'bg-white/70 text-slate-600 border border-white/80 hover:bg-white'
-                  }`}
-              >
+                className={cn(
+                  "px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all whitespace-nowrap border shadow-sm",
+                  activeType === type 
+                    ? "bg-slate-950 text-white border-slate-950 shadow-xl scale-105" 
+                    : "bg-white dark:bg-slate-900 text-slate-500 border-slate-100 dark:border-white/5 hover:bg-slate-50"
+                )}
+             >
                 {type}
-              </button>
-            ))}
-            <Button variant="outline" className="rounded-xl border-slate-200 font-bold gap-2 bg-white/70">
-              <SlidersHorizontal className="size-4" /> Filters
-            </Button>
-          </div>
+             </button>
+           ))}
         </div>
 
-        {/* Property Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* ── Listings Grid ── */}
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((listing) => {
             const image = PlaceHolderImages.find(img => img.id === listing.imageId);
             const badgeClass = typeColors[listing.type] || 'bg-slate-100 text-slate-700 border-slate-200';
+            
             return (
               <div
                 key={listing.id}
-                className="group bg-white/80 backdrop-blur-md border border-white/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-green-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col"
+                className="group relative bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-slate-100 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-xl hover:shadow-[0_40px_80px_-20px_rgba(16,185,129,0.15)] transition-all duration-700 hover:-translate-y-4 flex flex-col"
               >
-                <div className="relative h-52 w-full overflow-hidden">
-                  {image ? (
-                    <Image
-                      src={image.imageUrl} alt={listing.title} fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
-                      <Building2 className="size-16 text-white/20" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                  <div className="absolute top-3 right-3">
-                    <span className={`text-xs font-bold px-3 py-1 rounded-full border ${badgeClass}`}>
-                      {listing.type}
-                    </span>
-                  </div>
+                {/* Image Section */}
+                <div className="relative h-64 w-full overflow-hidden p-2">
+                   <div className="relative h-full w-full rounded-[2rem] overflow-hidden">
+                      {image ? (
+                        <Image
+                          src={image.imageUrl} alt={listing.title} fill
+                          className="object-cover transition-transform duration-[3000ms] group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="h-full bg-slate-950 flex items-center justify-center">
+                          <Building2 className="size-16 text-white/5" />
+                        </div>
+                      )}
+                      
+                      {/* Gradient Overlays */}
+                      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                      
+                      {/* Tags */}
+                      <div className="absolute top-4 left-4 flex gap-2">
+                         <Badge className={cn("border px-4 py-1.5 rounded-xl font-black uppercase text-[8px] tracking-widest shadow-2xl", badgeClass)}>
+                            {listing.type}
+                         </Badge>
+                         <Badge className="bg-emerald-500/20 text-emerald-400 backdrop-blur-xl border border-emerald-500/30 px-3 py-1.5 rounded-xl font-black uppercase text-[8px] tracking-widest shadow-2xl flex items-center gap-2">
+                            <Brain className="size-3" /> AI Fair-Val
+                         </Badge>
+                      </div>
+
+                      <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between text-white">
+                         <div className="flex items-center gap-1.5">
+                            <MapPin className="size-3.5 text-emerald-400" />
+                            <span className="font-black text-[10px] uppercase tracking-widest">Metropolitan Area</span>
+                         </div>
+                         <p className="font-black text-2xl tracking-tightest">{listing.price}</p>
+                      </div>
+                   </div>
                 </div>
 
-                <div className="p-5 flex-1 flex flex-col">
-                  <h3 className="font-black text-slate-900 text-base mb-1 leading-tight">{listing.title}</h3>
-                  <p className="text-2xl font-black text-green-700 mb-3">{listing.price}</p>
+                <div className="p-8 flex-1 flex flex-col space-y-6">
+                   <div className="space-y-2">
+                      <h3 className="font-black text-2xl text-slate-950 dark:text-white tracking-tight leading-tight group-hover:text-emerald-600 transition-colors">{listing.title}</h3>
+                      <div className="flex gap-4">
+                         <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-white/5">
+                            <Zap className="size-3 text-amber-500" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Power: Optimal</span>
+                         </div>
+                         <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-white/5">
+                            <Droplets className="size-3 text-blue-500" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">AQUA: Stable</span>
+                         </div>
+                      </div>
+                   </div>
 
-                  <div className="flex items-center gap-1.5 text-sm text-slate-500 mb-4">
-                    <MapPin className="size-3.5 text-orange-500 flex-shrink-0" />
-                    <span>Akwa Ibom State</span>
-                  </div>
+                   {listing.features && (
+                      <div className="grid grid-cols-3 gap-3">
+                         {[
+                            { icon: BedDouble, label: 'Beds', val: listing.features.beds, color: 'text-emerald-500' },
+                            { icon: Bath, label: 'Baths', val: listing.features.baths, color: 'text-orange-500' },
+                            { icon: Maximize, label: 'Sqft', val: listing.features.area, color: 'text-blue-500' }
+                         ].map(f => (
+                            <div key={f.label} className="bg-slate-50/50 dark:bg-slate-950/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5 flex flex-col items-center gap-1">
+                               <f.icon className={cn("size-4", f.color)} />
+                               <span className="text-sm font-black text-slate-900 dark:text-white">{f.val}</span>
+                               <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{f.label}</span>
+                            </div>
+                         ))}
+                      </div>
+                   )}
 
-                  {listing.features && (
-                    <div className="flex items-center gap-4 mb-4 text-xs text-slate-600 font-bold">
-                      {listing.features.beds && (
-                        <div className="flex items-center gap-1"><BedDouble className="size-3.5 text-green-600" /> {listing.features.beds} beds</div>
-                      )}
-                      {listing.features.baths && (
-                        <div className="flex items-center gap-1"><Bath className="size-3.5 text-orange-500" /> {listing.features.baths} baths</div>
-                      )}
-                      {listing.features.area && (
-                        <div className="flex items-center gap-1"><Maximize className="size-3.5 text-blue-500" /> {listing.features.area}</div>
-                      )}
-                    </div>
-                  )}
-
-                  <Button
-                    onClick={() => toast({ title: 'Coming Soon!', description: 'Full property details will be available shortly.' })}
-                    className="w-full mt-auto rounded-xl bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold shadow-md shadow-green-500/20 gap-2"
-                  >
-                    View Details <ChevronRight className="size-4" />
-                  </Button>
+                   <div className="pt-4 border-t border-slate-100 dark:border-white/10 mt-auto">
+                      <Button 
+                         onClick={() => toast({ title: 'Viewing Scheduled', description: 'Agent proximity established.' })}
+                         className="w-full h-16 rounded-2xl bg-slate-950 text-white font-black uppercase tracking-widest text-xs transition-all shadow-xl hover:bg-emerald-600 active:scale-[0.98] group/btn"
+                      >
+                         Access Full Dossier <ArrowRight className="size-4 ml-auto group-hover/btn:translate-x-1 transition-transform" />
+                      </Button>
+                   </div>
                 </div>
               </div>
             );
           })}
         </div>
-
-        {filtered.length === 0 && (
-          <div className="text-center py-20">
-            <Building2 className="size-16 text-slate-200 mx-auto mb-4" />
-            <p className="text-slate-400 font-medium">No properties found for your search.</p>
-          </div>
-        )}
       </div>
-    </div>
+    </main>
   );
 }
+

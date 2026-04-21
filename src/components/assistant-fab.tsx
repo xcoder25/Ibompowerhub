@@ -131,13 +131,13 @@ export function AssistantFAB({ onClick }: AssistantFABProps) {
             onTouchMove={(e) => handleDragMove(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchEnd={handleDragEnd}
             onClick={handleClick}
-            aria-label="AI Assistant"
+            aria-label="Orion AI Assistant"
           >
             {isInDismissZone ? <X className="h-7 w-7 text-white animate-in zoom-in" /> : <Sparkles className="h-7 w-7" />}
           </Button>
         </TooltipTrigger>
         <TooltipContent side="left">
-          <p>AI Assistant</p>
+          <p>Orion AI Assistant</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

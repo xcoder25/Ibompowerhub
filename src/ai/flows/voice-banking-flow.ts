@@ -4,42 +4,62 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const IntentSchema = z.object({
-    type: z.enum(['transfer', 'insight', 'unknown']).describe("Categorize the user's intent."),
+    type: z.enum(['transfer', 'insight', 'history', 'freeze_card', 'security', 'vaults', 'cards', 'greeting', 'balance', 'confirm', 'unknown']).describe("Categorize the user's intent."),
     amount: z.number().optional().describe("For transfers, the amount in numbers."),
     recipient: z.string().optional().describe("For transfers, who the money goes to."),
-    source: z.string().optional().describe("For transfers, where the money comes from (e.g. OWealth, balance)."),
-    insightCategory: z.string().optional().describe("For insights, what category of spending they are asking about (e.g. Fuel, Food)."),
-    sqlQuery: z.string().optional().describe("If type is insight, write a simulated SQL query to answer it. Format: SELECT SUM(amount) FROM transactions WHERE category = 'X' AND month = CURRENT_MONTH"),
-    insightAnswer: z.string().optional().describe("If type is insight, simulate an answer amount in Naira based on a safe guess or placeholder value like 45000."),
-    spokenResponse: z.string().describe("A conversational response acknowledging the action or giving the insight answer.")
+    recipientAccount: z.string().optional().describe("10 digit account number if provided."),
+    bank: z.string().optional().describe("Bank name if provided."),
+    source: z.string().optional().describe("For transfers, where the money comes from."),
+    insightCategory: z.string().optional().describe("For insights, what category of spending they are asking about."),
+    confirmationTarget: z.string().optional().describe("If the user is confirming something (yes/no), what are they confirming?"),
+    isConfirmed: z.boolean().optional().describe("Set to true if user says yes/proceed, false if cancel/no."),
+    spokenResponse: z.string().describe("A conversational, Gemini-style response.")
 });
 
 export type VoiceBankingIntent = z.infer<typeof IntentSchema>;
 
-const SYSTEM_PROMPT = `You are a dialect-aware Nigerian financial voice assistant. 
-You can understand English, Yoruba, Igbo, Hausa, and Pidgin.
-Extract the intent behind the user's spoken phrase.
+const SYSTEM_PROMPT = `You are Orion, a premium Gemini-powered financial assistant for Ibom PowerHub.
+You are conversational, intelligent, and dialect-aware (English, Pidgin, Yoruba, Igbo, Hausa).
+You represent the cutting edge of Nigerian Fintech.
 
-If they want to transfer money (e.g. "Abeg send 2k to my wife from my OWealth balance" or "send 500 naria to john"):
-- Set type="transfer", amount=2000, recipient="my wife", source="OWealth"
-- In spokenResponse, say something natural acknowledging the transfer intent and asking for voice-print confirmation.
+CONVERSATIONAL TONE:
+- Be warm but professional. Use "Boss", "Chairman", or "My Person" occasionally if the user uses Pidgin.
+- If the user is anxious about security, be extra calm and reassuring.
+- Use natural pauses and verbal fillers in spokenResponse to sound more human.
 
-If they want to know their spending (e.g. "how much did I spend on fuel this month?"):
-- Set type="insight", insightCategory="Fuel"
-- Create a sqlQuery like SELECT SUM(amount) FROM transactions WHERE category = 'Fuel' AND month = CURRENT_MONTH
-- Set insightAnswer to a random plausible amount like "₦45,000"
-- In spokenResponse, say: "You have spent X on Y this month."
+MODERN BANKING INTENTS:
+1. TRANSFER: "Send 2k to 0123456789 Zenith" -> type: "transfer", amount: 2000, recipientAccount: "0123456789", bank: "Zenith".
+2. HISTORY: "Show my logs" or "What did I buy?" -> type: "history".
+3. BALANCE: "How much do I have?" or "Abeg check my money" -> type: "balance".
+4. CONFIRM: "Yes do it", "Go ahead", "Cancel it", "No" -> type: "confirm", isConfirmed: true/false.
+5. FREEZE: "Lock my card" -> type: "freeze_card".
+6. SECURITY: "How safe am I?" -> type: "security".
+7. VAULTS: "Check my savings" -> type: "vaults".
 
-If you can't understand the intent, set type="unknown" and ask them to repeat.
-Respond strictly in valid JSON matching the schema.`;
+MULTI-TURN LOGIC:
+- If the previous context shows we asked for confirmation, and the user says "Yes", set type to "confirm" and isConfirmed: true.
+- If they provide missing info (like the bank name), update the intent.
 
-export async function processVoiceBankingIntent(transcript: string): Promise<VoiceBankingIntent> {
+Guidelines for spokenResponse:
+- For transfers: Acknowledge details. (e.g., "Got it. ₦2,000 to Zenith. Oya, give me the go-ahead and I'll fire it.")
+- For Pidgin users: "No wahala, I don see the 10k. Make I send am?"
+- For security: "Scanning neural mesh... ARISE Shield is 98.2% stable. You are secure."
+- Respond strictly in valid JSON matching the schema.`;
+
+export async function processVoiceBankingIntent(transcript: string, history?: any): Promise<VoiceBankingIntent> {
     try {
+        const messages: any[] = [
+            { role: 'system', content: [{ text: SYSTEM_PROMPT }] }
+        ];
+
+        if (history) {
+            messages.push({ role: 'user', content: [{ text: `Previous Context: ${JSON.stringify(history)}` }] });
+        }
+
+        messages.push({ role: 'user', content: [{ text: transcript }] });
+
         const result = await ai.generate({
-            messages: [
-                { role: 'system', content: [{ text: SYSTEM_PROMPT }] },
-                { role: 'user', content: [{ text: transcript }] },
-            ],
+            messages,
             output: { schema: IntentSchema }
         });
 

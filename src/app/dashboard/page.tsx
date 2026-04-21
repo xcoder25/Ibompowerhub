@@ -112,19 +112,21 @@ function getTimeGreeting() {
 }
 
 const services = [
-  { id: 'government', title: 'Government', icon: Building2, href: '/government', color: 'from-green-500/20 to-green-600/10', iconColor: 'text-green-700', borderColor: 'border-green-200/60' },
-  { id: 'health', title: 'Health', icon: HeartPulse, href: '/health', color: 'from-rose-500/20 to-rose-600/10', iconColor: 'text-rose-600', borderColor: 'border-rose-200/60' },
-  { id: 'education', title: 'Education', icon: GraduationCap, href: '/education', color: 'from-emerald-500/20 to-emerald-600/10', iconColor: 'text-emerald-600', borderColor: 'border-emerald-200/60' },
-  { id: 'flights', title: 'Flights', icon: Plane, href: '/flights', color: 'from-indigo-500/20 to-indigo-600/10', iconColor: 'text-indigo-600', borderColor: 'border-indigo-200/60' },
-  { id: 'market', title: 'Market', icon: ShoppingBag, href: '/market', color: 'from-teal-500/20 to-teal-600/10', iconColor: 'text-teal-600', borderColor: 'border-teal-200/60' },
-  { id: 'home-x', title: 'Home-x', icon: Home, href: '/home-x', color: 'from-blue-500/20 to-blue-600/10', iconColor: 'text-blue-600', borderColor: 'border-blue-200/60' },
+  { id: 'government', title: 'Gov Nexus', icon: Building2, href: '/government', color: 'from-blue-600/20 to-blue-700/10', iconColor: 'text-blue-700', borderColor: 'border-blue-200/60' },
+  { id: 'health', title: 'Bio-Matrix', icon: HeartPulse, href: '/health', color: 'from-rose-500/20 to-rose-600/10', iconColor: 'text-rose-600', borderColor: 'border-rose-200/60' },
+  { id: 'education', title: 'Learn Matrix', icon: GraduationCap, href: '/education', color: 'from-orange-500/20 to-orange-600/10', iconColor: 'text-orange-600', borderColor: 'border-orange-200/60' },
+  { id: 'access', title: 'Shield Gate', icon: ShieldCheck, href: '/access', color: 'from-indigo-600/20 to-indigo-700/10', iconColor: 'text-indigo-600', borderColor: 'border-indigo-200/60' },
+  { id: 'power', title: 'Grid Master', icon: Zap, href: '/power', color: 'from-amber-500/20 to-amber-600/10', iconColor: 'text-amber-600', borderColor: 'border-amber-200/60' },
+  { id: 'voting', title: 'Civil Ledger', icon: Vote, href: '/voting', color: 'from-purple-500/20 to-purple-600/10', iconColor: 'text-purple-600', borderColor: 'border-purple-200/60' },
+  { id: 'property', title: 'Real Estate', icon: Home, href: '/property', color: 'from-emerald-500/20 to-emerald-600/10', iconColor: 'text-emerald-600', borderColor: 'border-emerald-200/60' },
+  { id: 'forums', title: 'Townhall', icon: MessageSquare, href: '/forums', color: 'from-slate-500/20 to-slate-600/10', iconColor: 'text-slate-600', borderColor: 'border-slate-200/60' },
 ];
 
 const stats = [
-  { label: 'Active Services', value: 12, icon: Zap, color: 'text-green-700', bg: 'bg-green-500/15', progress: 80 },
-  { label: 'Notifications', value: 5, icon: Bell, color: 'text-amber-600', bg: 'bg-amber-500/15', progress: 25 },
-  { label: 'Completed Tasks', value: 28, icon: Award, color: 'text-emerald-600', bg: 'bg-emerald-500/15', progress: 70 },
-  { label: 'Community Score', value: '92%', icon: TrendingUp, color: 'text-teal-600', bg: 'bg-teal-500/15', progress: 92 },
+  { label: 'Grid Resonance', value: '49.8Hz', icon: Zap, color: 'text-amber-600', bg: 'bg-amber-500/15', progress: 98 },
+  { label: 'State Security', value: 'OPTIMAL', icon: ShieldCheck, color: 'text-indigo-600', bg: 'bg-indigo-500/15', progress: 100 },
+  { label: 'Civil Trust', value: '94%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-500/15', progress: 94 },
+  { label: 'Neural Sync', value: 'ACTIVE', icon: Brain, color: 'text-blue-600', bg: 'bg-blue-500/15', progress: 87 },
 ];
 
 type LiveTransaction = {
@@ -632,6 +634,74 @@ export default function DashboardPage() {
         </Card>
 
 
+
+        {/* ── Status Matrix ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+           {/* Orion State Briefing */}
+           <Card className="bg-indigo-950 border-none rounded-3xl overflow-hidden shadow-2xl relative group h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent" />
+              <div className="p-8 relative z-10 space-y-6 flex flex-col h-full">
+                 <div className="flex items-center justify-between">
+                    <div className="size-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-xl border border-white/10 group-hover:scale-110 transition-transform">
+                       <Brain className="size-7 text-blue-400" />
+                    </div>
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-none font-black uppercase text-[9px] tracking-widest px-3 py-1">Neural Active</Badge>
+                 </div>
+                 <div className="space-y-4">
+                    <h3 className="text-white font-black text-2xl tracking-tighter uppercase leading-none italic">"Emedi! All systems are optimal for Sector IV today."</h3>
+                    <p className="text-white/60 text-sm font-medium leading-relaxed">
+                       Grid capacity is at 84%. Your gate pass ARISE-9024 is pre-verified for your evening entry.
+                    </p>
+                 </div>
+                 <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
+                     <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Personalized Insights</p>
+                     <Button variant="ghost" size="sm" className="h-8 text-[9px] font-black uppercase tracking-widest text-white hover:bg-white/10">Full Forecase</Button>
+                 </div>
+              </div>
+              <div className="absolute top-[-20%] right-[-10%] size-64 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
+           </Card>
+
+           {/* Telemetry Snapshot */}
+           <Card className="lg:col-span-2 bg-white dark:bg-slate-900 border-none shadow-2xl rounded-3xl overflow-hidden p-0 relative h-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 h-full">
+                 <div className="p-8 space-y-8 border-r border-slate-100 dark:border-white/5">
+                    <div className="flex items-center gap-3">
+                       <Zap className="size-5 text-amber-500 animate-pulse" />
+                       <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter text-xl">GRID LOGISTICS</h4>
+                    </div>
+                    <div className="space-y-6">
+                       {[{ area: 'Shelter Afrique', status: 'Optimal', load: '12MW' }, { area: 'Uyo Metropolis', status: 'Maintenance', load: '4MW' }].map(node => (
+                          <div key={node.area} className="flex items-center justify-between">
+                             <span className="text-slate-500 font-bold text-xs">{node.area}</span>
+                             <div className="flex items-center gap-3">
+                                <span className="text-xs font-black text-slate-900 dark:text-white">{node.load}</span>
+                                <div className={cn("size-2 rounded-full", node.status === 'Optimal' ? "bg-emerald-500" : "bg-amber-500")} />
+                             </div>
+                          </div>
+                       ))}
+                    </div>
+                 </div>
+                 <div className="p-8 space-y-8 bg-slate-50/50 dark:bg-slate-950/50">
+                    <div className="flex items-center gap-3">
+                       <ShieldCheck className="size-5 text-indigo-500" />
+                       <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter text-xl">SECURE ACCESS</h4>
+                    </div>
+                    <div className="space-y-4">
+                       <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                             <div className="size-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500"><Scan className="size-4" /></div>
+                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">ID Sync</p>
+                          </div>
+                          <p className="font-black text-xs text-indigo-500 uppercase tracking-widest">Pre-Verified</p>
+                       </div>
+                       <Link href="/access" className="block">
+                          <Button className="w-full h-12 rounded-xl bg-slate-950 text-white hover:bg-indigo-600 transition-all font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-indigo-500/20">Initialize Gate Sync</Button>
+                       </Link>
+                    </div>
+                 </div>
+              </div>
+           </Card>
+        </div>
 
         {/* Advanced Voice Banking Edge Widget */}
         <div className="mb-10">

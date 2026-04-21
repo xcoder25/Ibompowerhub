@@ -25,8 +25,8 @@ type Message = {
     isStreaming?: boolean;
 };
 
-// Quick-start prompts for NOVA
-const NOVA_STARTERS = [
+// Quick-start prompts for Orion
+const ORION_STARTERS = [
   { label: '💸 How do I AirSend?', q: 'How do I use AirSend to send money?' },
   { label: '🏛 Government services', q: 'What government services are available?' },
   { label: '🛡 Verify my KYC', q: 'How do I complete my KYC verification?' },
@@ -127,13 +127,13 @@ export function AssistantWidget() {
                             </div>
                             <div>
                                 <div className="flex items-center gap-1.5">
-                                    <CardTitle className="font-black text-base uppercase tracking-widest text-white">NOVA</CardTitle>
+                                    <CardTitle className="font-black text-base uppercase tracking-widest text-white">Orion</CardTitle>
                                     <Badge className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5">
                                         Super AI
                                     </Badge>
                                 </div>
                                 <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5 flex items-center gap-1">
-                                    <Cpu className="size-2.5 text-indigo-400" /> HiAI · Gemini Powered
+                                    <Cpu className="size-2.5 text-indigo-400" /> Orion AI · Gemini Powered
                                 </p>
                             </div>
                         </div>
@@ -146,7 +146,7 @@ export function AssistantWidget() {
                         <div className="px-5 pt-3 pb-2 border-b bg-white dark:bg-slate-950">
                             <TabsList className="grid w-full grid-cols-2 rounded-xl p-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-inner">
                                 <TabsTrigger value="chat" className="rounded-lg font-bold text-xs uppercase tracking-widest data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
-                                    <Brain className="size-3 mr-1.5" /> NOVA Chat
+                                    <Brain className="size-3 mr-1.5" /> Orion Chat
                                 </TabsTrigger>
                                 <TabsTrigger value="ibibio" className="rounded-lg font-bold text-xs flex items-center gap-1.5 uppercase tracking-widest">
                                     <Languages className="w-3.5 h-3.5" /> Ibibio
@@ -166,11 +166,11 @@ export function AssistantWidget() {
                                             </div>
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-1">Emedi! I'm NOVA</h3>
+                                            <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-1">Emedi! I'm Orion</h3>
                                             <p className="text-sm text-slate-500 max-w-[220px] leading-relaxed font-medium">Your Super AI for all things Ibom PowerHub. Ask me anything!</p>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2 w-full mt-1">
-                                            {NOVA_STARTERS.map(s => (
+                                            {ORION_STARTERS.map(s => (
                                                 <button key={s.q} onClick={() => handleSendMessage(null, s.q)}
                                                     className="text-left px-3 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors text-[10px] font-bold text-slate-600 dark:text-slate-300 leading-snug hover:bg-indigo-50 dark:hover:bg-indigo-950/30">
                                                     {s.label}
@@ -236,7 +236,7 @@ export function AssistantWidget() {
                                         <Input
                                             value={input}
                                             onChange={(e) => setInput(e.target.value)}
-                                            placeholder="Ask NOVA anything..."
+                                            placeholder="Ask Orion anything..."
                                             className="w-full rounded-full bg-slate-100 dark:bg-slate-900/50 border-transparent shadow-inner focus:bg-white dark:focus:bg-slate-900 h-12 pl-5 pr-12 font-medium transition-all focus-visible:ring-1 focus-visible:ring-indigo-500/50"
                                             disabled={isLoading}
                                         />
@@ -254,7 +254,7 @@ export function AssistantWidget() {
                             <div className="space-y-6 w-full flex-1 flex flex-col pb-4">
                                 <div className="text-center space-y-2">
                                     <Badge className="bg-primary/10 text-primary border-none pointer-events-none tracking-widest uppercase font-black text-[9px]">Tonal Translator Active</Badge>
-                                    <p className="text-xs font-medium text-slate-500 px-6">Press the mic and speak in English. NOVA will generate the Ibibio tonal translation.</p>
+                                    <p className="text-xs font-medium text-slate-500 px-6">Press the mic and speak in English. Orion will generate the Ibibio tonal translation.</p>
                                 </div>
                                 <div className="flex-1 flex flex-col items-center justify-center space-y-8">
                                     <div className="relative group flex justify-center w-full">

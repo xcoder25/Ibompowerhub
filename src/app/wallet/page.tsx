@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { processVoiceBankingIntent } from '@/ai/flows/voice-banking-flow';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,7 +48,9 @@ import {
   Terminal,
   Clock,
   Shield,
-  Activity
+  Activity,
+  Brain,
+  Mic
 } from 'lucide-react';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, updateDoc, where, getDocs } from 'firebase/firestore';
@@ -117,6 +120,39 @@ type KycData = {
   faceVerified?: boolean;
 };
 
+// Orion SuperAI Engine (Wallet Edition) ───────────────────────────────────
+const OrionAIEngine = {
+  getFinancialHealth(balance: number, txns: any[]) {
+    const savingsRate = Math.min(100, (balance / 500000) * 100);
+    const riskIndex = txns.length > 10 ? 12 : 5;
+    return {
+      score: Math.round(75 + (balance / 100000)),
+      savingsRate: Math.round(savingsRate),
+      riskIndex,
+      status: balance > 50000 ? 'EXCELLENT' : 'STABLE'
+    };
+  }
+};
+
+const OrionVoice = {
+  speak(text: string, urgent = false, onDone?: () => void) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    const best = voices.find(v => v.name.toLowerCase().includes('female') || v.name.includes('Aria'))
+      || voices.find(v => v.lang.startsWith('en')) || null;
+    if (best) utt.voice = best;
+    utt.pitch = urgent ? 0.9 : 1.1;
+    utt.rate = 1.0;
+    utt.onend = () => { if (onDone) onDone(); };
+    window.speechSynthesis.speak(utt);
+  },
+  isSpeaking() {
+    return typeof window !== 'undefined' && window.speechSynthesis.speaking;
+  }
+};
+
 export default function WalletPage() {
   const { user } = useUser();
   const firestore = useFirestore();
@@ -169,6 +205,14 @@ export default function WalletPage() {
   const [newVaultName, setNewVaultName] = useState('');
   const [newVaultTarget, setNewVaultTarget] = useState('');
   const [isCreatingVault, setIsCreatingVault] = useState(false);
+  const [orionListening, setOrionListening] = useState(false);
+  const [orionThinking, setOrionThinking] = useState(false);
+  const [orionMessage, setOrionMessage] = useState('');
+  const [orionContext, setOrionContext] = useState<{ task: string; data: any } | null>(null);
+  const [voiceFocus, setVoiceFocus] = useState<'amount' | 'account' | 'bank' | null>(null);
+
+  const recognitionInstance = useRef<any>(null);
+
 
   const [topUpVaultId, setTopUpVaultId] = useState<string | null>(null);
   const [vaultTopUpAmount, setVaultTopUpAmount] = useState('');
@@ -194,6 +238,20 @@ export default function WalletPage() {
     kycData.identityVerified &&
     kycData.addressVerified &&
     kycData.faceVerified;
+
+  // ── Proactive AI Briefing ──
+  useEffect(() => {
+    if (isUnlocked && !isLoading && walletData) {
+      const timer = setTimeout(() => {
+        const health = OrionAIEngine.getFinancialHealth(walletData.balance, transactions);
+        const greeting = `Welcome back. ARISE Shield v2.0 is at peak efficiency. Your financial health score is ${health.score}. I have optimized your saving protocols for today.`;
+        OrionVoice.speak(greeting);
+        setOrionMessage(greeting);
+        setTimeout(() => setOrionMessage(''), 10000);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isUnlocked, isLoading, !!walletData]);
 
   // Load Paystack script
   useEffect(() => {
@@ -841,10 +899,157 @@ export default function WalletPage() {
   const balance = walletData?.balance || 0;
   const currency = walletData?.currency || 'NGN';
 
+  // ── Orion Voice Banking Logic ──
+  const startVoiceBanking = () => {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      toast({ variant: 'destructive', title: 'Not Supported', description: 'Voice recognition not available.' });
+      return;
+    }
+
+    const recognition = new SpeechRec();
+    recognitionInstance.current = recognition;
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      setOrionListening(true);
+      setOrionThinking(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      if (OrionVoice.isSpeaking()) return;
+
+      const results = event.results;
+      const latest = results[results.length - 1];
+      const transcript = Array.from(results)
+        .map((result: any) => result[0].transcript)
+        .join('').toLowerCase();
+      
+      setOrionMessage(transcript);
+
+      // ── Interim Real-time Feedback ──
+      const partialNumbers = transcript.match(/\d+/g);
+      if (partialNumbers) {
+         const latestNum = partialNumbers[partialNumbers.length - 1];
+
+         if (voiceFocus === 'account' || latestNum.length === 10) {
+            setRecipientAccount(latestNum);
+            if (latestNum.length === 10) setVoiceFocus('bank');
+         } else if (voiceFocus === 'amount' || (latestNum.length < 10 && !voiceFocus)) {
+            setTransferAmount(latestNum);
+            setAmount(latestNum);
+         }
+      }
+
+      // ── Final Processing ──
+      if (latest.isFinal) {
+        setOrionThinking(false);
+        processConversationalAI(transcript);
+      }
+    };
+
+    const processConversationalAI = async (cmd: string) => {
+      const nextTurn = () => {
+        try { recognition.start(); } catch (e) { /* already started */ }
+      };
+
+      setOrionThinking(true);
+      
+      try {
+        // ── Gemini Neural Integration ──
+        const aiResponse = await processVoiceBankingIntent(cmd, orionContext);
+        setOrionThinking(false);
+
+        // 1. Handle AI Generated Confirmation Intents (The AI now decides if "yes" or "no" was intended)
+        if (aiResponse.type === 'confirm') {
+           if (aiResponse.isConfirmed && orionContext?.task === 'transfer_confirm') {
+              OrionVoice.speak(aiResponse.spokenResponse || 'Transmission sequence active. Executing neural settlement.');
+              setOrionContext(null);
+              setTimeout(() => {
+                performSimulatedTransfer();
+                (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+              }, 1500);
+           } else {
+              OrionVoice.speak(aiResponse.spokenResponse || 'Transaction held. Link cleared.');
+              setOrionContext(null);
+           }
+           return;
+        }
+
+        // 2. Handle AI Generated Primary Intents
+        if (aiResponse.type !== 'unknown') {
+          if (aiResponse.type !== 'confirm') {
+             OrionVoice.speak(aiResponse.spokenResponse, false, nextTurn);
+          }
+
+          if (aiResponse.type === 'transfer') {
+            if (aiResponse.amount) { setAmount(aiResponse.amount.toString()); setTransferAmount(aiResponse.amount.toString()); }
+            if (aiResponse.recipientAccount) { setRecipientAccount(aiResponse.recipientAccount); }
+            if (aiResponse.bank) { setRecipientBank(aiResponse.bank === 'ibom x' ? 'ibomx' : aiResponse.bank.toLowerCase()); }
+            
+            (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+            setOrionContext({ task: 'transfer', data: aiResponse });
+            
+            if (!aiResponse.amount) setVoiceFocus('amount');
+            else if (!aiResponse.recipientAccount) setVoiceFocus('account');
+            else if (!aiResponse.bank) setVoiceFocus('bank');
+            else setOrionContext({ task: 'transfer_confirm', data: aiResponse });
+          } 
+          else if (aiResponse.type === 'history') (document.querySelector('[value="history"]') as HTMLElement)?.click();
+          else if (aiResponse.type === 'freeze_card') toggleCardFreeze();
+          else if (aiResponse.type === 'security') (document.querySelector('[value="security"]') as HTMLElement)?.click();
+          else if (aiResponse.type === 'vaults') (document.querySelector('[value="vaults"]') as HTMLElement)?.click();
+          else if (aiResponse.type === 'cards') (document.querySelector('[value="cards"]') as HTMLElement)?.click();
+          else if (aiResponse.type === 'balance') {
+             setIsBalanceVisible(true);
+             OrionVoice.speak(aiResponse.spokenResponse);
+          }
+          
+          return;
+        }
+      } catch (err) {
+        console.error("Gemini failed:", err);
+      }
+
+      setOrionThinking(false);
+      OrionVoice.speak('Neural link steady. Is there anything else you need across the Ibom network?', false, nextTurn);
+      setTimeout(() => setOrionMessage(''), 8000);
+    };
+
+    recognition.onerror = (e: any) => { 
+      if (e.error === 'no-speech') {
+        // Just silent, wait for user
+        return;
+      }
+      if (e.error === 'network') {
+        OrionVoice.speak('Neural link lost. Attempting to stabilize protocol.');
+        setOrionThinking(false);
+        setTimeout(() => { if (orionContext) recognition.start(); }, 3000);
+      } else {
+        setOrionListening(false); 
+        setOrionThinking(false); 
+      }
+    };
+
+    recognition.onend = () => { 
+      // Auto-restart if we are in the middle of a vital task and just "ended" due to silence
+      if (orionContext) {
+        setTimeout(() => {
+          try { recognition.start(); } catch (err) { /* ignore */ }
+        }, 300);
+      } else {
+        setOrionListening(false); 
+        setOrionThinking(false); 
+      }
+    };
+    recognition.start();
+  };
+
   return (
     <>
       {!isUnlocked && <WalletLock onUnlock={handleUnlock} />}
-      <main className="min-h-screen bg-[#f0f2f7] dark:bg-[#060810] pb-32 relative overflow-x-hidden">
+      <main className="min-h-screen bg-[#f0f2f7] dark:bg-[#060810] pb-32 relative overflow-hidden">
         {/* Premium layered background */}
         <div className="fixed inset-0 bg-[#f0f2f7] dark:bg-[#060810] z-0" />
         <div className="fixed top-0 left-0 right-0 h-72 bg-gradient-to-b from-emerald-600 to-transparent opacity-[0.07] dark:opacity-[0.12] z-0" />
@@ -1203,7 +1408,7 @@ export default function WalletPage() {
                         <Input
                           id="recipient-account-input"
                           placeholder="RECIPIENT ACCOUNT"
-                          className="h-14 sm:h-20 rounded-2xl sm:rounded-3xl bg-slate-50/50 border-none focus:bg-white font-mono text-lg sm:text-2xl tracking-[0.1em] sm:tracking-[0.2em] px-6 sm:px-8 shadow-inner"
+                          className={`h-14 sm:h-20 rounded-2xl sm:rounded-3xl bg-slate-50/50 border-none focus:bg-white font-mono text-lg sm:text-2xl tracking-[0.1em] sm:tracking-[0.2em] px-6 sm:px-8 shadow-inner ${voiceFocus === 'account' ? 'ring-2 ring-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : ''}`}
                           value={recipientAccount}
                           onChange={(e) => setRecipientAccount(e.target.value)}
                         />
@@ -1214,7 +1419,7 @@ export default function WalletPage() {
                         <div className="space-y-3 sm:space-y-4">
                           <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Gateway</Label>
                           <Select value={recipientBank} onValueChange={setRecipientBank}>
-                            <SelectTrigger className="h-14 sm:h-16 rounded-2xl border-none bg-slate-50/50 font-black uppercase text-[9px] sm:text-[10px] tracking-widest px-3 sm:px-6 shadow-inner">
+                            <SelectTrigger className={`h-14 sm:h-16 rounded-2xl border-none bg-slate-50/50 font-black uppercase text-[9px] sm:text-[10px] tracking-widest px-3 sm:px-6 shadow-inner ${voiceFocus === 'bank' ? 'ring-2 ring-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : ''}`}>
                               <SelectValue placeholder="GATEWAY" />
                             </SelectTrigger>
                             <SelectContent className="rounded-2xl border-none shadow-2xl">
@@ -1233,7 +1438,7 @@ export default function WalletPage() {
                             <Input
                               type="number"
                               placeholder="0.00"
-                              className="h-14 sm:h-16 pl-8 sm:pl-10 rounded-2xl border-none bg-slate-50/50 font-black text-lg sm:text-xl shadow-inner focus:bg-white transition-all"
+                              className={`h-14 sm:h-16 pl-8 sm:pl-10 rounded-2xl border-none bg-slate-50/50 font-black text-lg sm:text-xl shadow-inner focus:bg-white transition-all ${voiceFocus === 'amount' ? 'ring-2 ring-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : ''}`}
                               value={transferAmount}
                               onChange={(e) => setTransferAmount(e.target.value)}
                             />
@@ -1369,73 +1574,128 @@ export default function WalletPage() {
             </TabsContent>
 
             <TabsContent value="vaults" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700 w-full max-w-full overflow-hidden">
-              <div className="flex items-center justify-between px-2">
-                <div className="space-y-1">
-                  <h3 className="text-3xl font-black tracking-tighter">Strategic Vaults</h3>
-                  <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Target-Based Wealth Preservation</p>
-                </div>
-                <Button onClick={() => setIsCreateVaultOpen(true)} className="size-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-600/20 active:scale-90 transition-all">
-                  <Plus className="size-8" />
-                </Button>
-              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                 <div className="lg:col-span-2 space-y-10">
+                    <div className="flex items-center justify-between px-2">
+                      <div className="space-y-1">
+                        <h3 className="text-3xl font-black tracking-tighter">Strategic Vaults</h3>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Target-Based Wealth Preservation</p>
+                      </div>
+                      <Button onClick={() => setIsCreateVaultOpen(true)} className="size-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-600/20 active:scale-90 transition-all">
+                        <Plus className="size-8" />
+                      </Button>
+                    </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 min-w-0">
-                {vaults.map((vault, idx) => {
-                  const percentage = Math.min(100, Math.round((vault.currentAmount / vault.targetAmount) * 100));
-                  return (
-                    <Card key={vault.id} className="group relative border-none shadow-lg sm:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] hover:shadow-2xl transition-all duration-700 rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${idx * 100}ms` }}>
-                      <CardContent className="p-6 sm:p-8 space-y-6 sm:space-y-8">
-                        <div className="flex justify-between items-start">
-                          <div className="space-y-1 sm:space-y-2 min-w-0 pr-2">
-                            <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1.5 rounded-xl uppercase text-[9px] tracking-widest shadow-sm truncate">
-                              ID: {vault.id.slice(0, 8).toUpperCase()}
-                            </Badge>
-                            <CardTitle className="text-2xl sm:text-3xl font-black tracking-tightest leading-none truncate">{vault.name}</CardTitle>
-                          </div>
-                          <div className="size-12 sm:size-16 shrink-0 bg-slate-50 dark:bg-emerald-950 rounded-xl sm:rounded-[1.5rem] flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform duration-500">
-                            <PiggyBank className="size-6 sm:size-8 text-emerald-500" />
-                          </div>
-                        </div>
-
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-end">
-                            <div className="space-y-1 min-w-0 overflow-hidden">
-                              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Preserved Capital</p>
-                              <h4 className="text-2xl sm:text-4xl font-black font-mono tracking-tight text-slate-950 dark:text-white truncate">₦{vault.currentAmount.toLocaleString()}</h4>
-                            </div>
-                            <div className="flex flex-col items-end">
-                              <span className="text-lg font-black text-emerald-500">₦{vault.targetAmount.toLocaleString()}</span>
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Objective</span>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="h-4 w-full bg-slate-100 dark:bg-emerald-950 rounded-full overflow-hidden p-1 shadow-inner">
-                              <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-[2000ms] shadow-lg shadow-emerald-500/40 relative overflow-hidden" style={{ width: `${percentage}%` }}>
-                                <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 min-w-0">
+                      {vaults.map((vault, idx) => {
+                        const percentage = Math.min(100, Math.round((vault.currentAmount / vault.targetAmount) * 100));
+                        return (
+                          <Card key={vault.id} className="group relative border-none shadow-lg sm:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] hover:shadow-2xl transition-all duration-700 rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${idx * 100}ms` }}>
+                            <CardContent className="p-6 sm:p-8 space-y-6 sm:space-y-8">
+                              <div className="flex justify-between items-start">
+                                <div className="space-y-1 sm:space-y-2 min-w-0 pr-2">
+                                  <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1.5 rounded-xl uppercase text-[9px] tracking-widest shadow-sm truncate">
+                                    ID: {vault.id.slice(0, 8).toUpperCase()}
+                                  </Badge>
+                                  <CardTitle className="text-2xl sm:text-3xl font-black tracking-tightest leading-none truncate">{vault.name}</CardTitle>
+                                </div>
+                                <div className="size-12 sm:size-16 shrink-0 bg-slate-50 dark:bg-emerald-950 rounded-xl sm:rounded-[1.5rem] flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform duration-500">
+                                  <PiggyBank className="size-6 sm:size-8 text-emerald-500" />
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
-                              <span>Stabilization Status</span>
-                              <span className="text-emerald-500">{percentage}% Collateralized</span>
-                            </div>
+
+                              <div className="space-y-4">
+                                <div className="flex justify-between items-end">
+                                  <div className="space-y-1 min-w-0 overflow-hidden">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Preserved Capital</p>
+                                    <h4 className="text-2xl sm:text-4xl font-black font-mono tracking-tight text-slate-950 dark:text-white truncate">₦{vault.currentAmount.toLocaleString()}</h4>
+                                  </div>
+                                  <div className="flex flex-col items-end">
+                                    <span className="text-lg font-black text-emerald-500">₦{vault.targetAmount.toLocaleString()}</span>
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Objective</span>
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  <div className="h-4 w-full bg-slate-100 dark:bg-emerald-950 rounded-full overflow-hidden p-1 shadow-inner">
+                                    <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-[2000ms] shadow-lg shadow-emerald-500/40 relative overflow-hidden" style={{ width: `${percentage}%` }}>
+                                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                                    </div>
+                                  </div>
+                                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                    <span>Stabilization Status</span>
+                                    <span className="text-emerald-500">{percentage}% Collateralized</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <Button onClick={() => setTopUpVaultId(vault.id)} className="w-full h-18 rounded-2xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase text-xs tracking-[0.2em] shadow-2xl active:scale-95 py-6">
+                                <Zap className="mr-3 size-5" /> Injection Protocol
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+
+                      <Card onClick={() => setIsCreateVaultOpen(true)} className="border-2 border-dashed border-slate-200 dark:border-slate-800 shadow-none rounded-[2.5rem] bg-transparent flex flex-col items-center justify-center p-12 text-center min-h-[300px] hover:bg-white dark:hover:bg-slate-900/50 hover:border-emerald-500 transition-all cursor-pointer group hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${vaults.length * 100}ms` }}>
+                        <div className="size-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-inner">
+                          <PiggyBank className="size-10 text-slate-300 group-hover:text-white" />
+                        </div>
+                        <h3 className="text-2xl font-black tracking-tightest mb-2 group-hover:text-emerald-500 transition-colors">INITIATE VAULT</h3>
+                        <p className="text-sm text-slate-400 font-medium max-w-[220px]">Deploy a new capital reservation protocol for enhanced financial autonomy.</p>
+                      </Card>
+                    </div>
+                 </div>
+
+                 <div className="space-y-8">
+                    <div className="space-y-1 px-2">
+                      <h3 className="text-3xl font-black tracking-tighter">Orion Intelligence</h3>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Financial Health Analytics</p>
+                    </div>
+                    
+                    <Card className="border-none shadow-2xl rounded-[2.5rem] bg-slate-950 p-8 text-white relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent" />
+                      <div className="relative z-10 space-y-6">
+                        <div className="flex items-center justify-between">
+                          <Badge className="bg-indigo-500/20 text-indigo-400 border-none font-black px-4 py-1 rounded-xl uppercase text-[9px] tracking-widest">Neural Mode</Badge>
+                          <Brain className="size-8 text-indigo-400 animate-pulse" />
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Asset Health Index</p>
+                          <div className="flex items-end gap-2">
+                             <h4 className="text-6xl font-black tracking-tightest leading-none">{OrionAIEngine.getFinancialHealth(balance, transactions).score}</h4>
+                             <TrendingUp className="size-6 text-emerald-500 mb-1" />
                           </div>
                         </div>
 
-                        <Button onClick={() => setTopUpVaultId(vault.id)} className="w-full h-18 rounded-2xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase text-xs tracking-[0.2em] shadow-2xl active:scale-95 py-6">
-                          <Zap className="mr-3 size-5" /> Injection Protocol
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                        <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-1 p-4 rounded-2xl bg-white/5 border border-white/5">
+                              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Savings Rate</p>
+                              <p className="text-lg font-black">{OrionAIEngine.getFinancialHealth(balance, transactions).savingsRate}%</p>
+                           </div>
+                           <div className="space-y-1 p-4 rounded-2xl bg-white/5 border border-white/5">
+                              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Risk Index</p>
+                              <p className="text-lg font-black text-emerald-500">LOW</p>
+                           </div>
+                        </div>
 
-                <Card onClick={() => setIsCreateVaultOpen(true)} className="border-2 border-dashed border-slate-200 dark:border-slate-800 shadow-none rounded-[2.5rem] bg-transparent flex flex-col items-center justify-center p-12 text-center min-h-[300px] hover:bg-white dark:hover:bg-slate-900/50 hover:border-emerald-500 transition-all cursor-pointer group hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${vaults.length * 100}ms` }}>
-                  <div className="size-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-inner">
-                    <PiggyBank className="size-10 text-slate-300 group-hover:text-white" />
-                  </div>
-                  <h3 className="text-2xl font-black tracking-tightest mb-2 group-hover:text-emerald-500 transition-colors">INITIATE VAULT</h3>
-                  <p className="text-sm text-slate-400 font-medium max-w-[220px]">Deploy a new capital reservation protocol for enhanced financial autonomy.</p>
-                </Card>
+                        <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                           <p className="text-xs font-medium text-slate-300 italic leading-relaxed">
+                              "Orion suggests increasing your target for 'Emergency' vault by 12% to reach stability before Q3."
+                           </p>
+                        </div>
+                      </div>
+                    </Card>
+
+                    <Card className="border-none shadow-lg rounded-[2.5rem] bg-white dark:bg-slate-900 p-8 flex flex-col items-center justify-center text-center space-y-4">
+                       <div className="size-16 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <TrendingUp className="size-8 text-emerald-600" />
+                       </div>
+                       <h4 className="text-xl font-black uppercase tracking-tightest">Proactive Insights</h4>
+                       <p className="text-xs text-slate-400 font-medium">Your spending has decreased by 14% this week. Orion has allocated savings to your active vaults.</p>
+                       <Button variant="ghost" className="text-emerald-600 font-black uppercase text-[10px] tracking-widest">View Detailed Telemetry</Button>
+                    </Card>
+                 </div>
               </div>
             </TabsContent>
 
@@ -1544,20 +1804,22 @@ export default function WalletPage() {
                 </Card>
 
                 <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-slate-950 p-10 text-white relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-32 bg-emerald-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                  <div className="absolute top-0 right-0 p-32 bg-indigo-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 p-32 bg-emerald-500/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
                   <div className="relative z-10 space-y-6">
                     <div className="size-16 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md group-hover:scale-110 transition-transform">
-                      <Terminal className="size-8 text-emerald-400" />
+                      <ShieldCheck className="size-8 text-indigo-400" />
                     </div>
                     <div className="space-y-2">
-                      <h4 className="text-3xl font-black tracking-tightest leading-tight">Advanced Encryption Status: <span className="text-emerald-400 italic">SECURE.</span></h4>
-                      <p className="text-slate-400 text-sm font-medium leading-relaxed italic">&quot;RSA-4096 Multi-Region Node Verification is active on this session. All telemetry data is end-to-end sanitized.&quot;</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400">Security Architecture</p>
+                      <h4 className="text-4xl font-black tracking-tightest leading-tight">ARISE SHIELD <span className="text-emerald-400 italic">v2.0</span></h4>
+                      <p className="text-slate-400 text-sm font-medium leading-relaxed italic">&quot;Enterprise RSA-4096 Multi-Region Neural Mesh is active. All terminal telemetry is end-to-end sanitized and fraud-shielded by Orion.&quot;</p>
                     </div>
                     <div className="flex items-center gap-3 pt-4">
                       <div className="h-1.5 flex-1 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-500 w-[94%] shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                        <div className="h-full bg-indigo-500 w-[98%] shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-pulse" />
                       </div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">94.8% Integrity</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">98.2% Neural Integrity</span>
                     </div>
                   </div>
                 </Card>
@@ -1861,24 +2123,32 @@ export default function WalletPage() {
         <div className="bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/[0.05] shadow-[0_-8px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_40px_rgba(0,0,0,0.3)]">
           <div className="flex justify-around items-center px-2 pt-2 pb-safe" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
             {[
-              { id: 'topup', icon: Plus, label: 'Add', color: 'text-emerald-600 dark:text-emerald-400', action: () => {
-                (document.querySelector('[value="manage"]') as HTMLElement)?.click();
-                if (navigator.vibrate) navigator.vibrate(8);
-              }},
-              { id: 'send', icon: Send, label: 'Send', color: 'text-slate-600 dark:text-slate-300', action: () => {
-                (document.querySelector('[value="manage"]') as HTMLElement)?.click();
-                setTimeout(() => document.getElementById('recipient-account-input')?.focus(), 100);
-                if (navigator.vibrate) navigator.vibrate(8);
-              }},
-              { id: 'airsend-mid', icon: Wifi, label: '', color: '', action: () => {} }, // placeholder for FAB
-              { id: 'cards', icon: CreditCard, label: 'Cards', color: 'text-indigo-600 dark:text-indigo-400', action: () => {
-                (document.querySelector('[value="cards"]') as HTMLElement)?.click();
-                if (navigator.vibrate) navigator.vibrate(8);
-              }},
-              { id: 'history', icon: History, label: 'History', color: 'text-slate-600 dark:text-slate-300', action: () => {
-                (document.querySelector('[value="history"]') as HTMLElement)?.click();
-                if (navigator.vibrate) navigator.vibrate(8);
-              }},
+              {
+                id: 'topup', icon: Plus, label: 'Add', color: 'text-emerald-600 dark:text-emerald-400', action: () => {
+                  (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+                  if (navigator.vibrate) navigator.vibrate(8);
+                }
+              },
+              {
+                id: 'send', icon: Send, label: 'Send', color: 'text-slate-600 dark:text-slate-300', action: () => {
+                  (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+                  setTimeout(() => document.getElementById('recipient-account-input')?.focus(), 100);
+                  if (navigator.vibrate) navigator.vibrate(8);
+                }
+              },
+              { id: 'airsend-mid', icon: Wifi, label: '', color: '', action: () => { } }, // placeholder for FAB
+              {
+                id: 'cards', icon: CreditCard, label: 'Cards', color: 'text-indigo-600 dark:text-indigo-400', action: () => {
+                  (document.querySelector('[value="cards"]') as HTMLElement)?.click();
+                  if (navigator.vibrate) navigator.vibrate(8);
+                }
+              },
+              {
+                id: 'history', icon: History, label: 'History', color: 'text-slate-600 dark:text-slate-300', action: () => {
+                  (document.querySelector('[value="history"]') as HTMLElement)?.click();
+                  if (navigator.vibrate) navigator.vibrate(8);
+                }
+              },
             ].map((item) => {
               if (item.id === 'airsend-mid') {
                 return <div key={item.id} className="w-16" />; // gap for FAB
@@ -1899,11 +2169,57 @@ export default function WalletPage() {
           </div>
         </div>
       </div>
-      <NearbyAirSend 
+      <NearbyAirSend
         open={isAirSendOpen}
         onOpenChange={setIsAirSendOpen}
         currentBalance={balance}
       />
+
+      {/* Orion Super Assistant FAB */}
+      <div className="fixed bottom-24 right-6 sm:right-12 z-[70] group flex flex-col items-end gap-4">
+         {orionMessage && (
+           <div className="bg-slate-950/90 backdrop-blur-xl border border-indigo-500/30 text-white p-4 rounded-3xl max-w-xs shadow-2xl animate-in slide-in-from-bottom-2 fade-in">
+              <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Orion Neural Feed</p>
+              <p className="text-sm font-medium leading-relaxed italic text-slate-200">"{orionMessage}"</p>
+           </div>
+         )}
+
+         <div className="relative">
+            <div className={`absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full transition-all duration-500 ${orionListening || orionThinking ? 'scale-150 opacity-100' : 'scale-100 opacity-0'}`} />
+            <button
+              onClick={startVoiceBanking}
+              className={`relative size-16 sm:size-20 rounded-full bg-slate-950 border-2 flex items-center justify-center shadow-2xl transition-all duration-500 active:scale-90 ${orionListening ? 'border-indigo-400 overflow-hidden ring-4 ring-indigo-500/20 translate-y--2' : 'border-white/10 overflow-hidden hover:border-indigo-500/50'}`}
+            >
+              {(orionListening || orionThinking) ? (
+                <div className="relative flex items-center justify-center">
+                   <div className="absolute size-32 bg-indigo-500/10 animate-ping rounded-full" />
+                   <div className="flex gap-1 items-center">
+                      <div className="size-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="size-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="size-1.5 bg-indigo-400 rounded-full animate-bounce" />
+                   </div>
+                </div>
+              ) : (
+                <div className="relative flex flex-col items-center group-hover:scale-110 transition-transform">
+                   <Brain className="size-8 text-indigo-400" />
+                   <p className="absolute -bottom-1 text-[7px] font-black text-indigo-300 opacity-60 uppercase tracking-widest">Orion</p>
+                </div>
+              )}
+              {/* Orion HUD Glow */}
+              <div className={`absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-transparent transition-opacity ${orionListening ? 'opacity-100' : 'opacity-0'}`} />
+            </button>
+            
+            {/* Command Tooltip */}
+            {!orionMessage && (
+              <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center">
+                 <div className="bg-slate-950/90 backdrop-blur-xl border border-white/10 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-2xl whitespace-nowrap shadow-2xl animate-in slide-in-from-right-2">
+                    Establish Neural Link
+                 </div>
+                 <div className="w-2 h-2 bg-slate-950/90 border-r border-t border-white/10 rotate-45 -translate-x-1" />
+              </div>
+            )}
+         </div>
+      </div>
     </>
   );
 }

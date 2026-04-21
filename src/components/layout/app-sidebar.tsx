@@ -34,6 +34,9 @@ import {
   Wallet,
   Navigation,
   LayoutDashboard,
+  Wifi,
+  Activity,
+  Globe
 } from 'lucide-react';
 import {
   Sidebar,
@@ -212,6 +215,31 @@ export function AppSidebar() {
         {renderNavGroup(communityNav, 'Community')}
         <SidebarSeparator />
         {renderNavGroup(reportNav, 'Reports')}
+        <SidebarSeparator />
+        
+        {/* State Intelligence Widget */}
+        <div className="px-4 py-6 space-y-4">
+           <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Situational Aware</span>
+              <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+           </div>
+           <div className="space-y-3">
+              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
+                 <div className="flex items-center gap-2">
+                    <Activity className="size-3 text-amber-500" />
+                    <span className="text-[9px] font-black uppercase text-slate-500">Grid Master</span>
+                 </div>
+                 <span className="text-[10px] font-black text-amber-600">STABLE</span>
+              </div>
+              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
+                 <div className="flex items-center gap-2">
+                    <Globe className="size-3 text-blue-500" />
+                    <span className="text-[9px] font-black uppercase text-slate-500">State Node</span>
+                 </div>
+                 <span className="text-[10px] font-black text-blue-600">ACTIVE</span>
+              </div>
+           </div>
+        </div>
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>

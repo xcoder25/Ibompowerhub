@@ -3,93 +3,191 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { polls } from '@/lib/data';
-import { Vote, Sparkles, CheckCircle2, TrendingUp, BarChart } from 'lucide-react';
-import { useState } from 'react';
+import { 
+  Vote, Sparkles, CheckCircle2, TrendingUp, BarChart, 
+  ShieldCheck, Brain, Info, AlertCircle, Heart, 
+  ArrowRight, Users, Loader2 
+} from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 export default function VotingPage() {
+  const { toast } = useToast();
   const [votedPolls, setVotedPolls] = useState<Record<number, string>>({});
+  const [isCasting, setIsCasting] = useState<number | null>(null);
+  const [showAnalysis, setShowAnalysis] = useState<number | null>(null);
 
   const handleVote = (pollId: number, option: string) => {
     if (votedPolls[pollId]) return;
-    setVotedPolls(prev => ({ ...prev, [pollId]: option }));
+    
+    setIsCasting(pollId);
+    
+    // Neural Verification Simulation
+    setTimeout(() => {
+      setVotedPolls(prev => ({ ...prev, [pollId]: option }));
+      setIsCasting(null);
+      if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
+      toast({
+        title: "Vote Authenticated",
+        description: "Your selection has been hashed to the Arise Ledger.",
+      });
+    }, 1500);
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative overflow-hidden mesh-gradient">
-      {/* Cinematic Background Glows */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
+    <main className="min-h-screen bg-white dark:bg-slate-950 pb-32 relative overflow-hidden">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-blue-500/[0.07] to-transparent pointer-events-none" />
 
-      <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-8 md:space-y-12 relative z-10 animate-in fade-in duration-1000">
+      <div className="container mx-auto px-4 sm:px-8 py-10 md:py-16 space-y-12 relative z-10 animate-in fade-in duration-1000">
 
-        {/* Dynamic Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-          <div className="space-y-4 max-w-2xl">
-            <Badge className="bg-blue-600/10 text-blue-600 border-none px-4 py-1.5 rounded-full font-black uppercase text-[10px] tracking-widest">
-              Civic Engagement
-            </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-slate-950 dark:text-white leading-none">
-              COMMUNITY<span className="bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">VOTING</span>
+        {/* ── Dynamic Header ── */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+          <div className="space-y-5 max-w-3xl">
+            <div className="flex items-center gap-3">
+               <div className="size-10 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-sm">
+                  <Vote className="size-5 text-blue-500" />
+               </div>
+               <Badge className="bg-blue-600/10 text-blue-600 border-none px-4 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-sm">
+                 Civic Ledger V1.0
+               </Badge>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tightest text-slate-950 dark:text-white leading-none">
+              SECURE<span className="bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent italic">VOTING</span>
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed">
-              Shape the future of Akwa Ibom. Participate in localized polls and institutional decision-making.
+            <p className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed max-w-xl">
+              Engage with digital democracy via the Ibom Neural Matrix. Every vote is encrypted, verified, and immutable.
             </p>
+          </div>
+          
+          <div className="flex items-center gap-6 bg-slate-50 dark:bg-slate-900/40 backdrop-blur-xl p-6 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-inner">
+             <div className="flex -space-x-3">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="size-10 rounded-full border-2 border-white dark:border-slate-800 bg-slate-200 flex items-center justify-center overflow-hidden">
+                     <Users className="size-5 text-slate-400" />
+                  </div>
+                ))}
+             </div>
+             <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Live Participation</p>
+                <p className="text-xl font-black text-slate-900 dark:text-white">1,429 <span className="text-sm font-bold text-blue-500">RESIDENTS</span></p>
+             </div>
           </div>
         </div>
 
-        <div className="grid gap-10 lg:grid-cols-2">
+        {/* ── Polls Matrix ── */}
+        <div className="grid gap-12 lg:grid-cols-2">
           {polls.map((poll) => {
             const hasVoted = !!votedPolls[poll.id];
             const userVote = votedPolls[poll.id];
+            const isAnalyzing = showAnalysis === poll.id;
 
             return (
-              <Card key={poll.id} className="border-none shadow-sm bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-5 sm:p-8 rounded-2xl group transition-all duration-300 hover:-translate-y-1 overflow-hidden relative border border-white/20">
-                <div className="absolute top-0 right-0 p-6 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-0 rounded-bl-full">
-                  <BarChart className="size-16 sm:size-20" />
+              <Card key={poll.id} className="border-none shadow-2xl bg-white dark:bg-slate-900/60 backdrop-blur-3xl rounded-[2.5rem] group transition-all duration-500 hover:-translate-y-2 overflow-hidden relative border border-white/10 p-0">
+                
+                {/* Visual Accent */}
+                <div className="bg-slate-950 p-8 text-white relative overflow-hidden">
+                   <div className="relative z-10 flex justify-between items-start">
+                      <div className="space-y-2">
+                         <div className="flex items-center gap-2">
+                           <div className="size-2 rounded-full bg-blue-500 animate-pulse" />
+                           <p className="text-[9px] font-black uppercase tracking-[0.4em] text-blue-400 italic">Proposition ACTIVE</p>
+                         </div>
+                         <h3 className="text-2xl sm:text-3xl font-black tracking-tightest leading-tight">{poll.title}</h3>
+                      </div>
+                      <div className="size-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:rotate-12 transition-transform">
+                         <BarChart className="size-6 text-blue-400" />
+                      </div>
+                   </div>
+                   <div className="absolute top-0 right-0 p-32 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
                 </div>
 
-                <div className="relative z-10 flex flex-col h-full">
-                  <div className="mb-8">
-                    <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 border-none px-3 py-1 font-black uppercase text-[10px] tracking-widest mb-4">
-                      Active Poll
-                    </Badge>
-                    <h3 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white mb-2 leading-none">{poll.title}</h3>
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs flex items-center gap-2">
-                      <TrendingUp className="size-4 text-blue-500" /> {poll.totalVotes} Total Votes
-                    </p>
-                  </div>
+                <CardContent className="p-8 sm:p-10 space-y-8">
+                   {/* AI Insight Bridge */}
+                   <div className={cn("rounded-3xl border transition-all duration-500 overflow-hidden", isAnalyzing ? "bg-indigo-600 border-indigo-500 p-6 text-white" : "bg-slate-50 dark:bg-slate-950 p-4 border-slate-100 dark:border-slate-800")}>
+                      <div className="flex items-center justify-between mb-2">
+                         <div className="flex items-center gap-2">
+                            <Brain className={cn("size-4", isAnalyzing ? "text-white" : "text-indigo-500")} />
+                            <p className={cn("text-[10px] font-black uppercase tracking-widest", isAnalyzing ? "text-indigo-200" : "text-slate-400")}>Orion Analysis</p>
+                         </div>
+                         {!isAnalyzing && (
+                            <Button onClick={() => setShowAnalysis(poll.id)} variant="ghost" className="h-6 text-[8px] font-black uppercase tracking-widest px-2 hover:bg-indigo-500/10">Show Prediction</Button>
+                         )}
+                      </div>
+                      {isAnalyzing ? (
+                         <div className="animate-in fade-in slide-in-from-top-2 duration-500">
+                            <p className="text-sm font-bold leading-relaxed mb-4 italic">
+                               "Chairman, this policy could boost local infrastructure by 14%, but might require a temporary shift in Sector IV power cycles. Most of your neighbors in Shelter Afrique are tilting towards 'Yes'."
+                            </p>
+                            <Button onClick={() => setShowAnalysis(null)} className="h-8 rounded-xl bg-white/10 text-white font-bold text-[9px] uppercase tracking-widest border border-white/20">Minimize</Button>
+                         </div>
+                      ) : (
+                         <div className="flex items-center gap-2">
+                            <Info className="size-3 text-slate-300" />
+                            <p className="text-[10px] font-medium text-slate-400">Connect to Orion for a high-fidelity impact forecast.</p>
+                         </div>
+                      )}
+                   </div>
 
-                  <div className="space-y-5 mt-auto">
+                   <div className="space-y-6">
                     {Object.entries(poll.votes).map(([option, count]) => {
                       const percentage = poll.totalVotes > 0 ? Math.round((count / poll.totalVotes) * 100) : 0;
                       return (
-                        <div key={option} className="relative">
+                        <div key={option} className="relative perspective-1000">
                           {hasVoted ? (
-                            <div className={`p-4 rounded-2xl border-2 transition-all ${userVote === option ? 'border-blue-500 bg-blue-500/5' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900'}`}>
-                              <div className="flex justify-between items-center mb-3">
-                                <span className={cn("font-black tracking-tight", userVote === option ? "text-blue-500" : "text-slate-950 dark:text-white")}>
-                                  {option} {userVote === option && <CheckCircle2 className="inline ml-2 size-4 text-blue-500" />}
-                                </span>
-                                <span className="font-black text-xl text-slate-400">{percentage}%</span>
+                            <div className={cn(
+                              "p-6 rounded-3xl border-2 transition-all duration-700 backface-hidden",
+                              userVote === option 
+                                ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/10 shadow-[0_15px_30px_-5px_rgba(59,130,246,0.2)]" 
+                                : "border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50"
+                            )}>
+                              <div className="flex justify-between items-center mb-4">
+                                <div className="flex items-center gap-3">
+                                   <div className={cn("size-6 rounded-full flex items-center justify-center", userVote === option ? "bg-blue-500 text-white" : "bg-slate-200 dark:bg-slate-800 text-slate-400")}>
+                                      {userVote === option ? <CheckCircle2 className="size-4" /> : <div className="size-2 rounded-full border border-current" />}
+                                   </div>
+                                   <span className={cn("font-black text-lg tracking-tight", userVote === option ? "text-blue-600 dark:text-blue-400" : "text-slate-950 dark:text-white")}>
+                                     {option}
+                                   </span>
+                                </div>
+                                <span className="font-black text-2xl text-slate-950 dark:text-white">{percentage}%</span>
                               </div>
-                              <Progress value={percentage} className="h-3" />
+                              <div className="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-1 shadow-inner">
+                                <div 
+                                  className={cn("h-full rounded-full transition-all duration-[1.5s] ease-out-expo shadow-lg", userVote === option ? "bg-blue-500" : "bg-slate-300 dark:bg-slate-600")} 
+                                  style={{ width: `${percentage}%` }} 
+                                />
+                              </div>
                             </div>
                           ) : (
                             <Button
-                              className="w-full h-12 md:h-14 justify-between px-4 sm:px-6 rounded-xl bg-white dark:bg-slate-800 text-slate-950 dark:text-white hover:bg-blue-600 hover:text-white font-bold text-base sm:text-lg shadow-sm border border-slate-100 dark:border-slate-700 transition-all active:scale-[0.98]"
+                              disabled={isCasting !== null}
+                              className="w-full h-18 sm:h-20 justify-between px-8 rounded-3xl bg-white dark:bg-slate-800 text-slate-950 dark:text-white hover:bg-blue-600 hover:text-white hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/20 font-black text-lg sm:text-xl shadow-lg border border-slate-100 dark:border-slate-700 transition-all active:scale-[0.98] group/btn"
                               onClick={() => handleVote(poll.id, option)}
                             >
-                              <span>{option}</span>
-                              <Vote className="size-5 opacity-50" />
+                              <span className="tracking-tight">{option}</span>
+                              {isCasting === poll.id ? <Loader2 className="animate-spin size-6" /> : <div className="size-10 rounded-2xl bg-slate-50 dark:bg-slate-700 flex items-center justify-center group-hover/btn:bg-white group-hover/btn:text-blue-600 transition-all"><ArrowRight className="size-5" /></div>}
                             </Button>
                           )}
                         </div>
                       );
                     })}
-                  </div>
-                </div>
+                   </div>
+
+                   <div className="bg-slate-50 dark:bg-slate-950 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 border border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-3">
+                         <TrendingUp className="size-5 text-blue-500" />
+                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{poll.totalVotes} Verified Hashed Votes</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                         <ShieldCheck className="size-4 text-emerald-500" />
+                         <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Encrypted End-to-End</span>
+                      </div>
+                   </div>
+                </CardContent>
               </Card>
             );
           })}
