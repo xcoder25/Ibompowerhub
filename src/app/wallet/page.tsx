@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { processVoiceBankingIntent } from '@/ai/flows/voice-banking-flow';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +50,8 @@ import {
   Shield,
   Activity,
   BarChart2,
+  Brain,
+  Mic
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -59,6 +62,7 @@ import { Copy, Check, Info } from 'lucide-react';
 import { WalletLock } from '@/components/wallet/wallet-lock';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { QRCodeSVG } from 'qrcode.react';
+import { NearbyAirSend } from '@/components/wallet/nearby-airsend';
 
 const NIGERIAN_BANKS = [
   { code: '044', name: 'Access Bank' },
@@ -118,6 +122,39 @@ type KycData = {
   faceVerified?: boolean;
 };
 
+// Orion SuperAI Engine (Wallet Edition) ───────────────────────────────────
+const OrionAIEngine = {
+  getFinancialHealth(balance: number, txns: any[]) {
+    const savingsRate = Math.min(100, (balance / 500000) * 100);
+    const riskIndex = txns.length > 10 ? 12 : 5;
+    return {
+      score: Math.round(75 + (balance / 100000)),
+      savingsRate: Math.round(savingsRate),
+      riskIndex,
+      status: balance > 50000 ? 'EXCELLENT' : 'STABLE'
+    };
+  }
+};
+
+const OrionVoice = {
+  speak(text: string, urgent = false, onDone?: () => void) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    const best = voices.find(v => v.name.toLowerCase().includes('female') || v.name.includes('Aria'))
+      || voices.find(v => v.lang.startsWith('en')) || null;
+    if (best) utt.voice = best;
+    utt.pitch = urgent ? 0.9 : 1.1;
+    utt.rate = 1.0;
+    utt.onend = () => { if (onDone) onDone(); };
+    window.speechSynthesis.speak(utt);
+  },
+  isSpeaking() {
+    return typeof window !== 'undefined' && window.speechSynthesis.speaking;
+  }
+};
+
 export default function WalletPage() {
   const { user } = useUser();
   const firestore = useFirestore();
@@ -159,6 +196,7 @@ export default function WalletPage() {
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [isIbomAskModalOpen, setIsIbomAskModalOpen] = useState(false);
   const [scanTab, setScanTab] = useState<'scan' | 'my-qr'>('scan');
+  const [isAirSendOpen, setIsAirSendOpen] = useState(false);
 
   // Rate limit scanner errors so it doesn't flood the UI
   const lastScanErrorTime = useRef(0);
@@ -169,6 +207,14 @@ export default function WalletPage() {
   const [newVaultName, setNewVaultName] = useState('');
   const [newVaultTarget, setNewVaultTarget] = useState('');
   const [isCreatingVault, setIsCreatingVault] = useState(false);
+  const [orionListening, setOrionListening] = useState(false);
+  const [orionThinking, setOrionThinking] = useState(false);
+  const [orionMessage, setOrionMessage] = useState('');
+  const [orionContext, setOrionContext] = useState<{ task: string; data: any } | null>(null);
+  const [voiceFocus, setVoiceFocus] = useState<'amount' | 'account' | 'bank' | null>(null);
+
+  const recognitionInstance = useRef<any>(null);
+
 
   const [topUpVaultId, setTopUpVaultId] = useState<string | null>(null);
   const [vaultTopUpAmount, setVaultTopUpAmount] = useState('');
@@ -194,6 +240,20 @@ export default function WalletPage() {
     kycData.identityVerified &&
     kycData.addressVerified &&
     kycData.faceVerified;
+
+  // ── Proactive AI Briefing ──
+  useEffect(() => {
+    if (isUnlocked && !isLoading && walletData) {
+      const timer = setTimeout(() => {
+        const health = OrionAIEngine.getFinancialHealth(walletData.balance, transactions);
+        const greeting = `Welcome back. ARISE Shield v2.0 is at peak efficiency. Your financial health score is ${health.score}. I have optimized your saving protocols for today.`;
+        OrionVoice.speak(greeting);
+        setOrionMessage(greeting);
+        setTimeout(() => setOrionMessage(''), 10000);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isUnlocked, isLoading, !!walletData]);
 
   // Load Paystack script
   useEffect(() => {
@@ -854,218 +914,368 @@ export default function WalletPage() {
 
   const netFlow = recentInflow - recentOutflow;
 
+  // ── Orion Voice Banking Logic ──
+  const startVoiceBanking = () => {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      toast({ variant: 'destructive', title: 'Not Supported', description: 'Voice recognition not available.' });
+      return;
+    }
+
+    const recognition = new SpeechRec();
+    recognitionInstance.current = recognition;
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      setOrionListening(true);
+      setOrionThinking(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      if (OrionVoice.isSpeaking()) return;
+
+      const results = event.results;
+      const latest = results[results.length - 1];
+      const transcript = Array.from(results)
+        .map((result: any) => result[0].transcript)
+        .join('').toLowerCase();
+      
+      setOrionMessage(transcript);
+
+      // ── Interim Real-time Feedback ──
+      const partialNumbers = transcript.match(/\d+/g);
+      if (partialNumbers) {
+         const latestNum = partialNumbers[partialNumbers.length - 1];
+
+         if (voiceFocus === 'account' || latestNum.length === 10) {
+            setRecipientAccount(latestNum);
+            if (latestNum.length === 10) setVoiceFocus('bank');
+         } else if (voiceFocus === 'amount' || (latestNum.length < 10 && !voiceFocus)) {
+            setTransferAmount(latestNum);
+            setAmount(latestNum);
+         }
+      }
+
+      // ── Final Processing ──
+      if (latest.isFinal) {
+        setOrionThinking(false);
+        processConversationalAI(transcript);
+      }
+    };
+
+    const processConversationalAI = async (cmd: string) => {
+      const nextTurn = () => {
+        try { recognition.start(); } catch (e) { /* already started */ }
+      };
+
+      setOrionThinking(true);
+      
+      try {
+        // ── Gemini Neural Integration ──
+        const aiResponse = await processVoiceBankingIntent(cmd, orionContext);
+        setOrionThinking(false);
+
+        // 1. Handle AI Generated Confirmation Intents (The AI now decides if "yes" or "no" was intended)
+        if (aiResponse.type === 'confirm') {
+           if (aiResponse.isConfirmed && orionContext?.task === 'transfer_confirm') {
+              OrionVoice.speak(aiResponse.spokenResponse || 'Transmission sequence active. Executing neural settlement.');
+              setOrionContext(null);
+              setTimeout(() => {
+                performSimulatedTransfer();
+                (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+              }, 1500);
+           } else {
+              OrionVoice.speak(aiResponse.spokenResponse || 'Transaction held. Link cleared.');
+              setOrionContext(null);
+           }
+           return;
+        }
+
+        // 2. Handle AI Generated Primary Intents
+        if (aiResponse.type !== 'unknown') {
+          if (aiResponse.type !== 'confirm') {
+             OrionVoice.speak(aiResponse.spokenResponse, false, nextTurn);
+          }
+
+          if (aiResponse.type === 'transfer') {
+            if (aiResponse.amount) { setAmount(aiResponse.amount.toString()); setTransferAmount(aiResponse.amount.toString()); }
+            if (aiResponse.recipientAccount) { setRecipientAccount(aiResponse.recipientAccount); }
+            if (aiResponse.bank) { setRecipientBank(aiResponse.bank === 'ibom x' ? 'ibomx' : aiResponse.bank.toLowerCase()); }
+            
+            (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+            setOrionContext({ task: 'transfer', data: aiResponse });
+            
+            if (!aiResponse.amount) setVoiceFocus('amount');
+            else if (!aiResponse.recipientAccount) setVoiceFocus('account');
+            else if (!aiResponse.bank) setVoiceFocus('bank');
+            else setOrionContext({ task: 'transfer_confirm', data: aiResponse });
+          } 
+          else if (aiResponse.type === 'history') (document.querySelector('[value="history"]') as HTMLElement)?.click();
+          else if (aiResponse.type === 'freeze_card') toggleCardFreeze();
+          else if (aiResponse.type === 'security') (document.querySelector('[value="security"]') as HTMLElement)?.click();
+          else if (aiResponse.type === 'vaults') (document.querySelector('[value="vaults"]') as HTMLElement)?.click();
+          else if (aiResponse.type === 'cards') (document.querySelector('[value="cards"]') as HTMLElement)?.click();
+          else if (aiResponse.type === 'balance') {
+             setIsBalanceVisible(true);
+             OrionVoice.speak(aiResponse.spokenResponse);
+          }
+          
+          return;
+        }
+      } catch (err) {
+        console.error("Gemini failed:", err);
+      }
+
+      setOrionThinking(false);
+      OrionVoice.speak('Neural link steady. Is there anything else you need across the Ibom network?', false, nextTurn);
+      setTimeout(() => setOrionMessage(''), 8000);
+    };
+
+    recognition.onerror = (e: any) => { 
+      if (e.error === 'no-speech') {
+        // Just silent, wait for user
+        return;
+      }
+      if (e.error === 'network') {
+        OrionVoice.speak('Neural link lost. Attempting to stabilize protocol.');
+        setOrionThinking(false);
+        setTimeout(() => { if (orionContext) recognition.start(); }, 3000);
+      } else {
+        setOrionListening(false); 
+        setOrionThinking(false); 
+      }
+    };
+
+    recognition.onend = () => { 
+      // Auto-restart if we are in the middle of a vital task and just "ended" due to silence
+      if (orionContext) {
+        setTimeout(() => {
+          try { recognition.start(); } catch (err) { /* ignore */ }
+        }, 300);
+      } else {
+        setOrionListening(false); 
+        setOrionThinking(false); 
+      }
+    };
+    recognition.start();
+  };
+
   return (
     <>
       {!isUnlocked && <WalletLock onUnlock={handleUnlock} />}
-      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative overflow-hidden mesh-gradient">
-        {/* Cinematic Background Glows */}
-        <div className="absolute top-0 right-0 w-[1200px] h-[1200px] bg-emerald-500/10 rounded-full blur-[200px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
-        <div className="absolute bottom-0 left-0 w-[1000px] h-[1000px] bg-orange-500/10 rounded-full blur-[200px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
+      <main className="min-h-screen bg-[#f0f2f7] dark:bg-[#060810] pb-32 relative overflow-hidden">
+        {/* Premium layered background */}
+        <div className="fixed inset-0 bg-[#f0f2f7] dark:bg-[#060810] z-0" />
+        <div className="fixed top-0 left-0 right-0 h-72 bg-gradient-to-b from-emerald-600 to-transparent opacity-[0.07] dark:opacity-[0.12] z-0" />
+        <div className="fixed top-[-120px] right-[-80px] w-72 h-72 rounded-full bg-emerald-400/20 dark:bg-emerald-500/10 blur-[100px] z-0" />
+        <div className="fixed top-[200px] left-[-100px] w-80 h-80 rounded-full bg-indigo-400/10 dark:bg-indigo-500/10 blur-[120px] z-0" />
 
-        <div className="container mx-auto p-4 md:p-12 space-y-12 relative z-10">
-
-          {/* Header - Premium Look */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="size-14 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/20">
-                <Wallet className="size-8 text-white" />
+        <div className="w-full max-w-full mx-auto px-4 sm:px-12 pt-4 sm:pt-12 pb-4 sm:pb-12 flex flex-col gap-3 sm:gap-12 relative z-10 overflow-hidden isolate">
+          {/* ── Header ── */}
+          <div className="flex items-center justify-between pt-safe pt-2">
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="size-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-600/30 shrink-0">
+                <Wallet className="size-5 text-white" />
               </div>
-              <div>
-                <h1 className="text-4xl font-black tracking-tighter flex items-center gap-3">
-                  Ibom <span className="bg-gradient-to-r from-emerald-500 to-orange-500 bg-clip-text text-transparent italic tracking-tightest">Pay.</span>
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-4xl font-black tracking-tight flex items-center gap-1">
+                  Ibom <span className="bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent">Pay</span>
                 </h1>
-                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.4em]">Official ARISE Ecosystem</p>
+                <p className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.25em]">Arise Wallet</p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="rounded-full bg-slate-100 dark:bg-slate-900">
-              <Share2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-md h-9 w-9 border border-slate-200/60 dark:border-slate-800 shadow-sm active:scale-90 transition-all"
+                onClick={() => { if (navigator.vibrate) navigator.vibrate(5); }}
+              >
+                <Share2 className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+              </Button>
+              <div className="size-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center overflow-hidden shadow-md border-2 border-white dark:border-slate-900">
+                {user?.photoURL ? (
+                  <img src={user.photoURL} alt="Profile" className="size-full object-cover" />
+                ) : (
+                  <div className="font-black text-[11px] text-white">{user?.displayName?.[0] || 'U'}</div>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Premium Wallet Card - Modern Card UI */}
-          <div className="relative group perspective-1000">
-            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+          {/* ── Premium Wallet Card ── */}
+          <div className="relative">
+            {/* Glow behind card */}
+            <div className="absolute -inset-2 bg-gradient-to-br from-emerald-500/30 via-emerald-400/10 to-indigo-500/20 rounded-[2.5rem] blur-2xl opacity-60 dark:opacity-40" />
 
             <div
               className={`relative w-full transition-transform duration-700 preserve-3d cursor-pointer ${isCardFlipped ? 'rotate-y-180' : ''}`}
               onDoubleClick={(e) => {
                 e.preventDefault();
                 setIsCardFlipped(!isCardFlipped);
-                // Also trigger haptic feedback if available for mobile feel
-                if (typeof navigator !== 'undefined' && navigator.vibrate) {
-                  navigator.vibrate(50);
-                }
+                if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(50);
               }}
             >
-              {/* Front side elements */}
-              <Card className="relative bg-slate-950 text-white rounded-[2.5rem] overflow-hidden border-none shadow-2xl backface-hidden">
-                <CardContent className="p-8 sm:p-10 relative z-10">
-                  <div className="flex justify-between items-start mb-10">
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Live Balance</p>
+              {/* FRONT */}
+              <Card className="relative overflow-hidden border-none shadow-2xl backface-hidden rounded-[1.75rem] sm:rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white">
+                <CardContent className="p-5 sm:p-8 relative z-10">
+
+                  {/* Top row */}
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">Live Balance</span>
                       </div>
-                      <div className="flex items-center gap-2 max-w-full overflow-hidden">
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tighter truncate">
-                          {isBalanceVisible ? `₦${balance.toLocaleString()}` : '••••••'}
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-[30px] sm:text-5xl font-black font-mono tracking-tight leading-none">
+                          {isBalanceVisible ? `₦${balance.toLocaleString()}` : '₦ ••••••'}
                         </h2>
-                        <div
-                          className="bg-white/10 p-1.5 mx-1 rounded-xl border border-white/20 pointer-events-auto cursor-pointer hover:bg-white/20 transition-all shrink-0 shadow-lg relative group"
-                          onClick={(e) => { e.stopPropagation(); setScanTab('my-qr'); setIsScanModalOpen(true); }}
-                        >
-                          <QrCode className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 group-hover:scale-110 transition-transform" />
+                        <div className="flex flex-col gap-1.5 ml-1">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setIsBalanceVisible(!isBalanceVisible); }}
+                            className="size-7 rounded-xl bg-white/10 flex items-center justify-center border border-white/15 hover:bg-white/20 transition-all"
+                          >
+                            {isBalanceVisible ? <EyeOff className="size-3.5 text-slate-300" /> : <Eye className="size-3.5 text-slate-300" />}
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setScanTab('my-qr'); setIsScanModalOpen(true); }}
+                            className="size-7 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
+                          >
+                            <QrCode className="size-3.5 text-emerald-400" />
+                          </button>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsBalanceVisible(!isBalanceVisible);
-                          }}
-                          className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-10 w-10 transition-colors z-20"
-                        >
-                          {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                        </Button>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <div className="bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/30 backdrop-blur-md">
-                        <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Premium Tier</p>
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="bg-emerald-500/15 border border-emerald-500/25 px-2.5 py-1 rounded-full">
+                        <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Premium</p>
                       </div>
-                      <div className="flex items-center gap-1 mt-1 opacity-60">
-                        <RefreshCw className="h-3 w-3 animate-spin duration-[3000ms]" />
-                        <span className="text-[8px] uppercase font-bold tracking-widest">Double-Tap to Flip</span>
+                      <div className="flex items-center gap-1 opacity-50">
+                        <RefreshCw className="size-2.5 animate-spin" style={{ animationDuration: '3s' }} />
+                        <span className="text-[7px] uppercase font-bold tracking-widest">Tap×2 Flip</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-end mt-4">
-                    <div className="space-y-1">
-                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-[0.2em] mb-1">Card Holder</p>
-                      <p className="text-base sm:text-lg font-bold tracking-tight uppercase truncate max-w-[150px] sm:max-w-[300px]">{user?.displayName || 'PowerHub User'}</p>
+                  {/* Bottom row */}
+                  <div className="flex justify-between items-end">
+                    <div className="space-y-0.5">
+                      <p className="text-[8px] text-slate-500 font-black uppercase tracking-[0.25em]">Cardholder</p>
+                      <p className="text-sm font-bold uppercase tracking-wide truncate max-w-[160px] sm:max-w-xs">{user?.displayName || 'IbomX User'}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="flex -space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-emerald-600/80 border-2 border-slate-950 flex items-center justify-center backdrop-blur-sm">
-                          <ShieldCheck className="h-5 w-5 text-white" />
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="flex -space-x-2">
+                        <div className="size-7 rounded-full bg-emerald-500/80 border-2 border-slate-950 flex items-center justify-center">
+                          <ShieldCheck className="size-3.5 text-white" />
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-amber-500/80 border-2 border-slate-950 flex items-center justify-center backdrop-blur-sm shadow-xl">
-                          <TrendingUp className="h-5 w-5 text-white" />
+                        <div className="size-7 rounded-full bg-amber-500/80 border-2 border-slate-950 flex items-center justify-center">
+                          <TrendingUp className="size-3.5 text-white" />
                         </div>
                       </div>
-                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Powered by ARISE</p>
+                      <p className="text-[7px] font-black text-slate-600 uppercase tracking-widest">ARISE Node</p>
                     </div>
                   </div>
                 </CardContent>
 
-                {/* Advanced visual flare / Mesh background for Front */}
-                <div className="absolute top-[-30%] right-[-10%] w-[70%] h-[70%] bg-emerald-500/30 blur-[100px] rounded-full"></div>
-                <div className="absolute bottom-[-30%] left-[-10%] w-[60%] h-[60%] bg-emerald-400/20 blur-[80px] rounded-full"></div>
-                <div className="absolute top-[20%] left-[30%] w-[40%] h-[40%] bg-amber-500/10 blur-[120px] rounded-full"></div>
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat"></div>
+                {/* Mesh glows */}
+                <div className="absolute -top-12 -right-12 size-48 bg-emerald-500/25 blur-[80px] rounded-full" />
+                <div className="absolute -bottom-10 -left-10 size-40 bg-indigo-500/15 blur-[70px] rounded-full" />
+                <div className="absolute inset-0 opacity-[0.025] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" />
               </Card>
 
-              {/* Back side elements (Flipped Card) */}
-              <Card className="absolute inset-0 bg-slate-900 border-none shadow-2xl rounded-[2.5rem] overflow-hidden text-white backface-hidden rotate-y-180">
-                <CardContent className="p-8 sm:p-10 relative z-10 h-full flex flex-col justify-between">
+              {/* BACK */}
+              <Card className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-950 border-none shadow-2xl rounded-[1.75rem] sm:rounded-[2.5rem] overflow-hidden text-white backface-hidden rotate-y-180">
+                <CardContent className="p-5 sm:p-8 relative z-10 h-full flex flex-col justify-between">
                   <div>
-                    <div className="flex justify-between items-start mb-6">
+                    <div className="flex justify-between items-start mb-5">
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Account Info</p>
+                        <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
+                        <p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">Account Info</p>
                       </div>
-                      <div className="bg-white/5 p-2 rounded-xl backdrop-blur-md">
-                        <Banknote className="h-5 w-5 text-amber-500" />
+                      <div className="size-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <Banknote className="size-4 text-amber-400" />
                       </div>
                     </div>
 
                     {walletData?.dva ? (
-                      <div className="space-y-4">
-                        <div className="space-y-1">
-                          <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">Bank Account Number</p>
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <h3 className="text-2xl sm:text-3xl font-black font-mono tracking-widest text-white">{walletData.dva?.account_number}</h3>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (walletData.dva) {
-                                  copyToClipboard(walletData.dva.account_number);
-                                }
-                              }}
-                              className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-8 w-8 z-20"
-                            >
-                              {hasCopied ? <Check className="h-4 w-4 text-amber-500" /> : <Copy className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </div>
-
+                      <div className="space-y-3">
+                        <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">Account Number</p>
                         <div className="flex items-center gap-2">
-                          <p className="text-xs sm:text-sm font-bold text-slate-300 uppercase tracking-widest">{walletData.dva?.bank_name}</p>
-                          <div className="w-1 h-1 rounded-full bg-slate-600"></div>
-                          <p className="text-xs sm:text-sm font-medium text-slate-400">{walletData.dva?.account_name}</p>
+                          <h3 className="text-xl sm:text-3xl font-black font-mono tracking-widest text-white">{walletData?.dva?.account_number}</h3>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (walletData?.dva?.account_number) {
+                                copyToClipboard(walletData.dva.account_number);
+                              }
+                            }}
+                            className="size-8 rounded-xl bg-white/10 flex items-center justify-center border border-white/15 hover:bg-white/20 transition-all"
+                          >
+                            {hasCopied ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5 text-slate-300" />}
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2 pt-1">
+                          <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{walletData?.dva?.bank_name}</span>
+                          <span className="size-1 rounded-full bg-slate-700" />
+                          <span className="text-xs text-slate-500">{walletData?.dva?.account_name}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
-                        <Lock className="h-8 w-8 text-slate-600" />
-                        <div>
-                          <p className="text-sm font-bold text-slate-300">Account Not Ready</p>
-                          <p className="text-xs text-slate-500 mt-1 max-w-[200px] mx-auto">Complete KYC to unlock your direct top-up account.</p>
-                        </div>
+                      <div className="flex flex-col items-center justify-center py-4 text-center space-y-2">
+                        <Lock className="size-7 text-slate-600" />
+                        <p className="text-sm font-bold text-slate-300">KYC Required</p>
+                        <p className="text-[10px] text-slate-500 max-w-[180px]">Complete identity sync to unlock direct top-up.</p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex justify-between items-end mt-4 pt-4 border-t border-white/10">
-                    <p className="text-[10px] text-slate-500 uppercase font-black tracking-[0.2em]">Direct Top-up</p>
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest opacity-80 flex items-center gap-1">
-                      <RefreshCw className="h-3 w-3" />
-                      Double-Tap to Return
-                    </p>
+                  <div className="flex justify-between items-end pt-3 border-t border-white/[0.07]">
+                    <p className="text-[8px] text-slate-600 font-black uppercase tracking-widest">Direct Reserve Node</p>
+                    <div className="flex items-center gap-1 opacity-50">
+                      <RefreshCw className="size-2.5" />
+                      <span className="text-[7px] uppercase font-bold tracking-widest">Tap×2 Return</span>
+                    </div>
                   </div>
                 </CardContent>
-
-                {/* Back Card Flare */}
-                <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-amber-500/10 blur-[80px] rounded-full"></div>
-                <div className="absolute bottom-0 left-0 w-[60%] h-[60%] bg-slate-700/20 blur-[100px] rounded-full"></div>
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat"></div>
+                <div className="absolute top-0 right-0 size-40 bg-amber-500/10 blur-[70px] rounded-full" />
+                <div className="absolute bottom-0 left-0 size-48 bg-slate-700/20 blur-[80px] rounded-full" />
               </Card>
             </div>
           </div>
 
 
-          {/* Quick Actions Bar */}
-          <div className="flex overflow-x-auto gap-4 sm:gap-5 pb-5 pt-1 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 relative w-[calc(100%+2rem)] sm:w-auto">
-            {[
-              { id: 'topup', icon: Plus, label: 'Add', color: 'bg-emerald-500', shadow: 'shadow-emerald-500/20' },
-              { id: 'transfer', icon: Send, label: 'Send', color: 'bg-slate-900', shadow: 'shadow-slate-900/20' },
-              { id: 'flights', icon: Plane, label: 'Flights', color: 'bg-indigo-600', shadow: 'shadow-indigo-600/20', href: '/flights' },
-              { id: 'bills', icon: Smartphone, label: 'Bills', color: 'bg-amber-600', shadow: 'shadow-amber-600/20' },
-              { id: 'withdraw', icon: ArrowUpRight, label: 'Cash Out', color: 'bg-slate-500', shadow: 'shadow-slate-500/20' },
-            ].map((action, index, array) => {
-              const content = (
-                <div
-                  key={action.id}
-                  className={`flex flex-col items-center gap-2.5 min-w-[75px] group cursor-pointer ${index === array.length - 1 ? 'pr-4 sm:pr-0' : ''}`}
-                  onClick={() => {
-                    if (action.id === 'scan') setIsScanModalOpen(true);
-                  }}
-                >
-                  <div className={`${action.color} p-5 rounded-[1.75rem] text-white shadow-xl ${action.shadow} group-active:scale-90 transition-all duration-300`}>
-                    <action.icon className="h-6 w-6" />
+          {/* ── Quick Actions Pill Bar ── */}
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[1.5rem] border border-white/60 dark:border-slate-800/80 shadow-sm overflow-hidden">
+            <div className="grid grid-cols-6 gap-0 sm:flex sm:overflow-x-auto sm:no-scrollbar">
+              {[
+                { id: 'topup', icon: Plus, label: 'Add', bg: 'bg-emerald-500/10 dark:bg-emerald-500/15', icon_color: 'text-emerald-600 dark:text-emerald-400' },
+                { id: 'transfer', icon: Send, label: 'Send', bg: 'bg-slate-100 dark:bg-slate-800', icon_color: 'text-slate-700 dark:text-slate-200' },
+                { id: 'airsend', icon: Wifi, label: 'AirDrop', bg: 'bg-indigo-500/10 dark:bg-indigo-500/15', icon_color: 'text-indigo-600 dark:text-indigo-400' },
+                { id: 'flights', icon: Plane, label: 'Flights', bg: 'bg-sky-500/10 dark:bg-sky-500/15', icon_color: 'text-sky-600 dark:text-sky-400', href: '/flights' },
+                { id: 'bills', icon: Smartphone, label: 'Bills', bg: 'bg-amber-500/10 dark:bg-amber-500/15', icon_color: 'text-amber-600 dark:text-amber-400' },
+                { id: 'withdraw', icon: ArrowUpRight, label: 'Cash Out', bg: 'bg-rose-500/10 dark:bg-rose-500/15', icon_color: 'text-rose-600 dark:text-rose-400' },
+              ].map((action) => {
+                const inner = (
+                  <div
+                    key={action.id}
+                    className="flex flex-col items-center gap-1.5 py-4 px-1 sm:min-w-[90px] sm:px-5 group cursor-pointer active:scale-90 transition-transform"
+                    onClick={() => {
+                      if (action.id === 'airsend') setIsAirSendOpen(true);
+                    }}
+                  >
+                    <div className={`size-10 sm:size-11 rounded-2xl ${action.bg} flex items-center justify-center transition-all group-hover:scale-110`}>
+                      <action.icon className={`size-4.5 sm:size-5 ${action.icon_color}`} />
+                    </div>
+                    <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider ${action.icon_color.split(' ')[0].replace('text-', 'text-')} opacity-70`}>{action.label}</span>
                   </div>
-                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">{action.label}</span>
-                </div>
-              );
-              return action.href ? (
-                <Link href={action.href} key={action.id}>
-                  {content}
-                </Link>
-              ) : content;
-            })}
+                );
+                return action.href ? (
+                  <Link href={action.href} key={action.id} className="contents">{inner}</Link>
+                ) : <React.Fragment key={action.id}>{inner}</React.Fragment>;
+              })}
+            </div>
           </div>
 
           {/* Smart Insights Strip */}
@@ -1176,52 +1386,54 @@ export default function WalletPage() {
             );
           })()}
 
-          <Tabs defaultValue="manage" className="space-y-6">
-            <div className="overflow-x-auto no-scrollbar pb-1">
-              <TabsList className="flex w-max min-w-full bg-slate-100 dark:bg-slate-900 rounded-2xl p-1.5 h-14 gap-1">
-                <TabsTrigger value="manage" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">Transact</TabsTrigger>
-                <TabsTrigger value="cards" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">Cards</TabsTrigger>
-                <TabsTrigger value="vaults" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">Vault</TabsTrigger>
-                <TabsTrigger value="history" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">History</TabsTrigger>
-                <TabsTrigger value="security" className="rounded-xl font-bold uppercase tracking-widest text-[10px] flex-1 min-w-[100px]">Security</TabsTrigger>
+          <Tabs defaultValue="manage" className="space-y-5 sm:space-y-6 w-full max-w-full min-w-0">
+            <div className="w-full overflow-x-auto no-scrollbar pb-0.5">
+              <TabsList className="flex w-full bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl p-1 h-12 sm:h-14 gap-1 shadow-inner">
+                <TabsTrigger value="manage" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">Transact</TabsTrigger>
+                <TabsTrigger value="cards" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">Cards</TabsTrigger>
+                <TabsTrigger value="vaults" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">Vault</TabsTrigger>
+                <TabsTrigger value="history" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">History</TabsTrigger>
+                <TabsTrigger value="security" className="flex-1 rounded-lg sm:rounded-xl font-black uppercase tracking-widest text-[8px] sm:text-[10px] data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 transition-all">Security</TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent value="manage" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <TabsContent value="manage" className="space-y-5 sm:space-y-10 w-full max-w-full min-w-0">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-10">
                 {/* Institutional Deposit Protocol */}
-                <Card className="border-none shadow-[0_80px_160px_-30px_rgba(16,185,129,0.15)] rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(16,185,129,0.25)] transition-all duration-700">
-                  <CardHeader className="p-10 pb-0">
+                <Card className="border-none shadow-lg sm:shadow-[0_80px_160px_-30px_rgba(16,185,129,0.15)] rounded-2xl sm:rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(16,185,129,0.25)] transition-all duration-700">
+
+                  <CardHeader className="p-5 sm:p-10 pb-0">
                     <div className="flex items-center justify-between">
-                      <div className="space-y-2">
-                        <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Inbound Protocol</Badge>
-                        <CardTitle className="text-4xl font-black tracking-tightest">DEPOSIT</CardTitle>
+                      <div className="space-y-1 sm:space-y-2">
+                        <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-3 sm:px-4 py-1 rounded-full uppercase text-[8px] sm:text-[9px] tracking-widest">Inbound Protocol</Badge>
+                        <CardTitle className="text-2xl sm:text-4xl font-black tracking-tightest">DEPOSIT</CardTitle>
                       </div>
-                      <div className="size-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center shadow-inner">
-                        <Plus className="size-8 text-emerald-600" />
+                      <div className="size-12 sm:size-16 bg-emerald-500/10 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner shrink-0">
+                        <Plus className="size-6 sm:size-8 text-emerald-600" />
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-10 space-y-10">
+                  <CardContent className="p-5 sm:p-10 space-y-5 sm:space-y-10">
                     <div className="space-y-4">
                       <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Quantum of Injection</Label>
                       <div className="relative group">
-                        <span className="absolute left-8 top-1/2 -translate-y-1/2 font-black text-slate-300 text-3xl transition-colors group-focus-within:text-emerald-500">₦</span>
+                        <span className="absolute left-6 sm:left-8 top-1/2 -translate-y-1/2 font-black text-slate-300 text-2xl sm:text-3xl transition-colors group-focus-within:text-emerald-500">₦</span>
                         <Input
                           type="number"
                           placeholder="0.00"
-                          className="pl-16 h-24 text-4xl font-black rounded-3xl border-none bg-slate-50 dark:bg-slate-950/50 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-inner tracking-tighter"
+                          className="pl-14 sm:pl-16 h-16 sm:h-24 text-2xl sm:text-4xl font-black rounded-2xl sm:rounded-3xl border-none bg-slate-50 dark:bg-slate-950/50 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-inner tracking-tighter"
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
                         />
+
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-3 gap-2 sm:gap-4">
                         {['5000', '10000', '25000'].map(val => (
                           <Button
                             key={val}
                             variant="outline"
                             onClick={() => setAmount(val)}
-                            className="rounded-2xl border-slate-100 dark:border-slate-800 py-8 font-black text-xs uppercase tracking-widest hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all shadow-sm"
+                            className="rounded-xl sm:rounded-2xl border-slate-100 dark:border-slate-800 py-6 sm:py-8 font-black text-[10px] sm:text-xs uppercase tracking-widest hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 active:scale-95 transition-all shadow-sm"
                           >
                             ₦{parseInt(val).toLocaleString()}
                           </Button>
@@ -1231,12 +1443,13 @@ export default function WalletPage() {
 
                     <Button
                       onClick={addFunds}
-                      className="w-full h-20 rounded-3xl text-sm font-black uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(16,185,129,0.4)] bg-emerald-600 hover:bg-emerald-500 transition-all hover:scale-[1.02] active:scale-[0.95] py-6"
+                      className="w-full h-16 sm:h-20 rounded-2xl sm:rounded-3xl text-xs sm:text-sm font-black uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(16,185,129,0.4)] bg-emerald-600 hover:bg-emerald-500 transition-all hover:scale-[1.02] active:scale-[0.95] py-6"
                       disabled={!amount || parseFloat(amount) <= 0 || isAddingFunds}
                     >
-                      {isAddingFunds ? <Loader2 className="mr-3 size-6 animate-spin" /> : <CreditCard className="mr-3 size-6" />}
+                      {isAddingFunds ? <Loader2 className="mr-3 size-5 sm:size-6 animate-spin" /> : <CreditCard className="mr-3 size-5 sm:size-6" />}
                       {isAddingFunds ? 'CALIBRATING...' : 'INITIATE SECURE PAY'}
                     </Button>
+
 
                     <Separator className="bg-slate-100/50 dark:bg-slate-800/50" />
 
@@ -1257,8 +1470,8 @@ export default function WalletPage() {
                                 <Banknote className="size-6 text-emerald-400" />
                               </div>
                             </div>
-                            <div className="flex items-center gap-4">
-                              <h3 className="text-3xl font-black font-mono tracking-[0.15em] text-white group-hover:text-emerald-400 transition-colors">{walletData.dva?.account_number}</h3>
+                            <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
+                              <h3 className="text-lg sm:text-3xl font-black font-mono tracking-widest sm:tracking-[0.15em] text-white group-hover:text-emerald-400 transition-colors truncate">{walletData?.dva?.account_number}</h3>
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -1281,9 +1494,9 @@ export default function WalletPage() {
                           </div>
                         </div>
                       ) : (
-                        <div className="bg-slate-50 dark:bg-slate-950/50 p-10 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 text-center space-y-4 group hover:border-emerald-500/50 transition-all">
-                          <div className="size-20 rounded-full bg-slate-100 dark:bg-slate-900 mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500 transition-all">
-                            <Lock className="size-10 text-slate-300 group-hover:text-white" />
+                        <div className="bg-slate-50 dark:bg-slate-950/50 p-6 sm:p-10 rounded-3xl sm:rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 text-center space-y-4 group hover:border-emerald-500/50 transition-all">
+                          <div className="size-16 sm:size-20 rounded-full bg-slate-100 dark:bg-slate-900 mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500 transition-all">
+                            <Lock className="size-8 sm:size-10 text-slate-300 group-hover:text-white" />
                           </div>
                           <div className="space-y-1">
                             <p className="text-xl font-black tracking-tighter">Vault Uninitialized</p>
@@ -1299,19 +1512,20 @@ export default function WalletPage() {
                 </Card>
 
                 {/* Tactical Outbound Protocol */}
-                <Card className="border-none shadow-[0_80px_160px_-30px_rgba(15,23,42,0.15)] rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(15,23,42,0.25)] transition-all duration-700">
-                  <CardHeader className="p-10 pb-0">
+                <Card className="border-none shadow-lg sm:shadow-[0_80px_160px_-30px_rgba(15,23,42,0.15)] rounded-2xl sm:rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:shadow-[0_100px_200px_-40px_rgba(15,23,42,0.25)] transition-all duration-700">
+
+                  <CardHeader className="p-5 sm:p-10 pb-0">
                     <div className="flex items-center justify-between">
-                      <div className="space-y-2">
-                        <Badge className="bg-slate-950/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Outbound Protocol</Badge>
-                        <CardTitle className="text-4xl font-black tracking-tightest">TRANSFER</CardTitle>
+                      <div className="space-y-1 sm:space-y-2">
+                        <Badge className="bg-slate-950/10 text-slate-500 border-none font-black px-3 sm:px-4 py-1 rounded-full uppercase text-[8px] sm:text-[9px] tracking-widest">Outbound Protocol</Badge>
+                        <CardTitle className="text-2xl sm:text-4xl font-black tracking-tightest">TRANSFER</CardTitle>
                       </div>
-                      <div className="size-16 bg-slate-950 text-white rounded-2xl flex items-center justify-center shadow-xl">
-                        <Send className="size-8" />
+                      <div className="size-12 sm:size-16 shrink-0 bg-slate-950 text-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <Send className="size-6 sm:size-8" />
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-10 space-y-8">
+                  <CardContent className="p-5 sm:p-10 space-y-5 sm:space-y-8">
                     <div className="space-y-6">
                       <div className="space-y-4">
                         <div className="flex items-center justify-between px-2">
@@ -1325,18 +1539,20 @@ export default function WalletPage() {
                           </Button>
                         </div>
                         <Input
+                          id="recipient-account-input"
                           placeholder="RECIPIENT ACCOUNT"
-                          className="h-20 rounded-3xl bg-slate-50/50 border-none focus:bg-white font-mono text-2xl tracking-[0.2em] px-8 shadow-inner"
+                          className={`h-14 sm:h-20 rounded-2xl sm:rounded-3xl bg-slate-50/50 border-none focus:bg-white font-mono text-lg sm:text-2xl tracking-[0.1em] sm:tracking-[0.2em] px-6 sm:px-8 shadow-inner ${voiceFocus === 'account' ? 'ring-2 ring-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : ''}`}
                           value={recipientAccount}
                           onChange={(e) => setRecipientAccount(e.target.value)}
                         />
+
                       </div>
 
-                      <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                        <div className="space-y-3 sm:space-y-4">
                           <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Gateway</Label>
                           <Select value={recipientBank} onValueChange={setRecipientBank}>
-                            <SelectTrigger className="h-16 rounded-2xl border-none bg-slate-50/50 font-black uppercase text-[10px] tracking-widest px-6 shadow-inner">
+                            <SelectTrigger className={`h-14 sm:h-16 rounded-2xl border-none bg-slate-50/50 font-black uppercase text-[9px] sm:text-[10px] tracking-widest px-3 sm:px-6 shadow-inner ${voiceFocus === 'bank' ? 'ring-2 ring-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : ''}`}>
                               <SelectValue placeholder="GATEWAY" />
                             </SelectTrigger>
                             <SelectContent className="rounded-2xl border-none shadow-2xl">
@@ -1348,14 +1564,14 @@ export default function WalletPage() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Liquidity</Label>
                           <div className="relative group">
-                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-black text-sm group-focus-within:text-slate-950 transition-colors">₦</span>
+                            <span className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 font-black text-sm group-focus-within:text-slate-950 transition-colors">₦</span>
                             <Input
                               type="number"
                               placeholder="0.00"
-                              className="h-16 pl-10 rounded-2xl border-none bg-slate-50/50 font-black text-xl shadow-inner focus:bg-white transition-all"
+                              className={`h-14 sm:h-16 pl-8 sm:pl-10 rounded-2xl border-none bg-slate-50/50 font-black text-lg sm:text-xl shadow-inner focus:bg-white transition-all ${voiceFocus === 'amount' ? 'ring-2 ring-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : ''}`}
                               value={transferAmount}
                               onChange={(e) => setTransferAmount(e.target.value)}
                             />
@@ -1387,25 +1603,26 @@ export default function WalletPage() {
 
                       <Button
                         onClick={withdrawFunds}
-                        className="w-full h-20 rounded-3xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase tracking-[0.3em] shadow-[0_40px_80px_-20px_rgba(15,23,42,0.3)] active:scale-95 py-6"
+                        className="w-full h-16 sm:h-20 rounded-2xl sm:rounded-3xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase tracking-[0.3em] shadow-[0_40px_80px_-20px_rgba(15,23,42,0.3)] active:scale-95 py-6"
                         disabled={isTransferring || !transferAmount || parseFloat(transferAmount) > balance || (!recipientName && !recipientBank.toLowerCase().includes('ibom'))}
                       >
-                        {isTransferring ? <Loader2 className="mr-3 size-6 animate-spin" /> : <ArrowUpRight className="mr-3 size-6" />}
+                        {isTransferring ? <Loader2 className="mr-3 size-5 sm:size-6 animate-spin" /> : <ArrowUpRight className="mr-3 size-5 sm:size-6" />}
                         {isTransferring ? 'SYNCHRONIZING...' : 'EXECUTE X-TRANSFER'}
                       </Button>
+
                     </div>
                   </CardContent>
                 </Card>
               </div>
             </TabsContent>
 
-            <TabsContent value="cards" className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
+            <TabsContent value="cards" className="space-y-12 animate-in fade-in duration-700 w-full max-w-full overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Ultra-Premium Virtual Card */}
-                <div className="relative group perspective-2000">
-                  <div className="absolute -inset-2 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-[3.5rem] blur-2xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                <div className="relative group perspective-2000 overflow-hidden p-2">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-[3.5rem] blur-2xl opacity-10 sm:opacity-20 transition duration-1000"></div>
 
-                  <Card className={`relative border-none shadow-[0_80px_160px_-30px_rgba(0,0,0,0.4)] rounded-[3.5rem] overflow-hidden bg-slate-950 text-white min-h-[380px] flex flex-col justify-between p-12 transition-all duration-700 ${walletData?.isCardFrozen ? 'grayscale opacity-60' : 'hover:-translate-y-4 hover:rotate-1'}`}>
+                  <Card className={`relative border-none shadow-xl sm:shadow-[0_80px_160px_-30px_rgba(0,0,0,0.4)] rounded-[2.5rem] sm:rounded-[3.5rem] overflow-hidden bg-slate-950 text-white min-h-[320px] sm:min-h-[380px] flex flex-col justify-between p-6 sm:p-12 transition-all duration-700 ${walletData?.isCardFrozen ? 'grayscale opacity-60' : 'hover:-translate-y-4 hover:rotate-1'}`}>
                     {/* Advanced Mesh / Holographic Background */}
                     <div className="absolute top-[-20%] right-[-10%] w-[80%] h-[80%] bg-indigo-500/30 blur-[120px] rounded-full animate-pulse" />
                     <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-500/20 blur-[100px] rounded-full animate-pulse " style={{ animationDelay: '1s' }} />
@@ -1421,9 +1638,9 @@ export default function WalletPage() {
                       </div>
                     </div>
 
-                    <div className="relative z-10 space-y-4">
+                    <div className="relative z-10 space-y-2 sm:space-y-4">
                       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">Global Terminal Identifier</p>
-                      <h3 className="text-3xl sm:text-4xl font-black font-mono tracking-[0.2em] drop-shadow-2xl">4092 • 8820 • 0012 • 9024</h3>
+                      <h3 className="text-base sm:text-4xl font-black font-mono tracking-tight sm:tracking-[0.2em] drop-shadow-2xl truncate">4092 • 8820 • 0012 • 9024</h3>
                     </div>
 
                     <div className="relative z-10 flex justify-between items-end">
@@ -1489,96 +1706,151 @@ export default function WalletPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="vaults" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-              <div className="flex items-center justify-between px-2">
-                <div className="space-y-1">
-                  <h3 className="text-3xl font-black tracking-tighter">Strategic Vaults</h3>
-                  <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Target-Based Wealth Preservation</p>
-                </div>
-                <Button onClick={() => setIsCreateVaultOpen(true)} className="size-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-600/20 active:scale-90 transition-all">
-                  <Plus className="size-8" />
-                </Button>
-              </div>
+            <TabsContent value="vaults" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700 w-full max-w-full overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                 <div className="lg:col-span-2 space-y-10">
+                    <div className="flex items-center justify-between px-2">
+                      <div className="space-y-1">
+                        <h3 className="text-3xl font-black tracking-tighter">Strategic Vaults</h3>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Target-Based Wealth Preservation</p>
+                      </div>
+                      <Button onClick={() => setIsCreateVaultOpen(true)} className="size-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-600/20 active:scale-90 transition-all">
+                        <Plus className="size-8" />
+                      </Button>
+                    </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {vaults.map((vault, idx) => {
-                  const percentage = Math.min(100, Math.round((vault.currentAmount / vault.targetAmount) * 100));
-                  return (
-                    <Card key={vault.id} className="group relative border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] hover:shadow-[0_60px_120px_-30px_rgba(16,185,129,0.3)] transition-all duration-700 rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${idx * 100}ms` }}>
-                      <CardContent className="p-8 space-y-8">
-                        <div className="flex justify-between items-start">
-                          <div className="space-y-2">
-                            <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1.5 rounded-xl uppercase text-[9px] tracking-widest shadow-sm">
-                              ID: {vault.id.slice(0, 8).toUpperCase()}
-                            </Badge>
-                            <CardTitle className="text-3xl font-black tracking-tightest leading-none">{vault.name}</CardTitle>
-                          </div>
-                          <div className="size-16 bg-slate-50 dark:bg-emerald-950 rounded-[1.5rem] flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform duration-500">
-                            <PiggyBank className="size-8 text-emerald-500" />
-                          </div>
-                        </div>
-
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-end">
-                            <div className="space-y-1">
-                              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Preserved Capital</p>
-                              <h4 className="text-4xl font-black font-mono tracking-tight text-slate-950 dark:text-white">₦{vault.currentAmount.toLocaleString()}</h4>
-                            </div>
-                            <div className="flex flex-col items-end">
-                              <span className="text-lg font-black text-emerald-500">₦{vault.targetAmount.toLocaleString()}</span>
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Objective</span>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="h-4 w-full bg-slate-100 dark:bg-emerald-950 rounded-full overflow-hidden p-1 shadow-inner">
-                              <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-[2000ms] shadow-lg shadow-emerald-500/40 relative overflow-hidden" style={{ width: `${percentage}%` }}>
-                                <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 min-w-0">
+                      {vaults.map((vault, idx) => {
+                        const percentage = Math.min(100, Math.round((vault.currentAmount / vault.targetAmount) * 100));
+                        return (
+                          <Card key={vault.id} className="group relative border-none shadow-lg sm:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] hover:shadow-2xl transition-all duration-700 rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${idx * 100}ms` }}>
+                            <CardContent className="p-6 sm:p-8 space-y-6 sm:space-y-8">
+                              <div className="flex justify-between items-start">
+                                <div className="space-y-1 sm:space-y-2 min-w-0 pr-2">
+                                  <Badge className="bg-emerald-600/10 text-emerald-500 border-none font-black px-4 py-1.5 rounded-xl uppercase text-[9px] tracking-widest shadow-sm truncate">
+                                    ID: {vault.id.slice(0, 8).toUpperCase()}
+                                  </Badge>
+                                  <CardTitle className="text-2xl sm:text-3xl font-black tracking-tightest leading-none truncate">{vault.name}</CardTitle>
+                                </div>
+                                <div className="size-12 sm:size-16 shrink-0 bg-slate-50 dark:bg-emerald-950 rounded-xl sm:rounded-[1.5rem] flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform duration-500">
+                                  <PiggyBank className="size-6 sm:size-8 text-emerald-500" />
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
-                              <span>Stabilization Status</span>
-                              <span className="text-emerald-500">{percentage}% Collateralized</span>
-                            </div>
+
+                              <div className="space-y-4">
+                                <div className="flex justify-between items-end">
+                                  <div className="space-y-1 min-w-0 overflow-hidden">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Preserved Capital</p>
+                                    <h4 className="text-2xl sm:text-4xl font-black font-mono tracking-tight text-slate-950 dark:text-white truncate">₦{vault.currentAmount.toLocaleString()}</h4>
+                                  </div>
+                                  <div className="flex flex-col items-end">
+                                    <span className="text-lg font-black text-emerald-500">₦{vault.targetAmount.toLocaleString()}</span>
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Objective</span>
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  <div className="h-4 w-full bg-slate-100 dark:bg-emerald-950 rounded-full overflow-hidden p-1 shadow-inner">
+                                    <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-[2000ms] shadow-lg shadow-emerald-500/40 relative overflow-hidden" style={{ width: `${percentage}%` }}>
+                                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                                    </div>
+                                  </div>
+                                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                    <span>Stabilization Status</span>
+                                    <span className="text-emerald-500">{percentage}% Collateralized</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <Button onClick={() => setTopUpVaultId(vault.id)} className="w-full h-18 rounded-2xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase text-xs tracking-[0.2em] shadow-2xl active:scale-95 py-6">
+                                <Zap className="mr-3 size-5" /> Injection Protocol
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+
+                      <Card onClick={() => setIsCreateVaultOpen(true)} className="border-2 border-dashed border-slate-200 dark:border-slate-800 shadow-none rounded-[2.5rem] bg-transparent flex flex-col items-center justify-center p-12 text-center min-h-[300px] hover:bg-white dark:hover:bg-slate-900/50 hover:border-emerald-500 transition-all cursor-pointer group hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${vaults.length * 100}ms` }}>
+                        <div className="size-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-inner">
+                          <PiggyBank className="size-10 text-slate-300 group-hover:text-white" />
+                        </div>
+                        <h3 className="text-2xl font-black tracking-tightest mb-2 group-hover:text-emerald-500 transition-colors">INITIATE VAULT</h3>
+                        <p className="text-sm text-slate-400 font-medium max-w-[220px]">Deploy a new capital reservation protocol for enhanced financial autonomy.</p>
+                      </Card>
+                    </div>
+                 </div>
+
+                 <div className="space-y-8">
+                    <div className="space-y-1 px-2">
+                      <h3 className="text-3xl font-black tracking-tighter">Orion Intelligence</h3>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Financial Health Analytics</p>
+                    </div>
+                    
+                    <Card className="border-none shadow-2xl rounded-[2.5rem] bg-slate-950 p-8 text-white relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent" />
+                      <div className="relative z-10 space-y-6">
+                        <div className="flex items-center justify-between">
+                          <Badge className="bg-indigo-500/20 text-indigo-400 border-none font-black px-4 py-1 rounded-xl uppercase text-[9px] tracking-widest">Neural Mode</Badge>
+                          <Brain className="size-8 text-indigo-400 animate-pulse" />
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Asset Health Index</p>
+                          <div className="flex items-end gap-2">
+                             <h4 className="text-6xl font-black tracking-tightest leading-none">{OrionAIEngine.getFinancialHealth(balance, transactions).score}</h4>
+                             <TrendingUp className="size-6 text-emerald-500 mb-1" />
                           </div>
                         </div>
 
-                        <Button onClick={() => setTopUpVaultId(vault.id)} className="w-full h-18 rounded-2xl bg-slate-950 text-white hover:bg-emerald-600 transition-all font-black uppercase text-xs tracking-[0.2em] shadow-2xl active:scale-95 py-6">
-                          <Zap className="mr-3 size-5" /> Injection Protocol
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                        <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-1 p-4 rounded-2xl bg-white/5 border border-white/5">
+                              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Savings Rate</p>
+                              <p className="text-lg font-black">{OrionAIEngine.getFinancialHealth(balance, transactions).savingsRate}%</p>
+                           </div>
+                           <div className="space-y-1 p-4 rounded-2xl bg-white/5 border border-white/5">
+                              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Risk Index</p>
+                              <p className="text-lg font-black text-emerald-500">LOW</p>
+                           </div>
+                        </div>
 
-                <Card onClick={() => setIsCreateVaultOpen(true)} className="border-2 border-dashed border-slate-200 dark:border-slate-800 shadow-none rounded-[2.5rem] bg-transparent flex flex-col items-center justify-center p-12 text-center min-h-[300px] hover:bg-white dark:hover:bg-slate-900/50 hover:border-emerald-500 transition-all cursor-pointer group hover:-translate-y-2 animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${vaults.length * 100}ms` }}>
-                  <div className="size-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-inner">
-                    <PiggyBank className="size-10 text-slate-300 group-hover:text-white" />
-                  </div>
-                  <h3 className="text-2xl font-black tracking-tightest mb-2 group-hover:text-emerald-500 transition-colors">INITIATE VAULT</h3>
-                  <p className="text-sm text-slate-400 font-medium max-w-[220px]">Deploy a new capital reservation protocol for enhanced financial autonomy.</p>
-                </Card>
+                        <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                           <p className="text-xs font-medium text-slate-300 italic leading-relaxed">
+                              "Orion suggests increasing your target for 'Emergency' vault by 12% to reach stability before Q3."
+                           </p>
+                        </div>
+                      </div>
+                    </Card>
+
+                    <Card className="border-none shadow-lg rounded-[2.5rem] bg-white dark:bg-slate-900 p-8 flex flex-col items-center justify-center text-center space-y-4">
+                       <div className="size-16 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <TrendingUp className="size-8 text-emerald-600" />
+                       </div>
+                       <h4 className="text-xl font-black uppercase tracking-tightest">Proactive Insights</h4>
+                       <p className="text-xs text-slate-400 font-medium">Your spending has decreased by 14% this week. Orion has allocated savings to your active vaults.</p>
+                       <Button variant="ghost" className="text-emerald-600 font-black uppercase text-[10px] tracking-widest">View Detailed Telemetry</Button>
+                    </Card>
+                 </div>
               </div>
             </TabsContent>
 
             <TabsContent value="history" className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-                <div className="space-y-2">
-                  <Badge className="bg-slate-900/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[9px] tracking-widest">Digital Ledger</Badge>
-                  <h3 className="text-4xl font-black tracking-tightest">TRANSACTION FEED</h3>
-                  <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Historical Telemetry & Settlements</p>
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 px-2 sm:px-4">
+                <div className="space-y-1 sm:space-y-2 min-w-0">
+                  <Badge className="bg-slate-900/10 text-slate-500 border-none font-black px-4 py-1 rounded-full uppercase text-[8px] sm:text-[9px] tracking-widest">Digital Ledger</Badge>
+                  <h3 className="text-2xl sm:text-4xl font-black tracking-tightest truncate">TRANSACTION FEED</h3>
+                  <p className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest truncate">Historical Telemetry & Settlements</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap shrink-0">
+                  <Button variant="outline" className="rounded-xl sm:rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[8px] sm:text-[9px] tracking-widest px-4 sm:px-6 h-10 sm:h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
                     All Nodes
                   </Button>
-                  <Button variant="outline" className="rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[9px] tracking-widest px-6 h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
+                  <Button variant="outline" className="rounded-xl sm:rounded-2xl border-slate-100 dark:border-slate-800 font-black uppercase text-[8px] sm:text-[9px] tracking-widest px-4 sm:px-6 h-10 sm:h-12 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95 transition-all">
                     Export CSV
                   </Button>
                 </div>
               </div>
 
-              <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[3rem] overflow-hidden bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl border border-white/20">
-                <CardContent className="p-4 sm:p-8">
+              <Card className="border-none shadow-lg sm:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-2xl sm:rounded-[3rem] overflow-hidden bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl border border-white/20">
+                <CardContent className="p-3 sm:p-8">
                   {transactions.length === 0 ? (
                     <div className="text-center py-32 px-4 space-y-6">
                       <div className="size-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto shadow-inner group animate-pulse">
@@ -1594,28 +1866,26 @@ export default function WalletPage() {
                       {transactions.map((txn, idx) => (
                         <div key={txn.id} className="group relative">
                           <div className="absolute inset-0 bg-slate-50/50 dark:bg-slate-800/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
-                          <div className="flex items-center justify-between p-6 cursor-pointer border-b border-slate-50 dark:border-slate-800/50 last:border-0 transition-all">
-                            <div className="flex items-center gap-6">
-                              <div className={`size-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 group-active:scale-90 ${txn.type === 'credit' ? 'bg-emerald-500/10 text-emerald-600 shadow-emerald-500/10' : 'bg-slate-950 text-white shadow-slate-950/10'}`}>
-                                {txn.type === 'credit' ? <ArrowDownLeft className="size-7" /> : <ArrowUpRight className="size-7" />}
+                          <div className="flex items-center justify-between p-3 sm:p-6 cursor-pointer border-b border-slate-50 dark:border-slate-800/50 last:border-0 transition-opacity active:opacity-50">
+                            <div className="flex items-center gap-3 sm:gap-6 min-w-0 pr-2">
+                              <div className={`size-9 sm:size-14 shrink-0 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-md transition-transform group-hover:scale-110 ${txn.type === 'credit' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-slate-950 text-white'}`}>
+                                {txn.type === 'credit' ? <ArrowDownLeft className="size-4 sm:size-7" /> : <ArrowUpRight className="size-4 sm:size-7" />}
                               </div>
-                              <div className="space-y-1">
-                                <p className="font-black text-xl tracking-tightest uppercase text-slate-900 dark:text-white">{txn.description}</p>
-                                <div className="flex items-center gap-2">
-                                  <Badge className="bg-slate-100 dark:bg-slate-800 text-[8px] font-black tracking-widest uppercase py-0.5 px-2 rounded-md border-none text-slate-400">Node ID: {txn.id.slice(-8).toUpperCase()}</Badge>
-                                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                                    {txn.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} • {txn.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              <div className="min-w-0">
+                                <p className="font-black text-[12px] sm:text-xl tracking-tight uppercase text-slate-900 dark:text-white truncate leading-tight mb-0.5">{txn.description}</p>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                                    {txn.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric' })} · {txn.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </span>
+                                  {txn.isSimulated && <Badge className="bg-amber-500/10 text-amber-600 text-[6px] px-1 h-3.5 uppercase border-none">Demo</Badge>}
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right space-y-2">
-                              <p className={`font-black text-2xl tracking-tighter ${txn.type === 'credit' ? 'text-emerald-500' : 'text-slate-950 dark:text-white'}`}>
+                            <div className="text-right shrink-0">
+                              <p className={`font-black text-sm sm:text-2xl tracking-tight leading-none mb-0.5 ${txn.type === 'credit' ? 'text-emerald-500' : 'text-slate-950 dark:text-white'}`}>
                                 {txn.type === 'credit' ? '+' : '-'}₦{txn.amount.toLocaleString()}
                               </p>
-                              <div className="flex justify-end">
-                                <Badge className="text-[9px] h-5 px-3 font-black border-none bg-emerald-500/10 text-emerald-600 uppercase tracking-[0.2em] rounded-lg">Settled ✓</Badge>
-                              </div>
+                              <p className="text-[8px] font-black text-emerald-600/60 uppercase tracking-widest">Success</p>
                             </div>
                           </div>
                         </div>
@@ -1632,17 +1902,17 @@ export default function WalletPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="security" className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
-              <div className="text-center space-y-3 pb-4">
-                <div className="size-20 rounded-[2rem] bg-slate-950 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20 group hover:rotate-12 transition-transform duration-500">
-                  <ShieldCheck className="size-10 text-emerald-500" />
+            <TabsContent value="security" className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
+              <div className="text-center space-y-2 sm:space-y-3 pb-2 sm:pb-4 px-2">
+                <div className="size-16 sm:size-20 rounded-[1.5rem] sm:rounded-[2rem] bg-slate-950 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20 group hover:rotate-12 transition-transform duration-500">
+                  <ShieldCheck className="size-8 sm:size-10 text-emerald-500" />
                 </div>
-                <h3 className="text-4xl font-black tracking-tightest">DEFENSE PROTOCOLS</h3>
-                <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Institutional Grade Assets Protection</p>
+                <h3 className="text-2xl sm:text-4xl font-black tracking-tightest leading-none">DEFENSE PROTOCOLS</h3>
+                <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] sm:tracking-[0.3em]">Institutional Grade Assets</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-white dark:bg-slate-900/40 backdrop-blur-3xl p-8 space-y-8 border border-white/20">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2rem] sm:rounded-[2.5rem] bg-white dark:bg-slate-900/40 backdrop-blur-3xl p-6 sm:p-8 space-y-6 sm:space-y-8 border border-white/20">
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1.5">
@@ -1667,20 +1937,22 @@ export default function WalletPage() {
                 </Card>
 
                 <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] rounded-[2.5rem] bg-slate-950 p-10 text-white relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-32 bg-emerald-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                  <div className="absolute top-0 right-0 p-32 bg-indigo-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 p-32 bg-emerald-500/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
                   <div className="relative z-10 space-y-6">
                     <div className="size-16 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md group-hover:scale-110 transition-transform">
-                      <Terminal className="size-8 text-emerald-400" />
+                      <ShieldCheck className="size-8 text-indigo-400" />
                     </div>
                     <div className="space-y-2">
-                      <h4 className="text-3xl font-black tracking-tightest leading-tight">Advanced Encryption Status: <span className="text-emerald-400 italic">SECURE.</span></h4>
-                      <p className="text-slate-400 text-sm font-medium leading-relaxed italic">&quot;RSA-4096 Multi-Region Node Verification is active on this session. All telemetry data is end-to-end sanitized.&quot;</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400">Security Architecture</p>
+                      <h4 className="text-4xl font-black tracking-tightest leading-tight">ARISE SHIELD <span className="text-emerald-400 italic">v2.0</span></h4>
+                      <p className="text-slate-400 text-sm font-medium leading-relaxed italic">&quot;Enterprise RSA-4096 Multi-Region Neural Mesh is active. All terminal telemetry is end-to-end sanitized and fraud-shielded by Orion.&quot;</p>
                     </div>
                     <div className="flex items-center gap-3 pt-4">
                       <div className="h-1.5 flex-1 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-500 w-[94%] shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                        <div className="h-full bg-indigo-500 w-[98%] shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-pulse" />
                       </div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">94.8% Integrity</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">98.2% Neural Integrity</span>
                     </div>
                   </div>
                 </Card>
@@ -1697,7 +1969,7 @@ export default function WalletPage() {
       </main>
 
       <Dialog open={isScanModalOpen} onOpenChange={setIsScanModalOpen}>
-        <DialogContent className="sm:max-w-md bg-slate-50 dark:bg-slate-950 border-none rounded-[2rem] overflow-hidden p-0 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-slate-50 dark:bg-slate-950 border-none rounded-[2rem] overflow-hidden p-0 max-h-[90vh] overflow-y-auto">
           <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 p-8 flex flex-col items-center text-white relative">
             <ScanLine className="h-10 w-10 mb-3 opacity-90" />
             <DialogTitle className="text-2xl font-black uppercase tracking-widest text-white">Ibom X Scan</DialogTitle>
@@ -1818,7 +2090,7 @@ export default function WalletPage() {
       </Dialog>
 
       <Dialog open={isIbomAskModalOpen} onOpenChange={setIsIbomAskModalOpen}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2rem] overflow-hidden p-8 text-center">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2rem] overflow-hidden p-8 text-center uppercase">
           <div className="mx-auto bg-emerald-100 dark:bg-emerald-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
             <ScanLine className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
           </div>
@@ -1857,7 +2129,7 @@ export default function WalletPage() {
 
       {/* Vault Creation Dialog */}
       <Dialog open={isCreateVaultOpen} onOpenChange={setIsCreateVaultOpen}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8">
           <DialogTitle className="text-2xl font-black uppercase tracking-widest text-slate-900 dark:text-white mb-2">New Vault</DialogTitle>
           <DialogDescription className="text-sm font-medium text-slate-500 mb-6">Create a new savings target to lock away funds securely.</DialogDescription>
 
@@ -1900,7 +2172,7 @@ export default function WalletPage() {
 
       {/* Vault Top-Up Dialog */}
       <Dialog open={topUpVaultId !== null} onOpenChange={(open) => !open && setTopUpVaultId(null)}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8">
           <DialogTitle className="text-2xl font-black uppercase tracking-widest text-slate-900 dark:text-white mb-2">Fund Vault</DialogTitle>
           <DialogDescription className="text-sm font-medium text-slate-500 mb-6">Transfer money instantly from your main balance to this vault.</DialogDescription>
 
@@ -1936,7 +2208,7 @@ export default function WalletPage() {
 
       {/* Simulator Dialog for Starter restriction */}
       <Dialog open={showSimulatePrompt} onOpenChange={setShowSimulatePrompt}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8 text-center">
+        <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-slate-950 border-none rounded-[2.5rem] p-8 text-center">
           <div className="mx-auto bg-amber-100 dark:bg-amber-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
             <AlertTriangle className="h-8 w-8 text-amber-600 dark:text-amber-400" />
           </div>
@@ -1969,6 +2241,117 @@ export default function WalletPage() {
           <p className="text-[10px] text-slate-400 mt-6 font-medium">Use Simulation to test the wallet flow until your payment provider account is upgraded.</p>
         </DialogContent>
       </Dialog>
+      {/* ── Premium Native Bottom Nav ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-[60] sm:hidden">
+        {/* AirSend FAB */}
+        <div className="absolute left-1/2 -translate-x-1/2 -top-7 z-10">
+          <button
+            onClick={() => { setIsAirSendOpen(true); if (navigator.vibrate) navigator.vibrate([10, 20, 10]); }}
+            className="size-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-2xl shadow-indigo-500/50 border-[3px] border-white dark:border-slate-950 active:scale-90 transition-all"
+          >
+            <Wifi className="size-6 text-white" />
+          </button>
+        </div>
+        <div className="bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/[0.05] shadow-[0_-8px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_40px_rgba(0,0,0,0.3)]">
+          <div className="flex justify-around items-center px-2 pt-2 pb-safe" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+            {[
+              {
+                id: 'topup', icon: Plus, label: 'Add', color: 'text-emerald-600 dark:text-emerald-400', action: () => {
+                  (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+                  if (navigator.vibrate) navigator.vibrate(8);
+                }
+              },
+              {
+                id: 'send', icon: Send, label: 'Send', color: 'text-slate-600 dark:text-slate-300', action: () => {
+                  (document.querySelector('[value="manage"]') as HTMLElement)?.click();
+                  setTimeout(() => document.getElementById('recipient-account-input')?.focus(), 100);
+                  if (navigator.vibrate) navigator.vibrate(8);
+                }
+              },
+              { id: 'airsend-mid', icon: Wifi, label: '', color: '', action: () => { } }, // placeholder for FAB
+              {
+                id: 'cards', icon: CreditCard, label: 'Cards', color: 'text-indigo-600 dark:text-indigo-400', action: () => {
+                  (document.querySelector('[value="cards"]') as HTMLElement)?.click();
+                  if (navigator.vibrate) navigator.vibrate(8);
+                }
+              },
+              {
+                id: 'history', icon: History, label: 'History', color: 'text-slate-600 dark:text-slate-300', action: () => {
+                  (document.querySelector('[value="history"]') as HTMLElement)?.click();
+                  if (navigator.vibrate) navigator.vibrate(8);
+                }
+              },
+            ].map((item) => {
+              if (item.id === 'airsend-mid') {
+                return <div key={item.id} className="w-16" />; // gap for FAB
+              }
+              return (
+                <button
+                  key={item.id}
+                  onClick={item.action}
+                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl active:scale-75 transition-all focus:outline-none group"
+                >
+                  <div className="size-8 rounded-xl flex items-center justify-center transition-all group-active:bg-slate-100 dark:group-active:bg-slate-800">
+                    <item.icon className={`size-5 ${item.color} transition-colors`} />
+                  </div>
+                  <span className={`text-[8px] font-black uppercase tracking-widest ${item.color} opacity-80`}>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      <NearbyAirSend
+        open={isAirSendOpen}
+        onOpenChange={setIsAirSendOpen}
+        currentBalance={balance}
+      />
+
+      {/* Orion Super Assistant FAB */}
+      <div className="fixed bottom-24 right-6 sm:right-12 z-[70] group flex flex-col items-end gap-4">
+         {orionMessage && (
+           <div className="bg-slate-950/90 backdrop-blur-xl border border-indigo-500/30 text-white p-4 rounded-3xl max-w-xs shadow-2xl animate-in slide-in-from-bottom-2 fade-in">
+              <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Orion Neural Feed</p>
+              <p className="text-sm font-medium leading-relaxed italic text-slate-200">"{orionMessage}"</p>
+           </div>
+         )}
+
+         <div className="relative">
+            <div className={`absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full transition-all duration-500 ${orionListening || orionThinking ? 'scale-150 opacity-100' : 'scale-100 opacity-0'}`} />
+            <button
+              onClick={startVoiceBanking}
+              className={`relative size-16 sm:size-20 rounded-full bg-slate-950 border-2 flex items-center justify-center shadow-2xl transition-all duration-500 active:scale-90 ${orionListening ? 'border-indigo-400 overflow-hidden ring-4 ring-indigo-500/20 translate-y--2' : 'border-white/10 overflow-hidden hover:border-indigo-500/50'}`}
+            >
+              {(orionListening || orionThinking) ? (
+                <div className="relative flex items-center justify-center">
+                   <div className="absolute size-32 bg-indigo-500/10 animate-ping rounded-full" />
+                   <div className="flex gap-1 items-center">
+                      <div className="size-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="size-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="size-1.5 bg-indigo-400 rounded-full animate-bounce" />
+                   </div>
+                </div>
+              ) : (
+                <div className="relative flex flex-col items-center group-hover:scale-110 transition-transform">
+                   <Brain className="size-8 text-indigo-400" />
+                   <p className="absolute -bottom-1 text-[7px] font-black text-indigo-300 opacity-60 uppercase tracking-widest">Orion</p>
+                </div>
+              )}
+              {/* Orion HUD Glow */}
+              <div className={`absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-transparent transition-opacity ${orionListening ? 'opacity-100' : 'opacity-0'}`} />
+            </button>
+            
+            {/* Command Tooltip */}
+            {!orionMessage && (
+              <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center">
+                 <div className="bg-slate-950/90 backdrop-blur-xl border border-white/10 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-2xl whitespace-nowrap shadow-2xl animate-in slide-in-from-right-2">
+                    Establish Neural Link
+                 </div>
+                 <div className="w-2 h-2 bg-slate-950/90 border-r border-t border-white/10 rotate-45 -translate-x-1" />
+              </div>
+            )}
+         </div>
+      </div>
     </>
   );
 }
@@ -1982,7 +2365,7 @@ function ControlMatrixCard({ label, desc, icon, onClick, active, color }: { labe
   };
 
   return (
-    <Card onClick={onClick} className={`border border-none shadow-sm rounded-[2rem] p-7 flex flex-col gap-6 cursor-pointer hover:shadow-2xl hover:-translate-y-2 transition-all group bg-white dark:bg-slate-900/60 backdrop-blur-3xl overflow-hidden relative`}>
+    <Card onClick={onClick} className={`border border-none shadow-sm rounded-[2rem] p-5 sm:p-7 flex flex-col gap-4 sm:gap-6 cursor-pointer hover:shadow-2xl hover:-translate-y-2 transition-all group bg-white dark:bg-slate-900/60 backdrop-blur-3xl overflow-hidden relative`}>
       <div className={`size-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-6 ${colorMap[color] || colorMap.slate}`}>
         {icon}
       </div>
@@ -1999,7 +2382,7 @@ function ControlMatrixCard({ label, desc, icon, onClick, active, color }: { labe
 
 function SecurityStat({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/20 shadow-sm hover:shadow-md transition-shadow group">
+    <div className="flex items-center gap-3 sm:gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-4 sm:p-6 rounded-[2.25rem] sm:rounded-[2rem] border border-white/20 shadow-sm hover:shadow-md transition-shadow group">
       <div className="size-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
         {icon}
       </div>

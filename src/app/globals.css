@@ -110,6 +110,15 @@
 
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+  }
+
+  html {
+    overflow-x: hidden;
+    width: 100%;
+    overscroll-behavior-x: none;
   }
 
   /* Mobile-first: safe area insets for notched devices */
@@ -389,6 +398,14 @@
     perspective: 1000px;
   }
 
+  .perspective-2000 {
+    perspective: 2000px;
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
   .preserve-3d {
     transform-style: preserve-3d;
   }
@@ -420,7 +437,6 @@
       opacity: 1;
     }
   }
-
   /* ── New animations for enhanced splash & landing ── */
   @keyframes fade-in-up {
     from { opacity: 0; transform: translateY(20px) scale(0.98); }
@@ -457,4 +473,15 @@
   .animate-fade-in-up  { animation: fade-in-up 0.65s ease-out both; }
   .animate-splash-enter { animation: splash-enter 0.7s ease-out both; }
   .animate-spin-slow   { animation: spin-slow 20s linear infinite; }
+
+  @keyframes scan-y {
+    0% { top: 0%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .animate-scan-y {
+    animation: scan-y 2.5s cubic-bezier(1, 0, 0, 1) infinite;
+  }
 }

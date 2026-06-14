@@ -26,7 +26,7 @@ export default function CollectorGrid({ collectors }: { collectors: any[] }) {
 
   return (
     <div className="space-y-6">
-      <div className="relative max-w-md">
+      <div className="relative w-full max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
         <Input
           placeholder="Search by area or agency name..."

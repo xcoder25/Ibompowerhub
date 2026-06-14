@@ -7,6 +7,7 @@ declare global {
     interface Window {
         webkitSpeechRecognition: any;
         SpeechRecognition: any;
+        Capacitor: any;
     }
 }
 
@@ -38,7 +39,7 @@ export function useIbibioAI() {
     const [detectedLang, setDetectedLang] = useState<string>('en-NG');
     const [retryCount, setRetryCount] = useState(0);
     const [waveform, setWaveform] = useState<WaveformData>({ bars: Array(20).fill(0), rms: 0 });
-
+    const [hasPermission, setHasPermission] = useState<boolean | null>(null);
     const recognitionRef = useRef<any>(null);
     const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const retryRef = useRef(0);
@@ -47,6 +48,10 @@ export function useIbibioAI() {
     const micStreamRef = useRef<MediaStream | null>(null);
     const animFrameRef = useRef<number | null>(null);
     const isListeningRef = useRef(false);
+
+    // Platform detection
+    const isCapacitor = typeof window !== 'undefined' && !!window.Capacitor;
+    const platform = isCapacitor ? window.Capacitor.getPlatform() : 'web';
 
     // ── Waveform engine (Web Audio API) ──────────────────────────────────────
     const startWaveform = useCallback(async () => {
@@ -76,6 +81,7 @@ export function useIbibioAI() {
                 setWaveform({ bars, rms });
                 animFrameRef.current = requestAnimationFrame(draw);
             };
+
             draw();
         } catch {
             // Mic permission denied — use animated fallback
@@ -116,16 +122,44 @@ export function useIbibioAI() {
         }
     }, []);
 
+    /**
+     * Explicit Permission Request
+     * On Web, it uses navigator API.
+     * On Android/iOS via Capacitor, it ensures the core mic permission is requested.
+     */
+    const requestPermissions = useCallback(async () => {
+        try {
+            if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // This triggers the native browser/app-view permission dialog
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // Immediately stop the stream, we just validated/requested permission
+                stream.getTracks().forEach(track => track.stop());
+                setHasPermission(true);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Permission denied for microphone:', error);
+            setHasPermission(false);
+            return false;
+        }
+    }, []);
+
     // ── Core: Start listening ─────────────────────────────────────────────────
-    const startListening = useCallback(() => {
+    const startListening = useCallback(async () => {
         const SpeechRecognition = typeof window !== 'undefined'
             ? (window.SpeechRecognition || window.webkitSpeechRecognition)
             : null;
-        if (!SpeechRecognition) return;
+        if (!SpeechRecognition) {
+            console.warn('Speech recognition not supported on this browser/platform.');
+            return;
+        }
 
-        // Stop any existing session
-        if (recognitionRef.current) {
-            try { recognitionRef.current.stop(); } catch {}
+        // Always check/ensure permission before starting
+        const granted = await requestPermissions();
+        if (!granted) {
+            console.warn('Microphone permission not granted.');
+            return;
         }
 
         retryRef.current = 0;
@@ -221,7 +255,7 @@ export function useIbibioAI() {
         try { rec.start(); } catch (e) {
             console.error('[VoiceAI] Failed to start recognition:', e);
         }
-    }, [createRecognition, startWaveform, stopWaveform, clearSilenceTimer]);
+    }, [createRecognition, startWaveform, stopWaveform, clearSilenceTimer, requestPermissions]);
 
     // ── Core: Stop listening ──────────────────────────────────────────────────
     const stopListening = useCallback(() => {
@@ -244,20 +278,22 @@ export function useIbibioAI() {
 
     // ── TTS: Pick best female voice ───────────────────────────────────────────
     const pickFemaleVoice = useCallback((): SpeechSynthesisVoice | null => {
+        if (typeof window === 'undefined' || !window.speechSynthesis) return null;
+        
         const voices = window.speechSynthesis.getVoices();
         if (!voices.length) return null;
 
         const femaleKeywords = ['female', 'woman', 'girl', 'zira', 'hazel', 'susan',
             'samantha', 'victoria', 'karen', 'moira', 'tessa',
-            'fiona', 'nicky', 'kate', 'ava', 'allison', 'joanna', 'salli'];
+            'fiona', 'nicky', 'kate', 'ava', 'allison', 'joanna', 'salli', 'femi', 'ngozi'];
 
         const ngFemale = voices.find(v =>
-            (v.lang === 'en-NG' || v.lang.includes('NG'))
+            (v.lang.startsWith('en-NG') || v.lang.includes('NG'))
             && femaleKeywords.some(k => v.name.toLowerCase().includes(k))
         );
         if (ngFemale) return ngFemale;
 
-        const ngVoice = voices.find(v => v.lang === 'en-NG');
+        const ngVoice = voices.find(v => v.lang.startsWith('en-NG'));
         if (ngVoice) return ngVoice;
 
         const googleUK = voices.find(v => v.name === 'Google UK English Female');
@@ -275,7 +311,7 @@ export function useIbibioAI() {
         );
         if (anyFemale) return anyFemale;
 
-        const enGB = voices.find(v => v.lang === 'en-GB');
+        const enGB = voices.find(v => v.lang.startsWith('en-GB'));
         if (enGB) return enGB;
 
         return voices.find(v => v.lang.startsWith('en')) || null;
@@ -290,22 +326,37 @@ export function useIbibioAI() {
 
         const setVoiceAndSpeak = () => {
             const femaleVoice = pickFemaleVoice();
-            if (femaleVoice) utterance.voice = femaleVoice;
+            if (femaleVoice) {
+                utterance.voice = femaleVoice;
+                // On native, standard voices might be different, logging for debug
+                if (isCapacitor) console.log(`[NativeVoice] Speaking with: ${femaleVoice.name}`);
+            }
 
+            // ─── Tonal pitch simulation ───────────────────────────────────
             if (tones) {
                 const parts = tones.split(/[-\s]+/);
                 const highCount = parts.filter(t => t === 'H').length;
                 const lowCount = parts.filter(t => t === 'L').length;
-                utterance.pitch = highCount > lowCount ? 1.25 : lowCount > highCount ? 0.85 : 1.05;
+                if (highCount > lowCount) {
+                    utterance.pitch = 1.25;
+                } else if (lowCount > highCount) {
+                    utterance.pitch = 0.85;
+                } else {
+                    utterance.pitch = 1.05;
+                }
             } else {
                 utterance.pitch = 1.05;
             }
 
-            utterance.rate = 0.82;
+            // ─── Human-like delivery params ───────────────────────────────
+            utterance.rate = isCapacitor ? 0.85 : 0.80; // Slightly faster on native for responsiveness
             utterance.volume = 1.0;
             utterance.onstart = () => setIsSpeaking(true);
             utterance.onend = () => setIsSpeaking(false);
-            utterance.onerror = () => setIsSpeaking(false);
+            utterance.onerror = (e) => {
+                console.error('Speech synthesis error:', e);
+                setIsSpeaking(false);
+            };
 
             window.speechSynthesis.speak(utterance);
         };
@@ -315,7 +366,7 @@ export function useIbibioAI() {
         } else {
             setVoiceAndSpeak();
         }
-    }, [pickFemaleVoice]);
+    }, [pickFemaleVoice, isCapacitor]);
 
     const translateAndSpeak = useCallback((englishText: string) => {
         const found = findIbibioTranslation(englishText);
@@ -347,10 +398,15 @@ export function useIbibioAI() {
         detectedLang,
         retryCount,
         waveform,
+        hasPermission,
+        requestPermissions,
         startListening,
         stopListening,
         resetTranscript,
         speakTonal,
         translateAndSpeak,
+        platform,
+        isCapacitor
     };
 }
+

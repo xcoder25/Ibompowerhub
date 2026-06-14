@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Sparkles } from 'lucide-react';
+import { Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -12,6 +12,7 @@ import {
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { usePathname } from 'next/navigation';
 
 type AssistantFABProps = {
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -24,7 +25,15 @@ export function AssistantFAB({ onClick }: AssistantFABProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
+  const [isInDismissZone, setIsInDismissZone] = useState(false);
   const isMobile = useIsMobile();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setIsDismissed(false);
+  }, [pathname]);
+
 
   useEffect(() => {
     // Set initial position for desktop and mobile
@@ -68,11 +77,20 @@ export function AssistantFAB({ onClick }: AssistantFABProps) {
     const constrainedY = Math.max(0, Math.min(newY, maxY));
 
     setPosition({ x: constrainedX, y: constrainedY });
+
+    // Mark as dismissible if dragged into the bottom bar area or the left sidebar edge
+    if (constrainedY > window.innerHeight - 100 || constrainedX < 30) {
+      setIsInDismissZone(true);
+    } else {
+      setIsInDismissZone(false);
+    }
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
-    // Important: Reset hasMoved after a short delay to allow the click event to process
+    if (isInDismissZone) {
+      setIsDismissed(true);
+    }
     setTimeout(() => setHasMoved(false), 0);
   };
 
@@ -85,15 +103,19 @@ export function AssistantFAB({ onClick }: AssistantFABProps) {
     }
   }
 
+  if (isDismissed) return null;
+
   return (
-    <TooltipProvider>
+    <>
+      <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             ref={fabRef}
             className={cn(
-              'fixed h-14 w-14 rounded-full shadow-2xl z-30 cursor-grab',
-              isDragging && 'cursor-grabbing'
+              'fixed h-14 w-14 rounded-full shadow-2xl z-[60] cursor-grab transition-[transform,background-color] duration-200',
+              isDragging && 'cursor-grabbing scale-105',
+              isInDismissZone && 'bg-red-500 hover:bg-red-600 scale-90 opacity-90 shadow-red-500/30'
             )}
             style={{
               left: `${position.x}px`,
@@ -109,15 +131,36 @@ export function AssistantFAB({ onClick }: AssistantFABProps) {
             onTouchMove={(e) => handleDragMove(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchEnd={handleDragEnd}
             onClick={handleClick}
-            aria-label="AI Assistant"
+            aria-label="Orion AI Assistant"
           >
-            <Sparkles className="h-7 w-7" />
+            {isInDismissZone ? <X className="h-7 w-7 text-white animate-in zoom-in" /> : <Sparkles className="h-7 w-7" />}
           </Button>
         </TooltipTrigger>
         <TooltipContent side="left">
-          <p>AI Assistant</p>
+          <p>Orion AI Assistant</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+
+    {/* Dismiss visual indicator target */}
+    {isDragging && (
+      <>
+        <div className={cn(
+          "fixed bottom-6 left-1/2 -translate-x-1/2 p-4 rounded-full border-2 transition-all duration-300 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md pointer-events-none",
+          isInDismissZone ? "border-red-500 text-red-500 scale-110 shadow-lg shadow-red-500/20" : "border-slate-300 dark:border-slate-700 text-slate-500"
+        )}>
+          <X className="h-6 w-6" />
+        </div>
+        {!isMobile && (
+          <div className={cn(
+            "fixed top-1/2 left-4 -translate-y-1/2 p-4 rounded-full border-2 transition-all duration-300 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md pointer-events-none",
+            isInDismissZone ? "border-red-500 text-red-500 scale-110 shadow-lg shadow-red-500/20" : "border-slate-300 dark:border-slate-700 text-slate-500"
+          )}>
+            <X className="h-6 w-6" />
+          </div>
+        )}
+      </>
+    )}
+    </>
   );
 }

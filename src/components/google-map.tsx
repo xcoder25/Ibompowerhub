@@ -10,8 +10,8 @@ const containerStyle = {
 };
 
 const center = {
-    lat: 4.97,
-    lng: 8.34
+    lat: 5.038963,
+    lng: 7.909470
 };
 
 // Custom premium map style - Dark Mode + Clean labels

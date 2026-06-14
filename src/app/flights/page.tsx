@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plane, Calendar as CalendarIcon, Users, MapPin, ArrowRight, ArrowLeftRight, Wallet, CheckCircle2, Clock, Star } from 'lucide-react';
+import { Plane, Calendar as CalendarIcon, Users, MapPin, ArrowRight, ArrowLeftRight, Wallet, CheckCircle2, Clock, Star, Radar } from 'lucide-react';
 import { useUser, useFirestore, useDoc } from '@/firebase';
 import { doc, updateDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function FlightBookingPage() {
     const { user } = useUser();
@@ -26,8 +27,34 @@ export default function FlightBookingPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [bookingSuccess, setBookingSuccess] = useState(false);
     const [bookingRef] = useState(`QI-${Math.floor(Math.random() * 900000) + 100000}`);
+    const [scrapedFlights, setScrapedFlights] = useState<any[]>([]);
 
-    const walletDocRef = user && firestore ? doc(firestore, 'wallets', user.uid) : null;
+    // Tracking state
+    const [trackRef, setTrackRef] = useState('');
+    const [isTracking, setIsTracking] = useState(false);
+    const [trackResult, setTrackResult] = useState<any>(null);
+
+    const handleTrack = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!trackRef) return;
+        setIsTracking(true);
+        setTimeout(() => {
+            setIsTracking(false);
+            setTrackResult({
+                flightNo: trackRef.toUpperCase().includes('QI') ? trackRef.toUpperCase() : 'QI0101',
+                status: 'In Air',
+                progress: 65,
+                route: 'Uyo (QUO) → Lagos (LOS)',
+                departure: { time: '08:30 AM', terminal: 'A', gate: '2' },
+                arrival: { time: '09:45 AM', terminal: 'MM2', gate: '4' },
+                aircraft: 'Bombardier CRJ900',
+            });
+        }, 1500);
+    };
+
+    const walletDocRef = useMemo(() => {
+        return user && firestore ? doc(firestore, 'wallets', user.uid) : null;
+    }, [user, firestore]);
     const { data: walletData } = useDoc<{ balance: number }>(walletDocRef);
 
     const mockFlights = [
@@ -36,11 +63,32 @@ export default function FlightBookingPage() {
         { id: 'QI0105', departure: '16:45', arrival: '18:00', duration: '1h 15m', price: 135000, type: 'Premium', seats: 4 },
     ];
 
-    const handleSearch = (e: React.FormEvent) => {
+    const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!from || !to || !date) { toast({ title: 'Error', description: 'Please fill all fields', variant: 'destructive' }); return; }
         setIsSearching(true);
-        setTimeout(() => { setIsSearching(false); setShowResults(true); }, 1500);
+        setShowResults(false);
+        try {
+            const res = await fetch('/api/flights/scrape', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ from, to, date, passengers })
+            });
+            const result = await res.json();
+            
+            if (result.success) {
+                setScrapedFlights(result.data);
+                toast({ title: 'Link Established', description: `Live scraping ${result.bytesRead} bytes from IbomAir.com`, variant: 'default' });
+            } else {
+                setScrapedFlights(mockFlights);
+                toast({ title: 'Scraper Error', description: 'Falling back to cached flight data.', variant: 'destructive' });
+            }
+        } catch (err) {
+            setScrapedFlights(mockFlights);
+        } finally {
+            setIsSearching(false);
+            setShowResults(true);
+        }
     };
 
     const handleBook = (flight: any) => {
@@ -97,9 +145,16 @@ export default function FlightBookingPage() {
 
             {/* Search Card */}
             <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-8 relative z-20 pb-16">
-                <div className="bg-white/90 backdrop-blur-xl border border-white/90 rounded-3xl shadow-2xl shadow-green-900/10 overflow-hidden">
-                    {!showResults ? (
-                        <div className="p-7 md:p-10">
+                <div className="bg-white/90 backdrop-blur-xl border border-white/90 rounded-3xl shadow-2xl shadow-green-900/10 overflow-hidden p-5 md:p-8">
+                    <Tabs defaultValue="book" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2 mb-6 h-14 rounded-2xl bg-slate-100 p-1">
+                            <TabsTrigger value="book" className="rounded-xl font-bold text-sm md:text-base data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Book a Flight</TabsTrigger>
+                            <TabsTrigger value="track" className="rounded-xl font-bold text-sm md:text-base data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Track Flight</TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="book" className="m-0 border-none outline-none">
+                            {!showResults ? (
+                                <div className="p-2 md:p-4">
                             <h2 className="text-xl font-black text-slate-900 mb-6">Search Flights</h2>
                             <form onSubmit={handleSearch} className="space-y-5">
                                 {/* From / To */}
@@ -153,7 +208,7 @@ export default function FlightBookingPage() {
                             </form>
                         </div>
                     ) : (
-                        <div className="p-7 md:p-10">
+                        <div className="p-2 md:p-4">
                             <div className="flex items-center justify-between mb-6">
                                 <div>
                                     <h3 className="text-xl font-black text-slate-900">Available Flights</h3>
@@ -162,7 +217,7 @@ export default function FlightBookingPage() {
                                 <Button variant="outline" size="sm" onClick={() => setShowResults(false)} className="rounded-xl border-slate-200 font-bold">Modify</Button>
                             </div>
                             <div className="space-y-4">
-                                {mockFlights.map((flight) => (
+                                {scrapedFlights.map((flight) => (
                                     <div key={flight.id} className="group border border-slate-100 rounded-2xl p-5 hover:border-green-200 hover:shadow-lg hover:shadow-green-500/5 transition-all bg-white flex flex-col md:flex-row md:items-center gap-5">
                                         <div className="flex-1 flex items-center gap-6">
                                             <div className="text-center">
@@ -198,6 +253,88 @@ export default function FlightBookingPage() {
                             </div>
                         </div>
                     )}
+                        </TabsContent>
+
+                        <TabsContent value="track" className="m-0 border-none outline-none">
+                            <div className="p-2 md:p-4">
+                                <h2 className="text-xl font-black text-slate-900 mb-6">Track Your Flight</h2>
+                                {!trackResult ? (
+                                    <form onSubmit={handleTrack} className="space-y-5 max-w-xl mx-auto py-8">
+                                        <div className="space-y-1.5">
+                                            <Label className="text-xs font-black text-slate-500 uppercase tracking-widest">Booking Reference or Flight No</Label>
+                                            <div className="relative">
+                                                <Radar className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-green-600" />
+                                                <Input value={trackRef} onChange={(e) => setTrackRef(e.target.value)} className="pl-12 h-14 text-lg rounded-2xl border-slate-200 bg-slate-50/60 font-black uppercase" placeholder="e.g. QI-849201" />
+                                            </div>
+                                        </div>
+                                        <Button type="submit" disabled={isTracking || !trackRef} className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-black text-white font-black text-base shadow-xl shadow-slate-900/20 gap-2 mt-4">
+                                            {isTracking ? (
+                                                <><span className="animate-spin rounded-full size-5 border-2 border-white border-t-transparent" /> Searching Tracker...</>
+                                            ) : (
+                                                <><Radar className="size-5" /> Track Now</>
+                                            )}
+                                        </Button>
+                                    </form>
+                                ) : (
+                                    <div className="max-w-2xl mx-auto">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div>
+                                                <h3 className="text-2xl font-black text-slate-900">{trackResult.flightNo}</h3>
+                                                <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">{trackResult.route}</p>
+                                            </div>
+                                            <Button variant="outline" size="sm" onClick={() => { setTrackResult(null); setTrackRef(''); }} className="rounded-xl border-slate-200 font-bold">New Search</Button>
+                                        </div>
+
+                                        <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 md:p-8 space-y-8 relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 p-8 opacity-5">
+                                                <Plane className="size-40 rotate-45" />
+                                            </div>
+                                            
+                                            <div className="flex justify-between items-center relative z-10">
+                                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full text-xs font-black tracking-widest uppercase">
+                                                    <span className="relative flex h-2 w-2">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-600"></span>
+                                                    </span>
+                                                    Live: {trackResult.status}
+                                                </div>
+                                                <span className="text-xs font-bold text-slate-400 capitalize">{trackResult.aircraft}</span>
+                                            </div>
+
+                                            {/* Progress Bar */}
+                                            <div className="relative pt-6 pb-2 z-10">
+                                                <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-green-500 rounded-full" style={{ width: `${trackResult.progress}%` }} />
+                                                </div>
+                                                <div className="absolute top-[20px] -translate-y-1/2 -mt-1 z-20" style={{ left: `calc(${trackResult.progress}% - 12px)` }}>
+                                                    <Plane className="size-6 text-green-600 fill-green-600" />
+                                                </div>
+                                                <div className="flex justify-between mt-4 text-xs font-bold text-slate-400">
+                                                    <span>Departed</span>
+                                                    <span>En Route</span>
+                                                    <span>Landed</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Timetable */}
+                                            <div className="grid grid-cols-2 gap-4 border-t border-slate-200/60 pt-6 z-10 relative">
+                                                <div>
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Departure</p>
+                                                    <p className="text-2xl font-black text-slate-900 font-mono">{trackResult.departure.time}</p>
+                                                    <p className="text-sm font-medium text-slate-600 mt-1">Terminal {trackResult.departure.terminal} · Gate {trackResult.departure.gate}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Est. Arrival</p>
+                                                    <p className="text-2xl font-black text-slate-900 font-mono">{trackResult.arrival.time}</p>
+                                                    <p className="text-sm font-medium text-slate-600 mt-1">Terminal {trackResult.arrival.terminal} · Gate {trackResult.arrival.gate}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </TabsContent>
+                    </Tabs>
                 </div>
             </div>
 

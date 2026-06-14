@@ -13,7 +13,22 @@ service cloud.firestore {
 
     // Rules for the 'users' collection
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Rules for the 'artisans' collection
+    match /artisans/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /artisans/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    
+    match /users/{document=**} {
+        allow read, write: if isSignedIn();
     }
 
     // Rules for the 'wallets' collection
@@ -22,6 +37,11 @@ service cloud.firestore {
       
       // Rules for transactions subcollection
       match /transactions/{transactionId} {
+        allow read, write: if isSignedIn() && request.auth.uid == userId;
+      }
+      
+      // Rules for vaults subcollection
+      match /vaults/{vaultId} {
         allow read, write: if isSignedIn() && request.auth.uid == userId;
       }
     }
@@ -95,6 +115,17 @@ service cloud.firestore {
     // Rules for the 'kyc' collection — each user can only access their own KYC document
     match /kyc/{userId} {
       allow read, write: if isSignedIn() && isOwner(userId);
+    }
+
+    // Rules for Nearby AirSend
+    match /air_receivers/{document=**} {
+      allow read, write: if isSignedIn();
+    }
+    match /air_requesters/{document=**} {
+      allow read, write: if isSignedIn();
+    }
+    match /air_transfers/{document=**} {
+      allow read, write: if isSignedIn();
     }
   }
 }

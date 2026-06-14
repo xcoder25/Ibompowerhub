@@ -8,10 +8,8 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 const AppSidebar = dynamic(() => import('./app-sidebar').then(mod => mod.AppSidebar));
 const AppMobileNav = dynamic(() => import('./app-mobile-nav').then(mod => mod.AppMobileNav));
 const AppHeader = dynamic(() => import('./app-header').then(mod => mod.AppHeader));
-import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState, useRef } from 'react';
-import { AssistantWidget } from '../assistant-widget';
+import { NeuralHUD } from '../neural-hud';
 import { Toaster } from '../ui/toaster';
 import { useUser, useFirestore } from '@/firebase';
 import { SplashScreen } from '../splash-screen';
@@ -57,6 +55,16 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
     const isMobile = useIsMobile();
     const welcomeToastShown = useRef(false);
 
+    // Route flags moved here for accessibility in all return paths
+    const isDashboard = pathname.startsWith('/dashboard');
+    const isMapPage = pathname === '/map';
+    const isMarketPage = pathname === '/market';
+    const isFlightPage = pathname.startsWith('/flights');
+    const isWalletPage = pathname.startsWith('/wallet');
+    const isAuthPath = authRoutes.includes(pathname);
+    const isLandingPage = pathname === '/';
+    const showNav = !noNavRoutes.includes(pathname) && !authRoutes.includes(pathname);
+
     useEffect(() => {
         if (isUserLoading || !firestore) return;
 
@@ -77,7 +85,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
                 }
             });
 
-            if (authRoutes.includes(pathname)) {
+            if (isAuthPath) {
                 if (!welcomeToastShown.current) {
                     toast({
                         title: isNewUser ? 'Account Created!' : 'Login Successful!',
@@ -88,22 +96,20 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
                 router.push('/dashboard');
             }
         } else {
-            if (!authRoutes.includes(pathname) && pathname !== '/') {
+            if (!isAuthPath && !isLandingPage) {
                 router.push('/auth/login');
             }
             welcomeToastShown.current = false;
         }
-    }, [user, isUserLoading, pathname, router, firestore, toast]);
+    }, [user, isUserLoading, pathname, router, firestore, toast, isAuthPath, isLandingPage]);
 
     if (isUserLoading) {
         return <SplashScreen />;
     }
 
-    const isDashboard = pathname.startsWith('/dashboard');
-
-    if (authRoutes.includes(pathname) || pathname === '/') {
+    if (isAuthPath || isLandingPage) {
         return (
-            <main className="flex-1 flex flex-col">
+            <main className="flex-1 flex flex-col relative">
                 {children}
             </main>
         );
@@ -113,12 +119,9 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
         return <SplashScreen />;
     }
 
-    const isMapPage = pathname === '/map';
-    const showNav = !noNavRoutes.includes(pathname) && !authRoutes.includes(pathname);
-
     if (!showNav) {
         return (
-            <main className="flex-1 flex flex-col">
+            <main className="flex-1 flex flex-col relative">
                 {children}
             </main>
         );
@@ -130,13 +133,13 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
             <div className={cn("flex min-h-screen min-h-[100dvh]", isDashboard ? "bg-background" : "bg-background")}>
                 {!isMobile && <AppSidebar />}
                 <div className="flex flex-col flex-1">
-                    <AppHeader />
-                    <SidebarInset>
-                        <main className={cn("flex-1 flex flex-col", "pb-24 md:pb-0")}>
+                    {!(isMapPage || isFlightPage || isWalletPage || (isMarketPage && isMobile)) && <AppHeader />}
+                    <SidebarInset className="flex flex-col">
+                        <main className={cn("flex-1 flex flex-col relative h-full w-full", "pb-[80px] md:pb-0")}>
+                            <NeuralHUD />
                             {children}
                         </main>
                     </SidebarInset>
-                    <AssistantWidget />
                     {isMobile && <AppMobileNav />}
                 </div>
             </div>

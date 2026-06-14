@@ -49,7 +49,7 @@ const ONBOARDING_SLIDES = [
     title: 'Send Money,',
     titleHighlight: 'Pay Bills, Grow.',
     desc: 'Top up your Ibom X Wallet and send money to any bank in Nigeria. Pay electricity, fuel, flights and more — instantly.',
-    imageSrc: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1200&auto=format&fit=crop',
+    imageSrc: '/mon.png',
   },
   {
     id: 2,
@@ -66,7 +66,8 @@ const ONBOARDING_SLIDES = [
     title: 'Your Identity,',
     titleHighlight: 'Verified & Safe.',
     desc: 'Complete KYC in minutes using Smile ID biometrics and BVN. Unlock full wallet features with enterprise-level security.',
-    imageSrc: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&auto=format&fit=crop',
+    imageSrc: '/governor.png',
+    imageClass: 'object-contain object-top scale-[0.85] translate-y-[10%]',
   },
 ];
 
@@ -149,7 +150,7 @@ function MobileOnboarding() {
           src={slide.imageSrc}
           alt="background"
           fill
-          className={`object-cover transition-opacity duration-500 ${animating ? 'opacity-0' : 'opacity-100'}`}
+          className={`${(slide as any).imageClass || 'object-cover'} transition-opacity duration-500 ${animating ? 'opacity-0' : 'opacity-100'}`}
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/90" />

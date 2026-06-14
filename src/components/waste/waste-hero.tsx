@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Crs from "../../../public/crs.png";
 import { Trash2, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter } from "@/components/ui/card";
@@ -15,12 +14,12 @@ export default function WasteHero() {
 
   return (
     <Card className="overflow-hidden shadow-md rounded-3xl bg-slate-900 border-none">
-      <div className="relative h-48 md:h-64 w-full">
+      <div className="relative h-56 md:h-64 w-full">
         <Image
-          src={Crs}
+          src={heroImage?.imageUrl || "/images/akwa_ibom_hero.png"}
           fill
           alt="Waste Management"
-          className="object-cover opacity-60"
+          className="object-cover opacity-80"
         />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/20">

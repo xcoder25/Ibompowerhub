@@ -244,7 +244,7 @@ export function VoiceBankingWidget() {
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] mix-blend-overlay" />
             </div>
 
-            <CardContent className="relative z-10 p-8 sm:p-10 flex flex-col md:flex-row items-center gap-10">
+            <CardContent className="relative z-10 p-4 sm:p-10 flex flex-col md:flex-row items-center gap-4 md:gap-10">
 
                 <div className="flex-1 text-center md:text-left">
                     <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
@@ -256,12 +256,12 @@ export function VoiceBankingWidget() {
                         </Badge>
                     </div>
 
-                    <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-4">
-                        Dialect-Aware <br />
+                    <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight mb-2 md:mb-4">
+                        Dialect-Aware <br className="hidden sm:block" />
                         <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400 bg-clip-text text-transparent">Voice Banking</span>
                     </h2>
 
-                    <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-8 max-w-md mx-auto md:mx-0 font-medium">
+                    <p className="text-slate-400 text-xs sm:text-base leading-relaxed mb-4 md:mb-8 max-w-md mx-auto md:mx-0 font-medium">
                         Speak naturally in English, Yoruba, Igbo, Hausa, or Pidgin. Authorize transfers with your unique voice print, and ask your "Audio CFO" for insights.
                     </p>
 

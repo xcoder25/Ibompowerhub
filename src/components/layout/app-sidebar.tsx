@@ -33,6 +33,10 @@ import {
   Newspaper,
   Wallet,
   Navigation,
+  LayoutDashboard,
+  Wifi,
+  Activity,
+  Globe
 } from 'lucide-react';
 import {
   Sidebar,
@@ -99,7 +103,13 @@ export function AppSidebar() {
     [firestore, user]
   );
 
+  const userProfileDocRef = useMemoFirebase(
+    () => (user && firestore ? doc(firestore, 'users', user.uid) : null),
+    [firestore, user]
+  );
+
   const { data: walletData } = useDoc(walletDocRef);
+  const { data: profile } = useDoc<{ role?: string }>(userProfileDocRef);
   const balance = walletData?.balance ?? 0;
 
 
@@ -178,11 +188,58 @@ export function AppSidebar() {
         )}
         {renderNavGroup(mainNav, 'Main')}
         <SidebarSeparator />
+
+        {!isAdminLoading && profile?.role === 'Artisan' && (
+          <>
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-emerald-600 font-bold uppercase tracking-widest text-[10px]">Artisan Pro</SidebarGroupLabel>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.startsWith('/skills/dashboard')}
+                  className="bg-emerald-50/50 hover:bg-emerald-100/50 text-emerald-700"
+                >
+                  <Link href="/skills/dashboard">
+                    <LayoutDashboard className="size-4" />
+                    <span className="font-bold">Artisan Dashboard</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarGroup>
+            <SidebarSeparator />
+          </>
+        )}
+
         {renderNavGroup(servicesNav, 'Services')}
         <SidebarSeparator />
         {renderNavGroup(communityNav, 'Community')}
         <SidebarSeparator />
         {renderNavGroup(reportNav, 'Reports')}
+        <SidebarSeparator />
+        
+        {/* State Intelligence Widget */}
+        <div className="px-4 py-6 space-y-4">
+           <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Situational Aware</span>
+              <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+           </div>
+           <div className="space-y-3">
+              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
+                 <div className="flex items-center gap-2">
+                    <Activity className="size-3 text-amber-500" />
+                    <span className="text-[9px] font-black uppercase text-slate-500">Grid Master</span>
+                 </div>
+                 <span className="text-[10px] font-black text-amber-600">STABLE</span>
+              </div>
+              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
+                 <div className="flex items-center gap-2">
+                    <Globe className="size-3 text-blue-500" />
+                    <span className="text-[9px] font-black uppercase text-slate-500">State Node</span>
+                 </div>
+                 <span className="text-[10px] font-black text-blue-600">ACTIVE</span>
+              </div>
+           </div>
+        </div>
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>

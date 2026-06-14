@@ -129,19 +129,19 @@ export function WalletLock({ onUnlock }: WalletLockProps) {
     };
 
     return (
-        <div className="fixed inset-0 z-[100] bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-3xl flex items-center justify-center p-4">
-            <Card className="w-full max-w-sm border-none shadow-[0_40px_120px_-15px_rgba(0,0,0,0.3)] rounded-[3rem] bg-white dark:bg-slate-900 overflow-hidden ring-1 ring-slate-200 dark:ring-slate-800 transition-all duration-500">
-                <div className="p-10 flex flex-col items-center text-center space-y-8">
+        <div className="fixed inset-0 z-[100] bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-3xl flex flex-col items-center justify-center p-4 sm:p-6 h-[100dvh] w-[100dvw] overflow-hidden overscroll-none touch-none">
+            <Card className="w-[95vw] max-w-sm border-none shadow-[0_40px_120px_-15px_rgba(0,0,0,0.3)] rounded-[2rem] sm:rounded-[3rem] bg-white dark:bg-slate-900 overflow-y-auto no-scrollbar ring-1 ring-slate-200 dark:ring-slate-800 transition-all duration-500 max-h-[100dvh] sm:max-h-[90vh] touch-pan-y">
+                <div className="p-5 sm:p-10 flex flex-col items-center text-center space-y-5 sm:space-y-8 min-h-0">
 
-                    <div className="relative group">
+                    <div className="relative group shrink-0">
                         <div className="absolute inset-0 bg-primary/25 blur-3xl rounded-full scale-150 animate-pulse" />
-                        <div className="relative w-24 h-24 bg-gradient-to-tr from-primary to-blue-600 rounded-full flex items-center justify-center shadow-2xl">
-                            <Lock className="h-10 w-10 text-white" />
+                        <div className="relative w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-tr from-primary to-blue-600 rounded-full flex items-center justify-center shadow-2xl">
+                            <Lock className="h-7 w-7 sm:h-10 sm:w-10 text-white" />
                         </div>
                     </div>
 
-                    <div className="space-y-3">
-                        <CardTitle className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                    <div className="space-y-1 sm:space-y-3 shrink-0">
+                        <CardTitle className="text-xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
                             {showPinInput ? 'Security PIN' : 'Verify Identity'}
                         </CardTitle>
                         <CardDescription className="text-slate-500 font-medium leading-relaxed">
@@ -166,13 +166,13 @@ export function WalletLock({ onUnlock }: WalletLockProps) {
                                 <Button
                                     onClick={handleAuth}
                                     disabled={isAuthenticating}
-                                    className="w-full h-20 rounded-[2rem] text-xl font-black bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.03] active:scale-95 transition-all shadow-2xl shadow-slate-200 dark:shadow-none"
+                                    className="w-full h-14 sm:h-20 rounded-2xl sm:rounded-[2rem] text-base sm:text-xl font-black bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.03] active:scale-95 transition-all shadow-xl sm:shadow-2xl shadow-slate-200 dark:shadow-none"
                                 >
                                     {isAuthenticating ? (
-                                        <Loader2 className="h-8 w-8 animate-spin" />
+                                        <Loader2 className="h-5 w-5 sm:h-8 sm:w-8 animate-spin" />
                                     ) : (
-                                        <div className="flex items-center gap-4">
-                                            {deviceType === 'pc' ? <Monitor className="h-7 w-7" /> : <Smartphone className="h-7 w-7" />}
+                                        <div className="flex items-center gap-2 sm:gap-4">
+                                            {deviceType === 'pc' ? <Monitor className="h-5 w-5 sm:h-7 sm:w-7" /> : <Smartphone className="h-5 w-5 sm:h-7 sm:w-7" />}
                                             <span>Open Native Prompt</span>
                                         </div>
                                     )}
@@ -196,12 +196,12 @@ export function WalletLock({ onUnlock }: WalletLockProps) {
                                     value={pin}
                                     onChange={(e) => setPin(e.target.value)}
                                     placeholder="••••••"
-                                    className="w-full text-center text-5xl tracking-[0.4em] font-black bg-slate-100 dark:bg-slate-800/50 border-none rounded-[1.5rem] py-8 focus:ring-4 ring-primary/20 transition-all"
+                                    className="w-full text-center text-3xl sm:text-5xl tracking-[0.2em] sm:tracking-[0.4em] font-black bg-slate-100 dark:bg-slate-800/50 border-none rounded-2xl sm:rounded-[1.5rem] py-4 sm:py-8 focus:ring-4 ring-primary/20 transition-all font-mono"
                                     autoFocus
                                 />
                                 <Button
                                     type="submit"
-                                    className="w-full h-16 rounded-2xl font-black text-lg bg-primary text-white"
+                                    className="w-full h-14 sm:h-16 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg bg-primary text-white"
                                     disabled={pin.length < 4}
                                 >
                                     Unlock Wallet
@@ -217,10 +217,10 @@ export function WalletLock({ onUnlock }: WalletLockProps) {
                         )}
                     </div>
 
-                    <div className="flex items-center gap-2 pt-4 bg-slate-50 dark:bg-slate-800/50 px-4 py-2 rounded-full ring-1 ring-slate-100 dark:ring-slate-800">
+                    <div className="flex items-center gap-2 pt-4 bg-slate-50 dark:bg-slate-800/50 px-4 py-2 rounded-full ring-1 ring-slate-100 dark:ring-slate-800 shrink-0 mb-2">
                         <Info className="h-3 w-3 text-slate-400" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                            Running on {window.location.origin}
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate max-w-[200px]">
+                            Running on {typeof window !== 'undefined' ? window.location.hostname : 'secure environment'}
                         </span>
                     </div>
                 </div>

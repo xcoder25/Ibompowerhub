@@ -114,7 +114,7 @@ export default function MapPage() {
               <Search className="h-5 w-5 text-muted-foreground" />
               <input
                 className="bg-transparent border-none focus:ring-0 text-sm w-full outline-none font-medium"
-                placeholder="Search Akwa Ibom State..."
+                placeholder="Ask me for directions in Akwa Ibom..."
                 readOnly
                 onClick={() => {/* Trigger AI search focus */ }}
               />

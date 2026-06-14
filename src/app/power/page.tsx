@@ -1,201 +1,329 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import { powerSchedule } from '@/lib/data';
-import { Power, Zap, ZapOff, AlertTriangle, CheckCircle2, Clock, MapPin, ChevronRight, BatteryFull, Activity } from 'lucide-react';
+import { 
+  Power, Zap, ZapOff, AlertTriangle, CheckCircle2, Clock, 
+  MapPin, ChevronRight, BatteryFull, Activity, 
+  Cpu, LayoutGrid, ShieldCheck, ArrowRight, CreditCard, 
+  TrendingUp, Lightbulb
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+
+// ── Interactive Grid Canvas ──
+function GridCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let points: { x: number, y: number, r: number, vx: number, vy: number, age: number }[] = [];
+    
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      init();
+    };
+
+    const init = () => {
+      points = Array.from({ length: 40 }).map(() => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        age: Math.random() * 100
+      }));
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 0.5;
+      
+      points.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(245, 158, 11, ${0.1 + Math.sin(p.age * 0.05) * 0.1})`;
+        ctx.fill();
+        p.age++;
+
+        // Connections
+        points.forEach((p2, j) => {
+          if (i === j) return;
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 150) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(245, 158, 11, ${0.1 * (1 - dist/150)})`;
+            ctx.stroke();
+          }
+        });
+      });
+      animationFrameId = requestAnimationFrame(draw);
+    };
+
+    window.addEventListener('resize', resize);
+    resize();
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none opacity-40 dark:opacity-20" />;
+}
 
 export default function PowerPage() {
+  const { toast } = useToast();
+  const [meterNo, setMeterNo] = useState('');
+  const [amount, setAmount] = useState('');
+  const [isBuying, setIsBuying] = useState(false);
   const onPercent = 42;
   const offPercent = 58;
 
+  const handlePurchase = () => {
+    setIsBuying(true);
+    setTimeout(() => {
+      setIsBuying(false);
+      toast({
+        title: "Token Generated",
+        description: `Token: 4092-8821-0012-9024 for Meter ${meterNo}`,
+      });
+      setMeterNo('');
+      setAmount('');
+    }, 2000);
+  };
+
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative overflow-hidden mesh-gradient">
-      {/* Cinematic Background Glows */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none z-0" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-red-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none z-0" />
+    <main className="min-h-screen bg-white dark:bg-slate-950 pb-32 relative overflow-hidden">
+      <GridCanvas />
+      
+      {/* Premium background effects */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-amber-500/[0.05] rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/[0.05] rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4 pointer-events-none" />
 
-      <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-8 md:space-y-12 relative z-10 animate-in fade-in duration-1000">
+      <div className="container mx-auto px-4 sm:px-8 py-8 md:py-16 space-y-12 relative z-10 animate-in fade-in duration-1000">
 
-        {/* Dynamic Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-          <div className="space-y-4 max-w-2xl">
-            <Badge className="bg-amber-500/10 text-amber-500 border-none px-4 py-1.5 rounded-full font-black uppercase text-[10px] tracking-widest">
-              Grid Diagnostics
-            </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-5xl font-black tracking-tighter text-slate-950 dark:text-white leading-none">
-              POWER<span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">SERVICES</span>
+        {/* ── Dynamic Header ── */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+          <div className="space-y-5 max-w-3xl">
+            <div className="flex items-center gap-3">
+               <div className="size-10 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                  <Cpu className="size-5 text-amber-500" />
+               </div>
+               <Badge className="bg-amber-500/10 text-amber-500 border-none px-4 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest">
+                 Sector Link Active
+               </Badge>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tightest text-slate-950 dark:text-white leading-none">
+              GRID<span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent italic">MASTER</span>
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed">
-              Real-time grid status telemetry, outage schedules, and load shedding forecasts for Akwa Ibom State.
+            <p className="text-slate-500 dark:text-slate-400 font-medium text-lg leading-relaxed max-w-xl">
+              Precision energy telemetry for the Akwa Ibom Smart Power Grid. Real-time distribution monitoring & instant token provisioning.
             </p>
           </div>
-        </div>
-
-        {/* Live Status Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-slate-950 border border-white/10 p-6 md:p-8 shadow-lg">
-          <div className="absolute right-0 top-0 w-[400px] h-[400px] rounded-full bg-emerald-500/20 blur-[100px] pointer-events-none" />
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-
-          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className="size-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center backdrop-blur shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                <Power className="size-8 text-emerald-400" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Sector 4, Group A</p>
-                <div className="flex items-center">
-                  <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Grid 100% Online</h2>
-                </div>
-                <div className="flex items-center gap-3 pt-2">
-                  <span className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 text-[10px] uppercase font-black px-3 py-1 rounded-full tracking-widest">
-                    <CheckCircle2 className="size-3.5" /> Stability Confirmed
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 bg-orange-500/20 text-orange-400 text-[10px] uppercase font-black px-3 py-1 rounded-full tracking-widest">
-                    <Clock className="size-3.5" /> Next Shedding: 4H 12M
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="text-left md:text-right bg-white/5 backdrop-blur-3xl p-6 rounded-3xl border border-white/10">
-              <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Telemetry Sync</p>
-              <p className="text-white font-black text-2xl flex items-center gap-2 md:justify-end">
-                <Activity className="size-5 text-emerald-500" /> Live
-              </p>
-            </div>
+          
+          <div className="flex items-center gap-4 bg-slate-100 dark:bg-slate-900/50 backdrop-blur-xl p-4 rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-inner">
+             <div className="size-12 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-md">
+                <Activity className="size-6 text-emerald-500 animate-pulse" />
+             </div>
+             <div className="pr-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">System Load</p>
+                <p className="text-xl font-black text-slate-900 dark:text-white">82.4 <span className="text-sm font-bold text-slate-400">MW</span></p>
+             </div>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Power ON */}
-          <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 rounded-3xl p-6 shadow-sm hover:-translate-y-1 transition-all group">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="size-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shadow-inner group-hover:bg-emerald-500/20 transition-colors">
-                <BatteryFull className="size-6 text-emerald-500" />
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          {/* ── Main Monitor ── */}
+          <div className="xl:col-span-2 space-y-8">
+            {/* Live Visualizer Card */}
+            <Card className="relative overflow-hidden rounded-[2.5rem] bg-slate-950 border-none shadow-2xl min-h-[400px] group">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-indigo-500/5" />
+              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
+              
+              <div className="relative z-10 p-8 md:p-12 h-full flex flex-col justify-between">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400">Live Telemetry</p>
+                    </div>
+                    <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tightest leading-none">SECTOR-IV <br/><span className="text-amber-500">OPTIMAL</span></h2>
+                  </div>
+                  <div className="size-20 bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center backdrop-blur-3xl group-hover:rotate-12 transition-transform duration-700">
+                    <Zap className="size-10 text-amber-500" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-12">
+                   {[
+                     { label: 'Voltage', value: '232V', icon: TrendingUp, color: 'text-amber-500' },
+                     { label: 'Stability', value: '98.2%', icon: ShieldCheck, color: 'text-emerald-400' },
+                     { label: 'Frequency', value: '50.1Hz', icon: Activity, color: 'text-indigo-400' },
+                     { label: 'Capacity', value: '1.2GW', icon: BatteryFull, color: 'text-sky-400' },
+                   ].map((stat) => (
+                     <div key={stat.label} className="space-y-1">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">{stat.label}</p>
+                        <div className="flex items-center gap-2">
+                           <stat.icon className={`size-4 ${stat.color}`} />
+                           <p className="text-xl font-black text-white tracking-tighter">{stat.value}</p>
+                        </div>
+                     </div>
+                   ))}
+                </div>
               </div>
-              <div>
-                <p className="font-black text-slate-950 dark:text-white text-xl">Daily Up-time</p>
-                <p className="text-[10px] tracking-widest uppercase font-bold text-slate-400">Continuous Delivery</p>
-              </div>
+
+              {/* Animated HUD Elements */}
+              <div className="absolute bottom-[-10%] right-[-5%] size-64 bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
+              <div className="absolute top-[20%] left-[40%] size-48 bg-indigo-500/5 blur-[80px] rounded-full pointer-events-none" />
+            </Card>
+
+            {/* Grid Schedule Table */}
+            <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[2.5rem] border border-slate-200 dark:border-white/5 p-8 space-y-8 shadow-inner overflow-hidden">
+                <div className="flex items-center justify-between">
+                   <div className="flex items-center gap-4">
+                      <div className="size-12 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
+                         <LayoutGrid className="size-6 text-slate-600 dark:text-slate-300" />
+                      </div>
+                      <h3 className="text-2xl font-black text-slate-950 dark:text-white uppercase tracking-tighter">Distribution Matrix</h3>
+                   </div>
+                   <Badge variant="outline" className="border-slate-300 dark:border-slate-700 text-slate-500 font-bold uppercase text-[9px] tracking-widest h-8 px-4">Daily Cycle</Badge>
+                </div>
+
+                <div className="overflow-x-auto">
+                   <table className="w-full">
+                      <thead>
+                         <tr className="text-left border-b border-slate-200 dark:border-slate-800">
+                            <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Topology</th>
+                            <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Channel</th>
+                            <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-emerald-500">Inbound</th>
+                            <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-red-500">Shedding</th>
+                         </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                         {powerSchedule.map((item, idx) => (
+                           <tr key={idx} className="group hover:bg-white dark:hover:bg-slate-800/50 transition-all duration-300">
+                              <td className="py-6 font-black text-slate-900 dark:text-white flex items-center gap-3">
+                                 <div className="size-6 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                                    <MapPin className="size-3" />
+                                 </div>
+                                 {item.area}
+                              </td>
+                              <td className="py-6"><Badge className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-none font-bold">Node {item.group}</Badge></td>
+                              <td className="py-6 text-emerald-500 font-black"><Clock className="size-3.5 inline mr-1 opacity-50" /> {item.in}</td>
+                              <td className="py-6 text-red-500 font-black"><Clock className="size-3.5 inline mr-1 opacity-50" /> {item.out}</td>
+                           </tr>
+                         ))}
+                      </tbody>
+                   </table>
+                </div>
             </div>
-            <p className="text-4xl font-black text-slate-950 dark:text-white mb-3">10 <span className="text-2xl text-emerald-500 outline-text">hrs</span></p>
-            <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-2">
-              <div
-                className="h-full bg-emerald-500 rounded-full transition-all"
-                style={{ width: `${onPercent}%` }}
-              />
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">{onPercent}% Grid Saturation</p>
           </div>
 
-          {/* Power OFF */}
-          <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 rounded-3xl p-6 shadow-sm hover:-translate-y-1 transition-all group">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="size-12 rounded-xl bg-red-500/10 flex items-center justify-center shadow-inner group-hover:bg-red-500/20 transition-colors">
-                <ZapOff className="size-6 text-red-500" />
-              </div>
-              <div>
-                <p className="font-black text-slate-950 dark:text-white text-xl">Load Shedding</p>
-                <p className="text-[10px] tracking-widest uppercase font-bold text-slate-400">Maintenance Cycle</p>
-              </div>
-            </div>
-            <p className="text-4xl font-black text-slate-950 dark:text-white mb-3">14 <span className="text-2xl text-red-500 outline-text">hrs</span></p>
-            <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-2">
-              <div
-                className="h-full bg-red-500 rounded-full transition-all"
-                style={{ width: `${offPercent}%` }}
-              />
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">{offPercent}% Down-time</p>
-          </div>
+          {/* ── Action Panel ── */}
+          <div className="space-y-8">
+             {/* Instant Buy Card */}
+             <Card className="bg-white dark:bg-slate-900 border-none shadow-2xl rounded-[2.5rem] overflow-hidden group">
+                <div className="bg-slate-950 p-8 text-white relative overflow-hidden">
+                   <div className="relative z-10 space-y-4">
+                      <div className="flex justify-between items-center">
+                         <Badge className="bg-amber-500/20 text-amber-400 border-none font-black px-4 py-1 rounded-xl uppercase text-[9px] tracking-[0.2em]">Token Node</Badge>
+                         <CreditCard className="size-6 text-slate-500" />
+                      </div>
+                      <h3 className="text-3xl font-black tracking-tightest leading-none">SMART<br/><span className="text-amber-500">TOP-UP</span></h3>
+                   </div>
+                   <div className="absolute top-0 right-0 p-16 bg-amber-500/10 blur-[60px] rounded-full pointer-events-none" />
+                </div>
+                <CardContent className="p-8 space-y-6">
+                   <div className="space-y-4">
+                      <div className="space-y-1.5">
+                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 pl-2">Meter Identification</label>
+                         <Input 
+                            placeholder="0123 4567 890" 
+                            className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 border-none font-mono text-lg shadow-inner focus:ring-2 ring-amber-500/20"
+                            value={meterNo}
+                            onChange={(e) => setMeterNo(e.target.value)}
+                         />
+                      </div>
+                      <div className="space-y-1.5">
+                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 pl-2">Liquidity Amount (₦)</label>
+                         <Input 
+                            type="number"
+                            placeholder="0.00" 
+                            className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 border-none font-black text-xl shadow-inner focus:ring-2 ring-amber-500/20"
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                         />
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        {['2000', '5000', '10000'].map(v => (
+                          <Button key={v} variant="outline" size="sm" onClick={() => setAmount(v)} className="rounded-xl font-bold border-slate-100 dark:border-slate-800 text-[10px] h-10 hover:bg-amber-500 hover:text-white transition-all">₦{parseInt(v).toLocaleString()}</Button>
+                        ))}
+                      </div>
+                   </div>
 
-          {/* Next Outage */}
-          <div className="bg-orange-600 rounded-3xl p-6 shadow-md text-white relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 to-transparent" />
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <AlertTriangle className="size-24" />
-            </div>
-            <div className="relative z-10 flex flex-col h-full">
-              <div className="flex items-start gap-3 mb-auto">
-                <div className="size-12 rounded-xl bg-black/10 flex items-center justify-center backdrop-blur">
-                  <AlertTriangle className="size-6 text-white" />
+                   <Button 
+                    onClick={handlePurchase}
+                    disabled={isBuying || !meterNo || !amount}
+                    className="w-full h-16 rounded-2xl bg-slate-950 text-white hover:bg-amber-600 transition-all font-black uppercase text-xs tracking-widest shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] shadow-amber-500/20 group py-6"
+                   >
+                      {isBuying ? <Loader2 className="size-5 animate-spin mr-2" /> : <Zap className="size-5 mr-2 group-hover:scale-125 transition-transform" />}
+                      {isBuying ? 'SYNCHRONIZING...' : 'GENERATE TOKEN'}
+                   </Button>
+                </CardContent>
+             </Card>
+
+             {/* Orion Energy Insight */}
+             <Card className="bg-indigo-600 text-white border-none shadow-2xl rounded-[2.5rem] p-8 relative overflow-hidden group">
+                <div className="relative z-10 space-y-6">
+                   <div className="flex items-center justify-between">
+                      <div className="size-12 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-xl">
+                         <Lightbulb className="size-6 text-amber-300" />
+                      </div>
+                      <Badge className="bg-white/10 text-white border-white/20 font-black px-4 py-1 rounded-xl uppercase text-[9px] tracking-widest">Orion AI</Badge>
+                   </div>
+                   
+                   <p className="text-lg font-black leading-tight italic">
+                     "Boss, I noticed your Sector IV will go into cycle in 4 hours. Better top up now to ensure your Neural Link stays active."
+                   </p>
+
+                   <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-indigo-200">Confidence: 94%</p>
+                      <Button variant="ghost" className="h-8 rounded-full bg-white/5 text-[9px] font-black uppercase tracking-widest hover:bg-white/10">Full Forecase <ArrowRight className="size-3 ml-1.5" /></Button>
+                   </div>
+                </div>
+
+                <div className="absolute top-[-20%] right-[-10%] size-64 bg-indigo-400/20 blur-[100px] rounded-full pointer-events-none" />
+             </Card>
+
+             {/* Safety Check */}
+             <div className="bg-slate-100 dark:bg-slate-900 rounded-[2rem] p-7 flex items-center gap-5 border border-slate-200 dark:border-white/5">
+                <div className="size-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-inner">
+                   <ShieldCheck className="size-6" />
                 </div>
                 <div>
-                  <p className="font-black text-xl">Scheduled Cut</p>
-                  <p className="text-[10px] tracking-widest uppercase font-bold text-orange-200">System</p>
+                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Protection Protocol</p>
+                   <p className="text-sm font-black text-slate-900 dark:text-white leading-tight">ARISE Secure-Pay Active</p>
                 </div>
-              </div>
-              <div className="mt-6 space-y-2">
-                <p className="text-4xl font-black tracking-tighter">4:00<span className="text-xl font-bold ml-1 text-orange-200">PM</span></p>
-                <div className="flex items-center gap-3 pt-2">
-                  <span className="bg-black/20 font-black text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-lg flex items-center gap-2">
-                    <Clock className="size-3" /> 6 Hours
-                  </span>
-                  <span className="bg-black/20 font-black text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-lg">
-                    Groups A, B, C
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Load Shedding Schedule */}
-        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl border border-white/20 rounded-3xl overflow-hidden shadow-sm">
-          <div className="p-6 md:p-8 border-b border-white/10 dark:border-slate-800/50 flex items-center gap-4">
-            <div className="size-12 rounded-xl bg-amber-500/10 flex items-center justify-center shadow-inner">
-              <Zap className="size-6 text-amber-500" />
-            </div>
-            <div>
-              <h2 className="font-black text-2xl tracking-tight text-slate-950 dark:text-white">Distribution Schedule</h2>
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Load Shedding</p>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-slate-50/50 dark:bg-slate-950/50 border-b border-white/10 dark:border-slate-800/50">
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Sector / Topology</th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Sub-Group</th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-emerald-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-1.5"><CheckCircle2 className="size-3.5" /> Energy Distributed</span>
-                  </th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-red-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-1.5"><ZapOff className="size-3.5" /> Supply Cut</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                {powerSchedule.map((item, index) => (
-                  <tr key={index} className="hover:bg-white/50 dark:hover:bg-slate-950/50 transition-colors group">
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className="size-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                          <MapPin className="size-3.5" />
-                        </div>
-                        <span className="font-bold text-base text-slate-950 dark:text-white">{item.area}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-950 dark:text-white border-none font-bold text-[10px] uppercase tracking-widest px-3 py-1 shadow-inner">
-                        Group {item.group}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="text-emerald-500 font-black flex items-center gap-2 text-base">
-                        <Clock className="size-3.5 opacity-50" /> {item.in}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="text-red-500 font-black flex items-center gap-2 text-base">
-                        <Clock className="size-3.5 opacity-50" /> {item.out}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+             </div>
           </div>
         </div>
 

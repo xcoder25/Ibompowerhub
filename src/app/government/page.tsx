@@ -1,3 +1,4 @@
+'use client';
 
 import { Button } from "@/components/ui/button";
 import { GOVERNMENT_SERVICES } from "@/lib/government";
@@ -14,176 +15,154 @@ import {
   Zap,
   BadgeCheck,
   Users,
+  Brain,
+  ShieldCheck,
+  Activity,
+  Globe
 } from "lucide-react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const quickLinks = [
-  { icon: CircleUser, label: "Link Your ID", desc: "Connect National ID or state credentials", color: "from-green-500 to-green-700", shadow: "shadow-green-500/25", href: "/kyc" },
-  { icon: FileText, label: "Apply for Services", desc: "Permits, certificates & licenses", color: "from-orange-500 to-orange-600", shadow: "shadow-orange-500/25", href: "#services" },
-  { icon: Check, label: "Track Application", desc: "Real-time application status", color: "from-emerald-500 to-emerald-700", shadow: "shadow-emerald-500/25", href: "#track" },
-  { icon: Landmark, label: "Pay Taxes & Fees", desc: "Secure digital revenue platform", color: "from-amber-500 to-amber-600", shadow: "shadow-amber-500/25", href: "#payments" },
-];
-
-const stats = [
-  { value: "31", label: "LGAs Served", icon: Building2 },
-  { value: "4M+", label: "Citizens", icon: Users },
-  { value: "200+", label: "Services", icon: Zap },
-  { value: "100%", label: "Secure", icon: BadgeCheck },
+  { icon: CircleUser, label: "Neural ID Link", desc: "Sync Biometric State Credentials", color: "from-blue-600 to-indigo-700", shadow: "shadow-blue-500/25", href: "/kyc" },
+  { icon: FileText, label: "Arise Permits", desc: "Digital Land & Business Licenses", color: "from-emerald-500 to-emerald-700", shadow: "shadow-emerald-500/25", href: "#services" },
+  { icon: Landmark, label: "Revenue Portal", desc: "State-Verified Secure Payments", color: "from-amber-500 to-amber-600", shadow: "shadow-amber-500/25", href: "#payments" },
+  { icon: Activity, label: "Impact Tracker", desc: "Live Project Telemetry", color: "from-purple-500 to-purple-600", shadow: "shadow-purple-500/25", href: "#track" },
 ];
 
 export default function GovernmentPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/40 to-orange-50/20 relative overflow-hidden">
-      {/* Decorative background */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute -top-40 right-0 w-[600px] h-[600px] rounded-full bg-green-300/20 blur-[130px]" />
-        <div className="absolute bottom-0 -left-40 w-[500px] h-[500px] rounded-full bg-orange-300/15 blur-[130px]" />
-      </div>
+    <main className="min-h-screen bg-white dark:bg-slate-950 pb-32 relative overflow-hidden">
+      {/* Background Neural Grid */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[1200px] h-[800px] bg-emerald-600/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-      <div className="relative z-10 p-4 sm:p-6 md:p-10 max-w-7xl mx-auto space-y-12">
+      <div className="container mx-auto px-4 sm:px-8 py-10 md:py-16 space-y-12 relative z-10 animate-in fade-in duration-1000">
 
-        {/* Hero Header */}
-        <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-green-800 via-green-700 to-green-900 text-white p-8 md:p-14 shadow-2xl shadow-green-900/30">
-          {/* Overlay pattern */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
-            backgroundSize: '32px 32px'
-          }} />
-          <div className="absolute right-8 top-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-orange-400/20 blur-3xl" />
-
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-4 py-1.5 mb-6 text-white text-xs font-bold uppercase tracking-widest">
-              <Shield className="h-3.5 w-3.5 text-orange-300" />
-              ARISE Agenda — E-Government
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4 leading-tight">
-              E-Service Portal
-              <br />
-              <span className="bg-gradient-to-r from-orange-300 to-amber-300 bg-clip-text text-transparent">
-                Akwa Ibom State
-              </span>
-            </h1>
-            <p className="text-white/75 text-lg max-w-xl mb-8 leading-relaxed">
-              Your one-stop digital gateway to all Akwa Ibom government services — fast, secure, and paperless.
-            </p>
-            <Button className="bg-orange-500 hover:bg-orange-400 text-white font-black rounded-2xl px-8 h-12 shadow-xl shadow-orange-500/30 gap-2">
-              Get Started <ArrowRight className="size-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map(({ value, label, icon: Icon }) => (
-            <div
-              key={label}
-              className="bg-white/70 backdrop-blur-md border border-white/80 rounded-2xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
-            >
-              <div className="size-10 rounded-xl bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center shadow-lg shadow-green-500/20 flex-shrink-0">
-                <Icon className="size-5 text-white" />
+        {/* ── Dynamic Header ── */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+           <div className="space-y-5 max-w-3xl">
+              <div className="flex items-center gap-3">
+                 <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-sm">
+                    <Landmark className="size-5 text-emerald-600" />
+                 </div>
+                 <Badge className="bg-emerald-600/10 text-emerald-600 border-none px-4 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-sm">
+                   Institutional Nexus V4
+                 </Badge>
+              </div>
+              <h1 className="text-5xl md:text-8xl font-black tracking-tightest text-slate-950 dark:text-white leading-none">
+                STATE<span className="bg-gradient-to-r from-emerald-500 to-amber-500 bg-clip-text text-transparent italic">NEXUS</span>
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed max-w-xl">
+                 Secure digital infrastructure for the ARISE Agenda. Access government protocols, revenue channels, and civic initiatives.
+              </p>
+           </div>
+           
+           <div className="flex items-center gap-6 bg-slate-50 dark:bg-slate-900/40 backdrop-blur-xl p-6 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-inner">
+              <div className="size-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                 <Globe className="size-7 text-emerald-600" />
               </div>
               <div>
-                <p className="text-2xl font-black text-slate-900">{value}</p>
-                <p className="text-xs text-slate-500 font-medium">{label}</p>
+                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Governance Online</p>
+                 <p className="text-xl font-black text-slate-900 dark:text-white">100% <span className="text-sm font-bold text-emerald-500">READY</span></p>
               </div>
-            </div>
-          ))}
+           </div>
         </div>
 
-        {/* Quick Access Cards */}
-        <div>
-          <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-2">
-            <Zap className="size-6 text-orange-500" />
-            Quick Access
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickLinks.map(({ icon: Icon, label, desc, color, shadow, href }) => (
-              <Link key={label} href={href}>
-                <div className="group bg-white/70 backdrop-blur-md border border-white/80 rounded-2xl p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full">
-                  <div className={`size-12 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg ${shadow} mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="size-6 text-white" />
-                  </div>
-                  <h3 className="font-black text-slate-900 mb-1">{label}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
-                  <div className="flex items-center gap-1 mt-3 text-xs font-bold text-green-700 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Open <ChevronRight className="size-3" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+        {/* ── Quick Access Nexus ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+           {quickLinks.map((link) => (
+             <Link key={link.label} href={link.href}>
+                <Card className="group bg-white dark:bg-slate-900/60 backdrop-blur-3xl border-none shadow-xl rounded-[2.5rem] p-8 hover:-translate-y-2 transition-all duration-500 overflow-hidden relative">
+                   <div className={cn("size-16 rounded-[1.5rem] bg-gradient-to-br flex items-center justify-center shadow-lg mb-6 group-hover:scale-110 transition-transform duration-500", link.color, link.shadow)}>
+                      <link.icon className="size-8 text-white" />
+                   </div>
+                   <h3 className="text-xl font-black text-slate-950 dark:text-white mb-2">{link.label}</h3>
+                   <p className="text-xs text-slate-500 font-medium leading-relaxed mb-6">{link.desc}</p>
+                   <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Open Nexus <ArrowRight className="size-3" />
+                   </div>
+                   {/* Abstract element */}
+                   <div className="absolute -bottom-10 -right-10 size-32 bg-white/5 rounded-full pointer-events-none group-hover:bg-white/10 transition-colors" />
+                </Card>
+             </Link>
+           ))}
         </div>
 
-        {/* Service List */}
-        <div id="services">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-              <FileText className="size-6 text-green-700" />
-              Available Services
-            </h2>
-            <span className="text-sm text-slate-500 font-medium">{GOVERNMENT_SERVICES.length} services</span>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            {GOVERNMENT_SERVICES.map((service) => (
-              <div
-                key={service.name}
-                className="group bg-white/70 backdrop-blur-md border border-white/80 rounded-2xl p-5 flex items-center justify-between gap-4 hover:shadow-lg hover:border-green-200 transition-all duration-200 hover:-translate-y-0.5"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="size-10 rounded-xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200 flex items-center justify-center flex-shrink-0 group-hover:from-green-100 group-hover:to-green-200 transition-colors">
-                    <FileText className="size-5 text-green-700" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900">{service.name}</h3>
-                    <p className="text-sm text-slate-500">{service.description}</p>
-                  </div>
-                </div>
-                <Button
-                  size="sm"
-                  className="rounded-xl bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold shadow-md shadow-green-500/20 flex-shrink-0 gap-1"
-                >
-                  Apply <ChevronRight className="size-3" />
-                </Button>
+        {/* ── AI Service Directory ── */}
+        <div className="grid lg:grid-cols-3 gap-12 pt-8">
+           <div className="lg:col-span-2 space-y-10">
+              <div className="flex items-center justify-between">
+                 <h2 className="text-3xl font-black uppercase tracking-tightest flex items-center gap-4">
+                    <FileText className="size-8 text-emerald-600" /> Service Protocols
+                 </h2>
+                 <Badge className="bg-slate-100 text-slate-500 border-none font-bold px-4 py-1.5 rounded-xl uppercase text-[9px] tracking-widest">
+                    {GOVERNMENT_SERVICES.length} Registered
+                 </Badge>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Track & Pay Row */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Track Application */}
-          <div id="track" className="bg-white/70 backdrop-blur-md border border-white/80 rounded-3xl p-8 hover:shadow-xl transition-all">
-            <div className="size-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-5">
-              <Check className="size-7 text-white" />
-            </div>
-            <h3 className="text-xl font-black text-slate-900 mb-2">Track Applications</h3>
-            <p className="text-slate-500 mb-6 leading-relaxed">
-              Check the real-time status of your permits, certificates, and licenses — anywhere, anytime.
-            </p>
-            <Button className="rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold shadow-md gap-2">
-              Track Now <ChevronRight className="size-4" />
-            </Button>
-          </div>
+              <div className="grid gap-6">
+                 {GOVERNMENT_SERVICES.map((s) => (
+                   <Card key={s.name} className="group bg-white dark:bg-slate-900/40 border-none shadow-lg rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-2xl transition-all duration-500 border border-slate-100 dark:border-white/5">
+                      <div className="flex items-center gap-5 flex-1">
+                         <div className="size-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                            <ShieldCheck className="size-7" />
+                         </div>
+                         <div className="space-y-1">
+                            <h3 className="text-lg font-black tracking-tight text-slate-950 dark:text-white">{s.name}</h3>
+                            <p className="text-xs text-slate-500 font-medium">{s.description}</p>
+                         </div>
+                      </div>
+                      <Button className="h-14 rounded-2xl bg-slate-950 text-white font-black uppercase tracking-widest text-[9px] px-8 hover:bg-emerald-600 shadow-xl active:scale-95 transition-all">
+                         Initialize Request <ChevronRight className="size-4 ml-2" />
+                      </Button>
+                   </Card>
+                 ))}
+              </div>
+           </div>
 
-          {/* Feedback */}
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl p-8 text-white shadow-xl shadow-orange-500/25 hover:shadow-2xl hover:shadow-orange-500/30 transition-all">
-            <div className="size-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center mb-5">
-              <MessageSquareWarning className="size-7 text-white" />
-            </div>
-            <h3 className="text-xl font-black mb-2">Report an Issue</h3>
-            <p className="text-white/80 mb-6 leading-relaxed">
-              Submit complaints and service requests directly to relevant MDAs across Akwa Ibom State.
-            </p>
-            <Button className="rounded-xl bg-white text-orange-600 hover:bg-orange-50 font-bold shadow-md gap-2">
-              <Link href="/report" className="flex items-center gap-2">
-                Submit Report <ChevronRight className="size-4" />
-              </Link>
-            </Button>
-          </div>
+           {/* Orion Side HUD */}
+           <div className="space-y-8">
+              <Card className="bg-slate-950 text-white border-none rounded-[3rem] overflow-hidden shadow-2xl relative group">
+                 <div className="p-8 relative z-10 space-y-8">
+                    <div className="flex items-center justify-between">
+                       <div className="size-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-xl group-hover:rotate-12 transition-transform">
+                          <Brain className="size-7 text-emerald-400" />
+                       </div>
+                       <Badge className="bg-emerald-500/20 text-emerald-400 border-none font-black uppercase text-[9px] tracking-widest px-4 py-1.5">Orion Presence</Badge>
+                    </div>
+                    
+                    <div className="space-y-4">
+                       <p className="text-2xl font-black italic leading-tight text-emerald-50">"Boss, the state ledger is synchronized. Your ID link is at 100% trust level."</p>
+                       <div className="space-y-2 pt-4">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Live State Project: Pisonia Link</p>
+                          <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                             <div className="h-full bg-emerald-500 w-[78%] animate-pulse" />
+                          </div>
+                          <p className="text-[9px] font-bold text-emerald-500 text-right">78% Complete</p>
+                       </div>
+                    </div>
+                 </div>
+                 <div className="absolute -bottom-10 -right-10 size-48 bg-emerald-500/10 blur-[60px] rounded-full pointer-events-none" />
+              </Card>
+
+              {/* Verified Badge Case */}
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-white/5 space-y-6">
+                 <div className="flex items-center gap-3">
+                    <BadgeCheck className="size-6 text-blue-500" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Institutional Authenticity</p>
+                 </div>
+                 <p className="text-xs font-medium leading-relaxed italic text-slate-500 italic">
+                   "Governance in the ARISE era is transparent, hashed on the ledger, and accessible by every resident of our Great State."
+                 </p>
+              </div>
+           </div>
         </div>
 
         {/* Digital Payments */}
-        <div id="payments" className="bg-gradient-to-br from-green-900 via-green-800 to-green-900 rounded-3xl p-8 md:p-12 text-white relative overflow-hidden shadow-2xl shadow-green-900/30">
+        <div id="payments" className="bg-gradient-to-br from-green-900 via-green-800 to-green-900 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl shadow-green-900/30 mt-12">
           <div className="absolute right-8 top-1/2 -translate-y-1/2 size-48 rounded-full bg-orange-400/20 blur-3xl" />
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
@@ -195,13 +174,14 @@ export default function GovernmentPage() {
                 Pay your state taxes, levies, and government fees securely through our digital revenue platform.
               </p>
             </div>
-            <Button className="rounded-2xl bg-orange-500 hover:bg-orange-400 text-white font-black px-8 h-12 shadow-xl shadow-orange-500/30 gap-2 flex-shrink-0">
-              Pay Taxes & Fees <ArrowRight className="size-5" />
-            </Button>
+            <Link href="/wallet">
+              <Button className="rounded-2xl bg-orange-500 hover:bg-orange-400 text-white font-black px-8 h-12 shadow-xl shadow-orange-500/30 gap-2 flex-shrink-0">
+                Pay Taxes & Fees <ArrowRight className="size-5" />
+              </Button>
+            </Link>
           </div>
         </div>
-
       </div>
-    </div>
+    </main>
   );
 }
