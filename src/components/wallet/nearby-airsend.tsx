@@ -249,7 +249,7 @@ export function NearbyAirSend({ open, onOpenChange, currentBalance }: NearbyAirS
   }, [selectedReceivers, firestore, user]);
 
   const executeDrop = useCallback(async () => {
-    if (selectedReceivers.length === 0 || isProcessing || dropFiredRef.current) return;
+    if (!user || selectedReceivers.length === 0 || isProcessing || dropFiredRef.current) return;
     setIsProcessing(true);
     dropFiredRef.current = true;
     OrionVoice.speak('Initiating drop. Funds in flight.');
@@ -274,7 +274,7 @@ export function NearbyAirSend({ open, onOpenChange, currentBalance }: NearbyAirS
   }, [selectedReceivers, user, firestore, isProcessing, amount, isGift]);
 
   const acceptTransfer = useCallback(async () => {
-    if (!incomingTransfer || isProcessing) return;
+    if (!user || !incomingTransfer || isProcessing) return;
     setIsProcessing(true);
     try {
       await updateDoc(doc(firestore, 'air_transfers', incomingTransfer.id), { status: 'accepted' });

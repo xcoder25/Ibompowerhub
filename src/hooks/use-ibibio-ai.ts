@@ -370,7 +370,7 @@ export function useIbibioAI() {
 
     const translateAndSpeak = useCallback((englishText: string) => {
         const found = findIbibioTranslation(englishText);
-        if (found) {
+        if (found && found.ibibio) {
             speakTonal(found.ibibio, found.tones || '');
             return found.ibibio;
         }

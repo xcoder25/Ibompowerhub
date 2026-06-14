@@ -111,6 +111,7 @@ type Transaction = {
   description: string;
   timestamp: Date;
   reference?: string;
+  isSimulated?: boolean;
 };
 
 type KycData = {
@@ -977,7 +978,7 @@ export default function WalletPage() {
         setOrionThinking(false);
 
         // 1. Handle AI Generated Confirmation Intents (The AI now decides if "yes" or "no" was intended)
-        if (aiResponse.type === 'confirm') {
+        if ((aiResponse.type as string) === 'confirm') {
            if (aiResponse.isConfirmed && orionContext?.task === 'transfer_confirm') {
               OrionVoice.speak(aiResponse.spokenResponse || 'Transmission sequence active. Executing neural settlement.');
               setOrionContext(null);

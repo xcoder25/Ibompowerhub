@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import {
   Vote, Sparkles, CheckCircle2, TrendingUp, BarChart,
-  ShieldCheck, Brain, Info, AlertCircle, Loader2, Plus, Lock
+  ShieldCheck, Brain, Info, AlertCircle, Loader2, Plus, Lock, ArrowRight
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
