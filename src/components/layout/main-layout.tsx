@@ -19,6 +19,8 @@ import { LoadingProvider } from '@/context/loading-context';
 import { CartProvider } from '@/context/cart-context';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { useIbibioAI } from '@/hooks/use-ibibio-ai';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const [isClient, setIsClient] = useState(false);
