@@ -45,6 +45,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useUser } from '@/firebase';
 import { VoiceBankingWidget } from '@/components/voice-banking';
+import { EmergencySOS } from '@/components/emergency-sos';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit, doc } from 'firebase/firestore';
 import {
@@ -546,9 +547,12 @@ export default function DashboardPage() {
 
 
 
-        {/* Advanced Voice Banking Edge Widget */}
-        <div className="mb-10">
-          <VoiceBankingWidget />
+        {/* Emergency SOS + Voice Banking */}
+        <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <EmergencySOS />
+          <div className="w-full">
+            <VoiceBankingWidget />
+          </div>
         </div>
 
       </div>

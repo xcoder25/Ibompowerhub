@@ -1,6 +1,5 @@
 'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GoogleMap } from '@/components/google-map';
 import { MapNavigator } from '@/components/map-navigator';
 import { useLoadScript } from '@react-google-maps/api';
@@ -9,11 +8,24 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useFirestore } from '@/firebase';
+import { collection, query, onSnapshot } from 'firebase/firestore';
 
 export type MapLocation = {
   lat: number;
   lng: number;
   address: string;
+};
+
+export type MapReport = {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  category: string;
+  status: string;
+  latitude: number;
+  longitude: number;
 };
 
 const libraries: ('places')[] = ['places'];
@@ -24,8 +36,35 @@ export default function MapPage() {
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
   const [travelMode, setTravelMode] = useState<google.maps.TravelMode>('DRIVING' as google.maps.TravelMode);
   const [places, setPlaces] = useState<google.maps.places.PlaceResult[] | null>(null);
+  const [reports, setReports] = useState<MapReport[]>([]);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const isMobile = useIsMobile();
+  const firestore = useFirestore();
+
+  useEffect(() => {
+    if (!firestore) return;
+    const q = query(collection(firestore, 'reports'));
+    const unsub = onSnapshot(q, (snap) => {
+      const list: MapReport[] = [];
+      snap.forEach((doc) => {
+        const data = doc.data();
+        if (typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+          list.push({
+            id: doc.id,
+            title: data.title || '',
+            description: data.description || '',
+            location: data.location || '',
+            category: data.category || '',
+            status: data.status || '',
+            latitude: data.latitude,
+            longitude: data.longitude,
+          });
+        }
+      });
+      setReports(list);
+    });
+    return () => unsub();
+  }, [firestore]);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -128,6 +167,7 @@ export default function MapPage() {
           destination={destination}
           directions={directions}
           places={places}
+          reports={reports}
           setMap={setMap}
         />
       </div>
@@ -137,7 +177,7 @@ export default function MapPage() {
         <Button variant="secondary" size="icon" className="rounded-2xl shadow-xl border border-border/50 bg-background/95 backdrop-blur-md h-12 w-12 hover:bg-background active:scale-95 transition-all">
           <Filter className="h-5 w-5 text-primary" />
         </Button>
-        <Button variant="primary" size="icon" className="rounded-2xl shadow-2xl h-14 w-14 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center">
+        <Button variant="default" size="icon" className="rounded-2xl shadow-2xl h-14 w-14 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center">
           <Navigation className="h-6 w-6" />
         </Button>
       </div>

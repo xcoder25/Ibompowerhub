@@ -17,10 +17,26 @@ import {
 import { Input } from '@/components/ui/input';
 import { Logo } from '@/components/logo';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
-import { useAuth } from '@/firebase';
+import { useAuth, useFirestore } from '@/firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useLoading } from '@/context/loading-context';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+
+const AKWA_IBOM_LGAS = [
+    "Abak", "Eastern Obolo", "Eket", "Esit Eket", "Essien Udim", "Etim Ekpo",
+    "Etinan", "Ibeno", "Ibesikpo Asutan", "Ibiono Ibom", "Ika", "Ikono",
+    "Ikot Abasi", "Ikot Ekpene", "Ini", "Itu", "Mbo", "Mkpat Enin",
+    "Nsit Atai", "Nsit Ibom", "Nsit Ubium", "Obot Akara", "Okobo", "Onna",
+    "Oron", "Oruk Anam", "Udung Uko", "Ukanafun", "Uruan", "Urue-Offong/Oruko", "Uyo"
+];
 
 const formSchema = z.object({
     fullName: z.string().min(2, {
@@ -30,12 +46,22 @@ const formSchema = z.object({
         message: 'Please enter a valid email address.',
     }),
     password: z.string().min(8, {
-        message: 'Password must be at least 8 characters.',
+        message: 'Password must be at least 6 characters.',
     }),
     confirmPassword: z.string(),
+    isFromAkwaIbom: z.enum(['yes', 'no']),
+    localGov: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
+}).refine((data) => {
+    if (data.isFromAkwaIbom === 'yes' && (!data.localGov || data.localGov.trim() === '')) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Please select your Local Government Area.",
+    path: ["localGov"],
 });
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -47,6 +73,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function SignupPage() {
     const auth = useAuth();
+    const firestore = useFirestore();
     const { setIsLoading } = useLoading();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -58,15 +85,32 @@ export default function SignupPage() {
             email: '',
             password: '',
             confirmPassword: '',
+            isFromAkwaIbom: 'yes',
+            localGov: '',
         },
     });
 
+    const isFromAkwaIbom = form.watch('isFromAkwaIbom');
+
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        if (!auth) return;
+        if (!auth || !firestore) return;
         setIsLoading(true);
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
             await updateProfile(userCredential.user, { displayName: values.fullName });
+
+            // Create user document in firestore with signup info
+            const userDocRef = doc(firestore, 'users', userCredential.user.uid);
+            await setDoc(userDocRef, {
+                id: userCredential.user.uid,
+                name: values.fullName,
+                email: values.email,
+                role: 'Resident',
+                isFromAkwaIbom: values.isFromAkwaIbom === 'yes',
+                localGov: values.isFromAkwaIbom === 'yes' ? values.localGov : null,
+                location: values.isFromAkwaIbom === 'yes' ? `${values.localGov}, Akwa Ibom` : 'Other State',
+                createdAt: serverTimestamp()
+            }, { merge: true });
         } catch (error) {
             console.error("Signup failed", error);
             setIsLoading(false);
@@ -122,6 +166,53 @@ export default function SignupPage() {
                                 </FormItem>
                             )}
                         />
+                        <FormField
+                            control={form.control}
+                            name="isFromAkwaIbom"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Are you from Akwa Ibom State?</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select an option" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="yes">Yes, I am from Akwa Ibom</SelectItem>
+                                            <SelectItem value="no">No, I am from another state</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        {isFromAkwaIbom === 'yes' && (
+                            <FormField
+                                control={form.control}
+                                name="localGov"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Local Government Area</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select LGA" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {AKWA_IBOM_LGAS.map((lga) => (
+                                                    <SelectItem key={lga} value={lga}>
+                                                        {lga}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
                         <FormField
                             control={form.control}
                             name="password"

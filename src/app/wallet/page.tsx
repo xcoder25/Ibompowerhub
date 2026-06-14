@@ -47,8 +47,10 @@ import {
   Terminal,
   Clock,
   Shield,
-  Activity
+  Activity,
+  BarChart2,
 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, updateDoc, where, getDocs } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
@@ -457,10 +459,10 @@ export default function WalletPage() {
       }, 8000);
 
       initializePaystack({
-        publicKey,
+        key: publicKey,
         email: userEmail,
         amount: Math.round(numAmount * 100), // Ensure it's an integer
-        reference,
+        ref: reference,
         metadata: {
           userId: user.uid,
           userName: user.displayName || '',
@@ -471,7 +473,7 @@ export default function WalletPage() {
           setIsAddingFunds(false);
           console.log('Paystack popup closed');
         },
-        onSuccess: async (response: any) => {
+        callback: async (response: any) => {
           clearTimeout(popupTimeout);
           try {
             // Verify payment with backend
@@ -983,13 +985,15 @@ export default function WalletPage() {
                         <div className="space-y-1">
                           <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">Bank Account Number</p>
                           <div className="flex items-center gap-3 flex-wrap">
-                            <h3 className="text-2xl sm:text-3xl font-black font-mono tracking-widest text-white">{walletData.dva.account_number}</h3>
+                            <h3 className="text-2xl sm:text-3xl font-black font-mono tracking-widest text-white">{walletData.dva?.account_number}</h3>
                             <Button
                               variant="ghost"
                               size="icon"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                copyToClipboard(walletData.dva.account_number);
+                                if (walletData.dva) {
+                                  copyToClipboard(walletData.dva.account_number);
+                                }
                               }}
                               className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-8 w-8 z-20"
                             >
@@ -999,9 +1003,9 @@ export default function WalletPage() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <p className="text-xs sm:text-sm font-bold text-slate-300 uppercase tracking-widest">{walletData.dva.bank_name}</p>
+                          <p className="text-xs sm:text-sm font-bold text-slate-300 uppercase tracking-widest">{walletData.dva?.bank_name}</p>
                           <div className="w-1 h-1 rounded-full bg-slate-600"></div>
-                          <p className="text-xs sm:text-sm font-medium text-slate-400">{walletData.dva.account_name}</p>
+                          <p className="text-xs sm:text-sm font-medium text-slate-400">{walletData.dva?.account_name}</p>
                         </div>
                       </div>
                     ) : (
@@ -1104,6 +1108,74 @@ export default function WalletPage() {
             </div>
           </div>
 
+          {/* Spending Analytics Chart */}
+          {transactions.length > 0 && (() => {
+            // Build last-7-day buckets
+            const now = new Date();
+            const days = Array.from({ length: 7 }, (_, i) => {
+              const d = new Date(now);
+              d.setDate(d.getDate() - (6 - i));
+              return {
+                label: d.toLocaleDateString('en-NG', { weekday: 'short' }),
+                date: d.toDateString(),
+                credit: 0,
+                debit: 0,
+              };
+            });
+            transactions.forEach((tx) => {
+              const txDate = tx.timestamp instanceof Date
+                ? tx.timestamp.toDateString()
+                : new Date(tx.timestamp).toDateString();
+              const bucket = days.find((d) => d.date === txDate);
+              if (bucket) {
+                if (tx.type === 'credit') bucket.credit += tx.amount;
+                else bucket.debit += tx.amount;
+              }
+            });
+
+            return (
+              <div className="bg-white/70 dark:bg-slate-950/60 border border-white/60 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm backdrop-blur-md space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Spending Analytics</p>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white mt-0.5">7-Day Flow</h3>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs font-bold">
+                    <div className="flex items-center gap-1.5 text-emerald-600">
+                      <span className="size-2.5 rounded-full bg-emerald-500" />Credit
+                    </div>
+                    <div className="flex items-center gap-1.5 text-rose-600">
+                      <span className="size-2.5 rounded-full bg-rose-500" />Debit
+                    </div>
+                  </div>
+                </div>
+                <ResponsiveContainer width="100%" height={180}>
+                  <AreaChart data={days} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="creditGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="debitGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                    <XAxis dataKey="label" tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 700 }}
+                      formatter={(value: number, name: string) => [`₦${value.toLocaleString()}`, name === 'credit' ? 'Credit' : 'Debit']}
+                    />
+                    <Area type="monotone" dataKey="credit" stroke="#10b981" strokeWidth={2} fill="url(#creditGrad)" dot={false} />
+                    <Area type="monotone" dataKey="debit" stroke="#f43f5e" strokeWidth={2} fill="url(#debitGrad)" dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            );
+          })()}
+
           <Tabs defaultValue="manage" className="space-y-6">
             <div className="overflow-x-auto no-scrollbar pb-1">
               <TabsList className="flex w-max min-w-full bg-slate-100 dark:bg-slate-900 rounded-2xl p-1.5 h-14 gap-1">
@@ -1186,20 +1258,25 @@ export default function WalletPage() {
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
-                              <h3 className="text-3xl font-black font-mono tracking-[0.15em] text-white group-hover:text-emerald-400 transition-colors">{walletData.dva.account_number}</h3>
+                              <h3 className="text-3xl font-black font-mono tracking-[0.15em] text-white group-hover:text-emerald-400 transition-colors">{walletData.dva?.account_number}</h3>
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 className="size-12 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl"
-                                onClick={(e) => { e.stopPropagation(); copyToClipboard(walletData.dva.account_number); }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (walletData.dva) {
+                                    copyToClipboard(walletData.dva.account_number);
+                                  }
+                                }}
                               >
                                 {hasCopied ? <Check className="size-6 text-emerald-500" /> : <Copy className="size-6" />}
                               </Button>
                             </div>
                             <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-                              <span className="text-xs font-black uppercase tracking-widest text-slate-400">{walletData.dva.bank_name}</span>
+                              <span className="text-xs font-black uppercase tracking-widest text-slate-400">{walletData.dva?.bank_name}</span>
                               <div className="size-1 rounded-full bg-slate-700" />
-                              <span className="text-xs font-medium text-slate-500 truncate italic">{walletData.dva.account_name}</span>
+                              <span className="text-xs font-medium text-slate-500 truncate italic">{walletData.dva?.account_name}</span>
                             </div>
                           </div>
                         </div>
@@ -1682,7 +1759,6 @@ export default function WalletPage() {
                       }
                     }}
                     components={{
-                      audio: false,
                       finder: false
                     }}
                     styles={{

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Fingerprint, CheckCircle2, Loader2, Sparkles, Volume2, ShieldCheck, Zap, Database, ArrowRight } from 'lucide-react';
+import { Mic, Fingerprint, CheckCircle2, Loader2, Sparkles, Volume2, ShieldCheck, Zap, Database, ArrowRight, AlertTriangle, RefreshCw, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -9,12 +9,26 @@ import { Badge } from '@/components/ui/badge';
 import { useIbibioAI } from '@/hooks/use-ibibio-ai';
 import { processVoiceBankingIntent, VoiceBankingIntent } from '@/ai/flows/voice-banking-flow';
 
-type VoiceState = 'IDLE' | 'LISTENING' | 'PROCESSING' | 'BIOMETRICS' | 'SUCCESS' | 'INSIGHTS';
+type VoiceState = 'IDLE' | 'LISTENING' | 'PROCESSING' | 'CLARIFY' | 'BIOMETRICS' | 'SUCCESS' | 'INSIGHTS';
 
 export function VoiceBankingWidget() {
     const [state, setState] = useState<VoiceState>('IDLE');
     const [actionPreview, setActionPreview] = useState<React.ReactNode>(null);
-    const { isListening, transcript, startListening, stopListening, translateAndSpeak, speakTonal } = useIbibioAI();
+    const [clarificationIntent, setClarificationIntent] = useState<VoiceBankingIntent | null>(null);
+
+    const {
+        isListening,
+        transcript,
+        interimTranscript,
+        confidence,
+        detectedLang,
+        retryCount,
+        waveform,
+        startListening,
+        stopListening,
+        resetTranscript,
+        speakTonal
+    } = useIbibioAI();
 
     // Use a ref to track when we should process so we don't double fire
     const shouldProcessRef = useRef(false);
@@ -22,49 +36,103 @@ export function VoiceBankingWidget() {
     useEffect(() => {
         if (isListening) {
             setState('LISTENING');
-            setActionPreview(null);
+            if (state !== 'CLARIFY') {
+                setActionPreview(null);
+            }
             shouldProcessRef.current = true;
         } else if (!isListening && transcript && shouldProcessRef.current) {
-            // Speech ended, process using AI
             shouldProcessRef.current = false;
             handleRealtimeIntent(transcript);
-        } else if (!isListening && !transcript) {
+        } else if (!isListening && !transcript && state === 'LISTENING') {
             setState('IDLE');
         }
     }, [isListening, transcript]);
 
     const handleMicClick = () => {
-        if (state === 'IDLE' || state === 'SUCCESS' || state === 'INSIGHTS') {
-            startListening();
-        } else {
+        if (state === 'LISTENING') {
             stopListening();
-            setState('IDLE');
+        } else {
+            resetTranscript();
+            startListening();
         }
+    };
+
+    const cancelTransaction = () => {
+        stopListening();
+        resetTranscript();
+        setState('IDLE');
+        setActionPreview(null);
+        setClarificationIntent(null);
+        speakTonal("Transaction canceled.");
     };
 
     const handleRealtimeIntent = async (text: string) => {
         setState('PROCESSING');
         try {
-            const intent: VoiceBankingIntent = await processVoiceBankingIntent(text);
+            // If we are clarifying, we can combine the previous intent with the new input
+            let query = text;
+            if (clarificationIntent) {
+                query = `Clarification: ${clarificationIntent.recipient || ''} ${clarificationIntent.amount || ''} -> User says: ${text}`;
+            }
+
+            const intent: VoiceBankingIntent = await processVoiceBankingIntent(query);
 
             if (intent.type === 'transfer') {
+                if (intent.isAmbiguous) {
+                    setState('CLARIFY');
+                    setClarificationIntent(intent);
+                    setActionPreview(
+                        <div className="flex flex-col items-center gap-3 w-full animate-in fade-in slide-in-from-bottom-4">
+                            <div className="bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20 w-full text-center">
+                                <div className="flex justify-center mb-2">
+                                    <AlertTriangle className="h-5 w-5 text-amber-400 animate-bounce" />
+                                </div>
+                                <p className="text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">Details Needed</p>
+                                <p className="text-white text-sm font-medium">{intent.spokenResponse}</p>
+                            </div>
+                            <div className="flex gap-2 w-full">
+                                <Button
+                                    onClick={() => {
+                                        resetTranscript();
+                                        startListening();
+                                    }}
+                                    className="flex-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs rounded-xl py-2.5 h-auto flex items-center justify-center gap-1.5"
+                                >
+                                    <Mic className="h-3.5 w-3.5" /> Speak Answer
+                                </Button>
+                                <Button
+                                    onClick={cancelTransaction}
+                                    variant="ghost"
+                                    className="bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs rounded-xl py-2.5 h-auto"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </Button>
+                            </div>
+                        </div>
+                    );
+                    speakTonal(intent.spokenResponse);
+                    return;
+                }
+
+                // Regular transfer processing with Biometrics
                 setState('BIOMETRICS');
+                setClarificationIntent(null);
                 setActionPreview(
-                    <div className="flex flex-col items-center gap-2 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="flex flex-col items-center gap-2 w-full animate-in fade-in slide-in-from-bottom-4">
                         <div className="flex items-center gap-3 bg-white/10 p-4 rounded-2xl border border-white/20 w-full mb-2">
                             <div className="bg-emerald-500/20 p-2 rounded-xl border border-emerald-500/30">
-                                <ArrowRight className="h-5 w-5 text-emerald-400" />
+                                <ArrowRight className="h-5 w-5 text-emerald-400 animate-pulse" />
                             </div>
                             <div className="text-left flex-1 border-r border-white/10 pr-4">
                                 <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-0.5">Intent Detected</p>
                                 <p className="text-white font-semibold text-sm">Transfer ₦{intent.amount?.toLocaleString() || '...'}</p>
                             </div>
                             <div className="text-left pl-2">
-                                <p className="text-[10px] text-white/50 font-bold uppercase tracking-wider mb-0.5">To</p>
-                                <p className="text-white font-semibold text-sm truncate max-w-[80px]">{intent.recipient || 'Unknown'}</p>
+                                <p className="text-[10px] text-white/50 font-bold uppercase tracking-wider mb-0.5">To ({intent.bank || 'Bank'})</p>
+                                <p className="text-white font-semibold text-sm truncate max-w-[90px]">{intent.recipient || 'Unknown'}</p>
                             </div>
                         </div>
-                        <Badge className="bg-amber-500/20 text-amber-300 border-none px-3 py-1">Voice-Print 2FA Required</Badge>
+                        <Badge className="bg-amber-500/20 text-amber-300 border-none px-3 py-1 animate-pulse">Voice-Print 2FA Securing</Badge>
                         <p className="text-white/60 text-xs text-center mt-2 max-w-[250px]">
                             {intent.spokenResponse}
                         </p>
@@ -72,22 +140,48 @@ export function VoiceBankingWidget() {
                 );
                 speakTonal(intent.spokenResponse);
 
-                // Simulate biometric delay then success
+                // Simulate biometric signature analysis and success trigger
                 setTimeout(() => {
                     setState('SUCCESS');
                     speakTonal("Voice Biometrics Verified. Transfer Successful.");
                     setActionPreview(
-                        <div className="flex flex-col items-center gap-3 animate-in fade-in zoom-in duration-500">
+                        <div className="flex flex-col items-center gap-3 w-full animate-in fade-in zoom-in duration-500 relative">
+                            {/* Confetti simulator */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 pointer-events-none opacity-60">
+                                <div className="absolute top-0 left-0 w-2 h-2 bg-pink-500 rounded-full animate-ping" style={{ animationDelay: '0.1s' }} />
+                                <div className="absolute top-10 right-4 w-3.5 h-3.5 bg-yellow-400 rotate-45 animate-bounce" />
+                                <div className="absolute bottom-4 left-6 w-2 h-4 bg-sky-400 rotate-12 animate-pulse" />
+                                <div className="absolute bottom-10 right-8 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping" style={{ animationDelay: '0.4s' }} />
+                            </div>
+
                             <div className="relative">
-                                <div className="absolute inset-0 bg-emerald-500 blur-xl opacity-50 rounded-full animate-pulse" />
-                                <div className="bg-emerald-500 p-4 rounded-full relative z-10 shadow-lg shadow-emerald-500/50">
-                                    <CheckCircle2 className="h-10 w-10 text-white" />
+                                <div className="absolute inset-0 bg-emerald-500 blur-xl opacity-60 rounded-full animate-pulse" />
+                                <div className="bg-emerald-500 p-4 rounded-full relative z-10 shadow-lg shadow-emerald-500/50 border-2 border-emerald-300">
+                                    <CheckCircle2 className="h-10 w-10 text-white animate-[bounce_1s_infinite]" />
                                 </div>
                             </div>
-                            <div className="text-center mt-2">
-                                <h3 className="text-white font-bold text-xl mb-1">Transfer Successful</h3>
-                                <p className="text-emerald-300 text-sm font-medium">Voice Biometrics Verified</p>
+                            <div className="text-center mt-2 bg-white/5 border border-white/10 rounded-2xl p-4 w-full">
+                                <h3 className="text-white font-bold text-base mb-0.5">Transfer Successful</h3>
+                                <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">Voice Verified ✓</p>
+                                <div className="flex justify-between text-xs border-t border-white/5 pt-2 text-slate-400">
+                                    <span>Recipient:</span>
+                                    <span className="text-white font-semibold">{intent.recipient}</span>
+                                </div>
+                                <div className="flex justify-between text-xs text-slate-400 mt-1">
+                                    <span>Bank:</span>
+                                    <span className="text-white font-semibold">{intent.bank || 'Main Bank'}</span>
+                                </div>
+                                <div className="flex justify-between text-xs text-slate-400 mt-1">
+                                    <span>Amount:</span>
+                                    <span className="text-emerald-400 font-bold">₦{intent.amount?.toLocaleString()}</span>
+                                </div>
                             </div>
+                            <Button
+                                onClick={cancelTransaction}
+                                className="mt-2 bg-slate-800 hover:bg-slate-700 text-white text-xs py-1.5 px-4 h-auto rounded-xl"
+                            >
+                                Done
+                            </Button>
                         </div>
                     );
                 }, 4000);
@@ -95,34 +189,34 @@ export function VoiceBankingWidget() {
             } else if (intent.type === 'insight') {
                 setState('INSIGHTS');
                 setActionPreview(
-                    <div className="flex flex-col items-center gap-2 animate-in fade-in pb-4">
+                    <div className="flex flex-col items-center gap-2 w-full animate-in fade-in pb-4">
                         <div className="flex items-center gap-2 text-sky-300 text-xs uppercase tracking-widest font-bold mb-2">
-                            <Database className="h-4 w-4" /> Text-to-SQL Engine
+                            <Database className="h-4 w-4 animate-pulse" /> Text-to-SQL Engine
                         </div>
-                        <code className="bg-black/40 text-sky-200 p-3 rounded-xl text-xs sm:text-sm border border-sky-500/20 w-full overflow-hidden text-left font-mono mb-2">
-                            {intent.sqlQuery?.split('WHERE').map((part, i) => (
-                                <span key={i}>
-                                    {i === 1 ? <><br /><span className="text-pink-400">WHERE</span></> : ''}
-                                    {part}
-                                </span>
-                            ))}
+                        <code className="bg-black/50 text-sky-300 p-3.5 rounded-xl text-xs border border-sky-500/20 w-full overflow-hidden text-left font-mono mb-2 break-all leading-normal">
+                            {intent.sqlQuery}
                         </code>
-                        <div className="bg-sky-500/20 border border-sky-500/30 w-full p-5 rounded-3xl relative overflow-hidden mt-2">
-                            <div className="absolute right-[-10%] top-[-10%] opacity-10 text-sky-400 scale-150 rotate-12">
+                        <div className="bg-sky-500/10 border border-sky-500/20 w-full p-5 rounded-3xl relative overflow-hidden mt-2">
+                            <div className="absolute right-[-10%] top-[-10%] opacity-10 text-sky-400 scale-150 rotate-12 pointer-events-none">
                                 <Zap className="h-32 w-32" />
                             </div>
-                            <Badge className="bg-sky-500 text-white border-none mb-3">Audio CFO</Badge>
-                            <h3 className="text-white font-black text-3xl tracking-tight mb-1">{intent.insightAnswer || '₦...'}</h3>
-                            <p className="text-sky-200 text-sm font-medium">{intent.spokenResponse}</p>
+                            <Badge className="bg-sky-500/20 text-sky-300 border border-sky-500/30 mb-3 text-[9px] font-bold">Audio CFO Insight</Badge>
+                            <h3 className="text-white font-black text-3xl tracking-tight mb-2">{intent.insightAnswer || '₦...'}</h3>
+                            <p className="text-sky-200/90 text-sm font-medium leading-relaxed">{intent.spokenResponse}</p>
                         </div>
-                        <div className="flex items-center gap-2 text-white/50 text-xs font-semibold bg-white/5 px-4 py-2 rounded-full mt-2">
-                            <Volume2 className="h-3.5 w-3.5" /> ElevenLabs TTS Synthesizing...
+                        <div className="flex items-center gap-2 text-white/50 text-xs font-semibold bg-white/5 px-4 py-2 rounded-full mt-2 border border-white/5">
+                            <Volume2 className="h-3.5 w-3.5 text-sky-400 animate-pulse" /> ElevenLabs Voice Synth
                         </div>
                     </div>
                 );
                 speakTonal(intent.spokenResponse);
             } else {
                 setState('IDLE');
+                setActionPreview(
+                    <div className="text-center p-4 bg-red-500/10 border border-red-500/20 rounded-2xl w-full">
+                        <p className="text-red-400 text-sm font-medium">{intent.spokenResponse}</p>
+                    </div>
+                );
                 speakTonal(intent.spokenResponse);
             }
         } catch (error) {
@@ -131,19 +225,36 @@ export function VoiceBankingWidget() {
         }
     };
 
+    const getLangLabel = (code: string) => {
+        switch (code) {
+            case 'en-NG': return '🇳🇬 English (NG)';
+            case 'ha-NG': return '🇳🇬 Hausa';
+            case 'yo-NG': return '🇳🇬 Yoruba';
+            case 'ig-NG': return '🇳🇬 Igbo';
+            case 'en-GB': return '🇬🇧 UK English';
+            default: return '🎙️ Dialect: NG';
+        }
+    };
+
     return (
         <Card className="relative overflow-hidden border-0 shadow-2xl bg-[#0B1121] rounded-[2rem] col-span-1 lg:col-span-2 group">
+            {/* Visual background rings */}
             <div className="absolute inset-0 z-0">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-br from-emerald-600/20 via-sky-600/20 to-indigo-600/20 blur-[100px] rounded-full pointer-events-none" />
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-gradient-to-br from-emerald-600/15 via-teal-600/10 to-sky-600/15 blur-[120px] rounded-full pointer-events-none" />
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] mix-blend-overlay" />
             </div>
 
             <CardContent className="relative z-10 p-8 sm:p-10 flex flex-col md:flex-row items-center gap-10">
 
                 <div className="flex-1 text-center md:text-left">
-                    <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors mb-4 px-3 py-1 font-bold tracking-widest uppercase text-[10px]">
-                        <Sparkles className="h-3 w-3 mr-1.5" /> Edge Voice AI
-                    </Badge>
+                    <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
+                        <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors px-3 py-1 font-bold tracking-widest uppercase text-[10px]">
+                            <Sparkles className="h-3 w-3 mr-1.5" /> Edge Voice AI
+                        </Badge>
+                        <Badge className="bg-sky-500/10 text-sky-400 border border-sky-500/20 px-3 py-1 text-[10px] font-bold">
+                            {getLangLabel(detectedLang)}
+                        </Badge>
+                    </div>
 
                     <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-4">
                         Dialect-Aware <br />
@@ -167,29 +278,80 @@ export function VoiceBankingWidget() {
                     </div>
                 </div>
 
-                <div className="flex-1 w-full max-w-sm flex flex-col items-center justify-center min-h-[300px]">
+                <div className="flex-1 w-full max-w-sm flex flex-col items-center justify-center min-h-[320px] bg-slate-900/40 border border-white/5 rounded-3xl p-6 relative">
+                    
+                    {/* Live Match Accuracy Meter / Status indicator */}
+                    <div className="absolute top-4 right-4 flex items-center gap-1.5">
+                        {confidence > 0 && (
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-black/40 border border-white/10">
+                                <span className={cn(
+                                    "h-2 w-2 rounded-full",
+                                    confidence >= 0.8 ? "bg-emerald-400 animate-pulse" :
+                                    confidence >= 0.55 ? "bg-amber-400" : "bg-red-500 animate-pulse"
+                                )} />
+                                <span className="text-white/80">Match: {Math.round(confidence * 100)}%</span>
+                            </div>
+                        )}
+                        {retryCount > 0 && (
+                            <Badge className="bg-red-500/20 text-red-400 border border-red-500/30 text-[9px] animate-pulse">
+                                <RefreshCw className="h-2.5 w-2.5 mr-1 animate-spin" /> Retry #{retryCount}
+                            </Badge>
+                        )}
+                    </div>
 
-                    <div className="h-[200px] w-full flex items-end justify-center mb-6">
-                        {actionPreview}
-                        {state === 'LISTENING' && transcript && (
-                            <p className="text-white text-lg font-serif italic text-center animate-in fade-in slide-in-from-bottom-2">
-                                "{transcript}"
-                            </p>
-                        )}
-                        {state === 'LISTENING' && !transcript && (
-                            <p className="text-emerald-400 font-bold uppercase tracking-widest animate-pulse text-sm">
-                                Listening...
-                            </p>
-                        )}
-                        {state === 'IDLE' && (
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">
-                                Tap the microphone
-                            </p>
+                    <div className="h-[210px] w-full flex items-center justify-center mb-4 overflow-hidden relative">
+                        {actionPreview ? (
+                            <div className="w-full">{actionPreview}</div>
+                        ) : state === 'LISTENING' ? (
+                            <div className="flex flex-col items-center gap-4 w-full">
+                                {/* Waveform Visualizer */}
+                                <div className="flex items-center gap-[3px] h-16 justify-center w-full">
+                                    {waveform.bars.map((bar, i) => (
+                                        <div
+                                            key={i}
+                                            className="w-[3px] rounded-full bg-gradient-to-t from-emerald-500 to-teal-400 transition-all duration-75"
+                                            style={{
+                                                height: `${Math.max(8, bar)}%`,
+                                                opacity: 0.3 + (bar / 100) * 0.7
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+
+                                <div className="text-center px-4 w-full max-h-24 overflow-y-auto">
+                                    {transcript ? (
+                                        <p className="text-white text-sm font-semibold leading-relaxed">
+                                            "{transcript}"
+                                            {interimTranscript && (
+                                                <span className="text-emerald-400/80 italic font-normal"> {interimTranscript}</span>
+                                            )}
+                                        </p>
+                                    ) : interimTranscript ? (
+                                        <p className="text-emerald-400/90 text-sm font-medium italic">
+                                            "{interimTranscript}"
+                                        </p>
+                                    ) : (
+                                        <p className="text-emerald-400 font-bold uppercase tracking-widest text-xs animate-pulse">
+                                            Listening...
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center">
+                                <Mic className="h-10 w-10 text-slate-600 mb-2 mx-auto" />
+                                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
+                                    Tap the Mic & Speak
+                                </p>
+                                <p className="text-slate-600 text-xs mt-1 max-w-[200px]">
+                                    e.g., "Send 10k to Udeme" or "How much did I spend on fuel?"
+                                </p>
+                            </div>
                         )}
                     </div>
 
                     <div className="relative">
-                        {state !== 'IDLE' && state !== 'SUCCESS' && state !== 'INSIGHTS' && (
+                        {state === 'LISTENING' && (
                             <>
                                 <div className="absolute inset-0 rounded-full border border-emerald-500/30 scale-[1.3] animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
                                 <div className="absolute inset-0 rounded-full border border-teal-500/20 scale-[1.6] animate-[ping_2.5s_cubic-bezier(0,0,0.2,1)_infinite]" />
@@ -200,27 +362,26 @@ export function VoiceBankingWidget() {
                         <Button
                             onClick={handleMicClick}
                             className={cn(
-                                "relative z-10 w-24 h-24 rounded-full shadow-2xl transition-all duration-500 flex items-center justify-center overflow-hidden",
+                                "relative z-10 w-20 h-20 rounded-full shadow-2xl transition-all duration-500 flex items-center justify-center overflow-hidden border",
                                 state === 'IDLE'
-                                    ? "bg-slate-800 hover:bg-slate-700 hover:scale-105 border border-white/10"
+                                    ? "bg-slate-800 hover:bg-slate-700 border-white/10 hover:scale-105"
                                     : state === 'SUCCESS' || state === 'INSIGHTS'
-                                        ? "bg-emerald-600 scale-100 border border-emerald-400"
+                                        ? "bg-emerald-600 border-emerald-400"
                                         : state === 'BIOMETRICS'
-                                            ? "bg-amber-600 scale-110 border-2 border-amber-400 shadow-[0_0_50px_rgba(217,119,6,0.5)]"
-                                            : "bg-emerald-500 scale-110 shadow-[0_0_50px_rgba(16,185,129,0.4)]"
+                                            ? "bg-amber-600 border-amber-400 shadow-[0_0_40px_rgba(217,119,6,0.4)] animate-pulse"
+                                            : state === 'CLARIFY'
+                                                ? "bg-amber-500 border-amber-300"
+                                                : "bg-emerald-500 border-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.35)]"
                             )}
                         >
-                            {state === 'IDLE' && <Mic className="h-10 w-10 text-white" />}
+                            {state === 'IDLE' && <Mic className="h-8 w-8 text-white" />}
                             {state === 'LISTENING' && (
-                                <div className="flex items-center gap-1.5">
-                                    {[1, 2, 3, 4, 5].map(i => (
-                                        <div key={i} className="w-1.5 bg-white rounded-full animate-pulse" style={{ height: `${20 + Math.random() * 20}px`, animationDelay: `${i * 0.1}s` }} />
-                                    ))}
-                                </div>
+                                <div className="w-4 h-4 bg-white rounded-full animate-ping" />
                             )}
-                            {state === 'PROCESSING' && <Loader2 className="h-10 w-10 text-white animate-spin" />}
-                            {state === 'BIOMETRICS' && <Fingerprint className="h-10 w-10 text-white animate-pulse" />}
-                            {(state === 'SUCCESS' || state === 'INSIGHTS') && <CheckCircle2 className="h-10 w-10 text-white" />}
+                            {state === 'PROCESSING' && <Loader2 className="h-8 w-8 text-white animate-spin" />}
+                            {state === 'BIOMETRICS' && <Fingerprint className="h-8 w-8 text-white animate-pulse" />}
+                            {state === 'CLARIFY' && <AlertTriangle className="h-8 w-8 text-white" />}
+                            {(state === 'SUCCESS' || state === 'INSIGHTS') && <CheckCircle2 className="h-8 w-8 text-white" />}
                         </Button>
                     </div>
 
