@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 const issues = [
-  { id: 1, issue: 'Broken Streetlight', location: 'Marian Rd', status: 'Reported', time: '2 hours ago', type: 'Infrastructure' },
-  { id: 2, issue: 'Pothole Assessment', location: 'Etta Agbor', status: 'In Progress', time: '5 hours ago', type: 'Roads' },
-  { id: 3, issue: 'Waste Collection Missed', location: '8 Miles', status: 'Resolved', time: '1 day ago', type: 'Sanitation' },
-  { id: 4, issue: 'Traffic Light Malfunction', location: 'Highway Intersection', status: 'Reported', time: '3 hours ago', type: 'Transport' },
+  { id: 1, issue: 'Broken Streetlight', location: 'Udo Udoma Avenue, Uyo', status: 'Reported', time: '2 hours ago', type: 'Infrastructure' },
+  { id: 2, issue: 'Pothole Assessment', location: 'Ikot Ekpene Road, Uyo', status: 'In Progress', time: '5 hours ago', type: 'Roads' },
+  { id: 3, issue: 'Waste Collection Missed', location: 'Ewet Housing Estate, Uyo', status: 'Resolved', time: '1 day ago', type: 'Sanitation' },
+  { id: 4, issue: 'Traffic Light Malfunction', location: 'Itam Junction, Uyo', status: 'Reported', time: '3 hours ago', type: 'Transport' },
 ];
 
 export default function IssuesPage() {

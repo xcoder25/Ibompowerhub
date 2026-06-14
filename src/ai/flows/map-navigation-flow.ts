@@ -15,7 +15,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const MapNavigationInputSchema = z.object({
-  query: z.string().describe("The user's natural language query for directions, e.g., 'directions from Watt Market to Tinapa'."),
+  query: z.string().describe("The user's natural language query for directions, e.g., 'directions from Itam Market to Ibom Icon Hotel'."),
 });
 export type MapNavigationInput = z.infer<typeof MapNavigationInputSchema>;
 
@@ -33,7 +33,7 @@ const mapNavigationPrompt = ai.definePrompt({
   name: 'mapNavigationPrompt',
   input: {schema: MapNavigationInputSchema},
   output: {schema: MapNavigationOutputSchema},
-  system: `You are a navigation assistant for an app covering Cross River State, Nigeria. Your job is to parse a user's query and extract the origin and destination for a journey.
+  system: `You are a navigation assistant for an app covering Akwa Ibom State, Nigeria. Your job is to parse a user's query and extract the origin and destination for a journey.
 
 The user's query may be imprecise. Extract the most likely origin and destination based on their input. Both origin and destination should be real, recognizable places. If only a destination is provided, you can leave the origin as "My Current Location".
 

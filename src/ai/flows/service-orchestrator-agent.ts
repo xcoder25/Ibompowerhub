@@ -86,7 +86,7 @@ const serviceOrchestrationPrompt = ai.definePrompt({
   name: 'serviceOrchestrationPrompt',
   input: { schema: ServiceOrchestrationInputSchema },
   output: { schema: ServiceOrchestrationOutputSchema },
-  system: `You are the Service Orchestration AI Agent for Cross River State.
+  system: `You are the Service Orchestration AI Agent for Akwa Ibom State.
 
 Your role is to coordinate complex multi-step government processes that require multiple agents working together.
 

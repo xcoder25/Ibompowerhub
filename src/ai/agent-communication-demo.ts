@@ -127,12 +127,12 @@ export async function demonstrateAgentCommunication() {
 
   // Simulate various scenarios
   const results = {
-    floodEmergency: await handleFloodEmergency('Calabar South', 'high'),
-    diseaseOutbreak: await handleDiseaseOutbreak('Malaria', ['Calabar Municipality', 'Odukpani']),
+    floodEmergency: await handleFloodEmergency('Uyo Metropolis', 'high'),
+    diseaseOutbreak: await handleDiseaseOutbreak('Malaria', ['Uyo', 'Eket']),
     businessRegistration: await processBusinessRegistration('CIT_001', {
       businessName: 'AgroTech Solutions',
       type: 'Technology',
-      location: 'Calabar'
+      location: 'Uyo'
     }),
     systemStatus: await getAgentCommunicationStatus()
   };

@@ -1,6 +1,6 @@
 # Paystack Payment Integration Guide
 
-This document describes the Paystack payment integration for PowerHub CRS wallet system.
+This document describes the Paystack payment integration for the Ibom PowerHub (Akwa Ibom) wallet system.
 
 ## Overview
 

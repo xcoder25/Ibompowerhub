@@ -117,7 +117,7 @@ export function MapNavigator({
         try {
             const result = await findPlace({ query: queryStr });
             const request = {
-                query: `${result.placeType} in Calabar`,
+                query: `${result.placeType} in Uyo, Akwa Ibom`,
                 fields: ['name', 'geometry', 'formatted_address', 'place_id'],
             };
             const service = new google.maps.places.PlacesService(map);
@@ -241,7 +241,7 @@ export function MapNavigator({
                                 <div className="space-y-3">
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 px-1">Recent Searches</h4>
                                     <div className="space-y-1">
-                                        {['Calabar Mall', 'Marina Resort', 'U.J. Esuene Stadium'].map((place) => (
+                                        {['Ibom Plaza', 'Ibom Icon Hotel & Golf Resort', 'Godswill Akpabio International Stadium'].map((place) => (
                                             <button key={place} className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-muted/50 transition-colors text-left">
                                                 <div className="h-8 w-8 rounded-xl bg-muted flex items-center justify-center shrink-0">
                                                     <History className="h-4 w-4 text-muted-foreground" />
@@ -286,7 +286,7 @@ export function MapNavigator({
                                     <Bus className="h-8 w-8" />
                                 </div>
                                 <h3 className="text-sm font-bold">Public Transit Coming Soon</h3>
-                                <p className="text-xs text-muted-foreground mt-1 max-w-[200px] mx-auto leading-relaxed">We're mapping Calabar's taxi and bus routes to serve you better.</p>
+                                <p className="text-xs text-muted-foreground mt-1 max-w-[200px] mx-auto leading-relaxed">We're mapping Akwa Ibom taxi and bus routes, starting from Uyo, to serve you better.</p>
                             </TabsContent>
                         </div>
                     </Tabs>

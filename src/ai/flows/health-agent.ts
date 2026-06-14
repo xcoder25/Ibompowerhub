@@ -68,7 +68,7 @@ const healthAgentPrompt = ai.definePrompt({
   name: 'healthAgentPrompt',
   input: { schema: HealthAgentInputSchema },
   output: { schema: HealthAgentOutputSchema },
-  system: `You are the Health AI Agent for Cross River State Government Services.
+  system: `You are the Health AI Agent for Akwa Ibom State Government Services.
 
 **Your Capabilities:**
 - Find nearest hospitals and healthcare facilities

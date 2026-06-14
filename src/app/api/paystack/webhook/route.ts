@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
                         await addDoc(txnsRef, {
                             type: 'credit',
                             amount: amount,
-                            description: `Top-up: ${data.channel || 'Paystack'}`,
+                            description: `Top-up: ${data.channel || 'card payment'}`,
                             timestamp: serverTimestamp(),
                             reference: reference,
                             gateway_response: data.gateway_response,

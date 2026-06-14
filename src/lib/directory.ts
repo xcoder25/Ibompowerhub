@@ -9,9 +9,9 @@ export const businessCategories = [
 export const businesses = [
     { 
       id: 1, 
-      name: 'Calabar Kitchen', 
+      name: 'Ibom Kitchen', 
       category: 'Food & Drink', 
-      address: '123 Marian Road, Calabar', 
+      address: '123 Oron Road, Uyo', 
       phone: '08012345678', 
       imageId: 'directory-restaurant' 
     },
@@ -19,7 +19,7 @@ export const businesses = [
       id: 2, 
       name: 'AutoFix Masters', 
       category: 'Auto Services', 
-      address: '45 Big Qua Town, Calabar', 
+      address: '45 Ikot Ekpene Road, Uyo', 
       phone: '09087654321', 
       imageId: 'directory-mechanic' 
     },
@@ -27,7 +27,7 @@ export const businesses = [
       id: 3, 
       name: 'Serenity Hotel', 
       category: 'Lodging', 
-      address: '78 Atekong Drive, Calabar', 
+      address: 'Ewet Housing Estate, Uyo', 
       phone: '07011223344', 
       imageId: 'directory-hotel' 
     },
@@ -35,7 +35,7 @@ export const businesses = [
       id: 4,
       name: 'The Food Crescent',
       category: 'Food & Drink',
-      address: '99 Yellow Duke St, Calabar',
+      address: '99 Nwaniba Road, Uyo',
       phone: '08123456789',
       imageId: 'directory-restaurant-2'
     },
@@ -43,15 +43,15 @@ export const businesses = [
       id: 5,
       name: 'Axle & Gear Autos',
       category: 'Auto Services',
-      address: '15 Goldie Street, Calabar',
+      address: '15 Abak Road, Uyo',
       phone: '09098765432',
       imageId: 'directory-mechanic-2'
     },
     {
       id: 6,
-      name: 'Transcorp Hotels Calabar',
+      name: 'Ibom Icon Hotel & Golf Resort',
       category: 'Lodging',
-      address: '10 Murtala Mohammed Highway, Calabar',
+      address: 'Nwaniba Road, Uyo',
       phone: '07033445566',
       imageId: 'directory-hotel-2'
     }

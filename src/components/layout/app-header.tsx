@@ -66,7 +66,7 @@ export function AppHeader() {
   return (
     <>
       <header className={cn(
-        "sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-green-100/60 bg-background/80 px-4 backdrop-blur-sm md:px-6",
+        "sticky top-0 z-30 flex h-14 min-h-14 items-center gap-4 border-b border-primary/10 bg-background/90 px-4 backdrop-blur-md md:px-6",
         isMapPage && "absolute border-none bg-transparent backdrop-blur-none"
       )}>
         <div className="flex w-full items-center justify-between">
@@ -87,14 +87,14 @@ export function AppHeader() {
             )}
 
             <QuickNav>
-              <Button variant="ghost" size="icon" className="rounded-full hover:text-green-700">
+              <Button variant="ghost" size="icon" className="rounded-full hover:text-primary">
                 <LayoutGrid className="h-5 w-5" />
               </Button>
             </QuickNav>
 
             {isDashboard && (
-              <Button asChild className='hidden sm:flex bg-green-700 hover:bg-green-800 text-white'>
-                <Link href="/report"><Plus className='mr-2' />Report Issue</Link>
+              <Button asChild className="hidden sm:flex bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Link href="/report"><Plus className="mr-2 size-4" />Report Issue</Link>
               </Button>
             )}
 

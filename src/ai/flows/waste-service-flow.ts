@@ -31,7 +31,7 @@ const wasteServicePrompt = ai.definePrompt({
   name: 'wasteServicePrompt',
   input: {schema: WasteServiceInputSchema},
   output: {schema: WasteServiceOutputSchema},
-  system: `You are a waste management assistant for PowerHub CRS.
+  system: `You are a waste management assistant for Ibom PowerHub (Akwa Ibom State).
   
   You can help with the following services:
   - 'pickup': Schedule a waste pickup.

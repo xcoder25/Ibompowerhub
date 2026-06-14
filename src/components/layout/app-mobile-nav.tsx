@@ -21,15 +21,15 @@ export function AppMobileNav() {
   const pathname = usePathname();
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/70 backdrop-blur-lg border-t">
-      <nav className="flex items-center justify-around h-16">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t border-primary/10 pb-[env(safe-area-inset-bottom)]">
+      <nav className="flex items-center justify-around h-16 min-h-16">
         {mobileNavItems.map((item, index) => {
           const isActive = pathname === item.href;
           return (
             <React.Fragment key={item.href}>
               {index === 2 && (
                 <Link href="/report" passHref>
-                  <Button size="icon" className='rounded-full size-12 -mt-8 shadow-lg'>
+                  <Button size="icon" className="rounded-full size-12 -mt-8 shadow-lg aks-gradient-motion text-white border-0 hover:opacity-95">
                     <Plus className="size-6" />
                   </Button>
                 </Link>

@@ -15,19 +15,19 @@ import { Logo } from '@/components/logo';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 
-// ─── Onboarding slides data ───────────────────────────────────────────────────
+// ─── Onboarding slides (AKS: green, gradient orange, white) ────────────────────
 const ONBOARDING_SLIDES = [
   {
     id: 0,
-    bg: 'from-[#071a0c] via-[#0a2213] to-[#040d06]',
-    accentBg: 'bg-emerald-600/20',
+    bg: 'from-[#071a0c] via-[#0a2e14] to-[#040d06]',
+    accentBg: 'bg-aks-green/30',
     accent: 'text-emerald-400',
-    accentBorder: 'border-emerald-500/40',
-    accentBg2: 'bg-emerald-500/15',
+    accentBorder: 'border-aks-green/50',
+    accentBg2: 'bg-aks-green/20',
     gradFrom: 'from-emerald-400',
-    gradTo: 'to-teal-300',
+    gradTo: 'to-orange-400',
     icon: Sparkles,
-    iconBg: 'bg-emerald-500',
+    iconBg: 'bg-aks-green',
     badge: 'ARISE Agenda',
     title: 'Everything Akwa Ibom,',
     titleHighlight: 'In One App.',
@@ -36,15 +36,15 @@ const ONBOARDING_SLIDES = [
   },
   {
     id: 1,
-    bg: 'from-[#060e1a] via-[#091120] to-[#040d06]',
-    accentBg: 'bg-blue-600/20',
-    accent: 'text-blue-400',
-    accentBorder: 'border-blue-500/40',
-    accentBg2: 'bg-blue-500/15',
-    gradFrom: 'from-blue-400',
-    gradTo: 'to-violet-300',
+    bg: 'from-[#071a0c] via-[#0d1f0f] to-[#040d06]',
+    accentBg: 'bg-aks-orange/20',
+    accent: 'text-orange-300',
+    accentBorder: 'border-aks-orange/40',
+    accentBg2: 'bg-aks-orange/15',
+    gradFrom: 'from-aks-green-light',
+    gradTo: 'to-aks-orange',
     icon: Wallet,
-    iconBg: 'bg-blue-500',
+    iconBg: 'bg-aks-orange',
     badge: 'Smart Finance',
     title: 'Send Money,',
     titleHighlight: 'Pay Bills, Grow.',
@@ -53,15 +53,15 @@ const ONBOARDING_SLIDES = [
   },
   {
     id: 2,
-    bg: 'from-[#160a06] via-[#1a0c08] to-[#040d06]',
-    accentBg: 'bg-amber-600/20',
-    accent: 'text-amber-400',
-    accentBorder: 'border-amber-500/40',
-    accentBg2: 'bg-amber-500/15',
-    gradFrom: 'from-amber-400',
-    gradTo: 'to-orange-300',
+    bg: 'from-[#0a1a0c] via-[#0f1f0a] to-[#040d06]',
+    accentBg: 'bg-aks-orange/25',
+    accent: 'text-orange-300',
+    accentBorder: 'border-aks-orange/50',
+    accentBg2: 'bg-aks-orange/20',
+    gradFrom: 'from-orange-400',
+    gradTo: 'to-amber-300',
     icon: Shield,
-    iconBg: 'bg-amber-500',
+    iconBg: 'aks-gradient-motion',
     badge: 'Bank-Grade Security',
     title: 'Your Identity,',
     titleHighlight: 'Verified & Safe.',
@@ -70,14 +70,14 @@ const ONBOARDING_SLIDES = [
   },
 ];
 
-// ─── Desktop feature cards ────────────────────────────────────────────────────
+// ─── Desktop feature cards (AKS branded) ─────────────────────────────────────
 const FEATURES = [
-  { icon: Wallet, title: 'Smart Wallet', desc: 'Send, receive and manage money with bank-grade security.', color: 'from-emerald-500 to-teal-600', bg: 'bg-emerald-500/10', textColor: 'text-emerald-400' },
-  { icon: MapPin, title: 'Interactive Map', desc: 'Discover services, businesses, and government locations.', color: 'from-blue-500 to-indigo-600', bg: 'bg-blue-500/10', textColor: 'text-blue-400' },
-  { icon: Plane, title: 'Flight Booking', desc: 'Search and book domestic flights with real-time availability.', color: 'from-violet-500 to-purple-600', bg: 'bg-violet-500/10', textColor: 'text-violet-400' },
-  { icon: Zap, title: 'Utility Payments', desc: 'Pay electricity, water, and government fees instantly.', color: 'from-amber-500 to-orange-500', bg: 'bg-amber-500/10', textColor: 'text-amber-400' },
-  { icon: Shield, title: 'KYC Verification', desc: 'Quick identity verification through Smile ID biometrics.', color: 'from-rose-500 to-pink-600', bg: 'bg-rose-500/10', textColor: 'text-rose-400' },
-  { icon: Globe, title: 'Ibibio AI', desc: 'Translate and speak in native Ibibio/Efik language.', color: 'from-cyan-500 to-sky-600', bg: 'bg-cyan-500/10', textColor: 'text-cyan-400' },
+  { icon: Wallet, title: 'Smart Wallet', desc: 'Send, receive and manage money with bank-grade security.', color: 'from-aks-green to-aks-green-light', bg: 'bg-aks-green/10', textColor: 'text-aks-green' },
+  { icon: MapPin, title: 'Interactive Map', desc: 'Discover services, businesses, and government locations.', color: 'from-aks-green to-aks-orange', bg: 'bg-aks-green/10', textColor: 'text-aks-green' },
+  { icon: Plane, title: 'Flight Booking', desc: 'Search and book domestic flights with real-time availability.', color: 'from-aks-orange-dark to-aks-orange', bg: 'bg-aks-orange/10', textColor: 'text-aks-orange-dark' },
+  { icon: Zap, title: 'Utility Payments', desc: 'Pay electricity, water, and government fees instantly.', color: 'from-aks-orange to-amber-400', bg: 'bg-aks-orange/10', textColor: 'text-aks-orange' },
+  { icon: Shield, title: 'KYC Verification', desc: 'Quick identity verification through Smile ID biometrics.', color: 'from-aks-green to-aks-orange', bg: 'bg-aks-green/10', textColor: 'text-aks-green' },
+  { icon: Globe, title: 'Ibibio AI', desc: 'Translate and speak in native Ibibio/Efik language.', color: 'from-aks-green-light to-aks-orange', bg: 'bg-aks-orange/10', textColor: 'text-aks-orange' },
 ];
 
 const STATS = [
@@ -89,7 +89,7 @@ const STATS = [
 
 const TRUST_POINTS = [
   'Bank-grade 256-bit encryption',
-  'Paystack-secured transactions',
+  'Securely processed payments',
   'Smile ID biometric KYC',
   'Real-time Firebase sync',
   'NDPR compliant data handling',
@@ -180,7 +180,7 @@ function MobileOnboarding() {
         {/* Dots */}
         <div className="flex items-center gap-2 mb-6">
           {ONBOARDING_SLIDES.map((_, i) => (
-            <button key={i} onClick={() => goTo(i)} className={`transition-all duration-300 rounded-full ${i === current ? `w-8 h-2 ${slide.iconBg}` : 'w-2 h-2 bg-white/25'}`} />
+            <button key={i} onClick={() => goTo(i)} className={`transition-all duration-300 rounded-full ${i === current ? `w-8 h-2 ${slide.iconBg === 'aks-gradient-motion' ? 'aks-gradient-motion' : slide.iconBg}` : 'w-2 h-2 bg-white/25'}`} />
           ))}
         </div>
 
@@ -188,7 +188,7 @@ function MobileOnboarding() {
         {isLast ? (
           <div className="space-y-3">
             <Link href="/auth/signup" className="block">
-              <button className="w-full h-14 rounded-2xl bg-amber-500 hover:bg-amber-400 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(245,158,11,0.3)]">
+              <button className="w-full h-14 rounded-2xl aks-gradient-motion text-white font-black text-base flex items-center justify-center gap-2 shadow-lg border-0 hover:opacity-95">
                 Create Free Account
                 <ArrowRight className="h-5 w-5" />
               </button>
@@ -252,7 +252,7 @@ function DesktopLanding() {
               <Button variant="ghost" className="text-white/80 hover:text-white hover:bg-white/10 font-semibold">Sign In</Button>
             </Link>
             <Link href="/auth/signup">
-              <Button className="bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl px-5">Get Started</Button>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-5">Get Started</Button>
             </Link>
           </div>
         </div>
@@ -265,17 +265,17 @@ function DesktopLanding() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-[#040d06]" />
         </div>
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-emerald-600/10 blur-[120px] animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-teal-500/10 blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-aks-green/20 blur-[120px] animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-aks-orange/15 blur-[120px] animate-pulse [animation-delay:1s]" />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 rounded-full px-4 py-1.5 mb-6 text-emerald-300 text-xs font-bold uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 bg-aks-green/20 border border-aks-green/40 rounded-full px-4 py-1.5 mb-6 text-white/90 text-xs font-bold uppercase tracking-widest">
             <Sparkles className="h-3.5 w-3.5" />
             Akwa Ibom State's Super App
           </div>
           <h1 className="text-6xl md:text-7xl font-black leading-[1.05] mb-6">
             <span className="block text-white">Everything</span>
-            <span className="block bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">Akwa Ibom</span>
+            <span className="block text-gradient">Akwa Ibom</span>
             <span className="block text-white">In One Place.</span>
           </h1>
           <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed mb-10">
@@ -283,7 +283,7 @@ function DesktopLanding() {
           </p>
           <div className="flex gap-4 justify-center items-center mb-16">
             <Link href="/auth/signup">
-              <Button size="lg" className="bg-emerald-500 hover:bg-emerald-400 text-white font-black rounded-2xl px-8 h-14 text-base shadow-[0_0_40px_rgba(34,197,94,0.4)]">
+              <Button size="lg" className="aks-gradient-motion text-white border-0 font-black rounded-2xl px-8 h-14 text-base shadow-lg hover:opacity-95">
                 Start for Free <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -296,7 +296,7 @@ function DesktopLanding() {
           <div className="grid grid-cols-4 gap-4 max-w-3xl mx-auto">
             {STATS.map(({ icon: Icon, value, label }) => (
               <div key={label} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-4 py-4 flex flex-col items-center gap-1.5">
-                <Icon className="h-5 w-5 text-emerald-400" />
+                <Icon className="h-5 w-5 text-aks-green-light" />
                 <p className="text-2xl font-black text-white">{value}</p>
                 <p className="text-xs text-white/50 font-medium">{label}</p>
               </div>
@@ -314,9 +314,9 @@ function DesktopLanding() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-4 text-white/60 text-xs font-bold uppercase tracking-widest">
-              <Zap className="h-3.5 w-3.5 text-amber-400" /> What we offer
+              <Zap className="h-3.5 w-3.5 text-aks-orange" /> What we offer
             </div>
-            <h2 className="text-5xl font-black text-white mb-4">One App, <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">Infinite Possibilities</span></h2>
+            <h2 className="text-5xl font-black text-white mb-4">One App, <span className="text-gradient">Infinite Possibilities</span></h2>
             <p className="text-white/50 max-w-xl mx-auto text-base leading-relaxed">From paying utility bills to booking a flight, Ibom PowerHub connects you to every essential service in Akwa Ibom.</p>
           </div>
           <div className="grid grid-cols-3 gap-5">
@@ -338,8 +338,8 @@ function DesktopLanding() {
       <section className="relative px-6 py-24 overflow-hidden">
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-40 left-0 w-[600px] h-[600px] rounded-full bg-emerald-800/20 blur-[140px]" />
-          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-amber-800/10 blur-[140px]" />
+          <div className="absolute -top-40 left-0 w-[600px] h-[600px] rounded-full bg-aks-green/20 blur-[140px]" />
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-aks-orange/10 blur-[140px]" />
         </div>
 
         <div className="relative max-w-6xl mx-auto">

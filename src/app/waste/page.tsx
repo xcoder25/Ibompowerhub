@@ -27,19 +27,19 @@ import { Button } from "@/components/ui/button";
 
 const collectionSchedule = [
   {
-    area: "State Housing Estate",
+    area: "State Housing Estate, Uyo",
     day: "Mondays & Thursdays",
     time: "8:00 AM - 12:00 PM",
     status: "Active"
   },
   {
-    area: "Marian / Calabar South",
+    area: "Itam / Ikot Ekpene Road",
     day: "Tuesdays & Fridays",
     time: "8:00 AM - 12:00 PM",
     status: "Active"
   },
   {
-    area: "8 Miles / Highway",
+    area: "Ewet Housing / Oron Road",
     day: "Wednesdays & Saturdays",
     time: "8:00 AM - 12:00 PM",
     status: "Delayed"

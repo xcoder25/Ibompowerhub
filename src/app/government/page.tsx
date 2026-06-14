@@ -192,7 +192,7 @@ export default function GovernmentPage() {
               </div>
               <h3 className="text-2xl font-black mb-2">Digital Payments & Revenue</h3>
               <p className="text-white/70 max-w-lg leading-relaxed">
-                Pay your state taxes, levies, and government fees securely through our Paystack-powered digital revenue platform.
+                Pay your state taxes, levies, and government fees securely through our digital revenue platform.
               </p>
             </div>
             <Button className="rounded-2xl bg-orange-500 hover:bg-orange-400 text-white font-black px-8 h-12 shadow-xl shadow-orange-500/30 gap-2 flex-shrink-0">

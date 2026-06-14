@@ -82,7 +82,7 @@ export function SchedulePickupDialog({
             <Input
               id="address"
               name="address"
-              placeholder="Near Marian Market..."
+              placeholder="Near Itam Market, Uyo..."
               required
             />
           </div>

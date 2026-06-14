@@ -1,4 +1,4 @@
-# **App Name**: PowerHub CRS
+## **App Name**: Ibom PowerHub (Akwa Ibom)
 
 ## Core Features:
 

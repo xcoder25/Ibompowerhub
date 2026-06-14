@@ -16,9 +16,9 @@ export default function LiveTrackingDemoPage() {
   const [customOrderId, setCustomOrderId] = useState('');
 
   const demoDestination = {
-    lat: 4.9757, // Calabar coordinates
-    lng: 8.3417,
-    address: 'Marina Resort, Calabar, Nigeria'
+    lat: 5.0513, // Uyo coordinates
+    lng: 7.9339,
+    address: 'Ibom Plaza, Uyo, Akwa Ibom, Nigeria'
   };
 
   const demoDriverInfo = {

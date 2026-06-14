@@ -17,7 +17,7 @@ export function Logo({ withText = false, className, size = 36, layout = 'row' }:
           priority={size > 50}
         />
       </div>
-      {withText && <span className="whitespace-nowrap text-green-800">Arise AKS</span>}
+      {withText && <span className="whitespace-nowrap text-gradient font-semibold">Arise AKS</span>}
     </div>
   );
 }

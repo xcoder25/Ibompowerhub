@@ -412,8 +412,8 @@ export default function WalletPage() {
     if (!publicKey) {
       toast({
         variant: 'destructive',
-        title: 'Missing Public Key',
-        description: 'The Paystack Public Key is not loaded. If you just added it to .env.local, please restart the dev server manually in your terminal.'
+        title: 'Configuration Error',
+        description: 'The payment gateway key is not loaded. Please try again later or contact support.'
       });
       return;
     }
@@ -428,12 +428,12 @@ export default function WalletPage() {
         setPaystackLoaded(true);
         console.log('Paystack script loaded successfully.');
       } catch (error) {
-        console.error('Paystack script load error:', error);
+        console.error('Payment script load error:', error);
         setIsAddingFunds(false);
         toast({
           variant: 'destructive',
           title: 'Script Error',
-          description: 'Could not load Paystack. Check your internet connection or Public Key.'
+          description: 'Could not load the payment window. Check your connection or try again.'
         });
         return;
       }
@@ -490,7 +490,7 @@ export default function WalletPage() {
               await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
                 type: 'credit',
                 amount: verifiedAmount,
-                description: 'Funds added via Paystack',
+                description: 'Wallet top-up',
                 timestamp: new Date(),
                 reference: response.reference
               });
@@ -839,6 +839,19 @@ export default function WalletPage() {
   const balance = walletData?.balance || 0;
   const currency = walletData?.currency || 'NGN';
 
+  // Lightweight insights from recent transactions (for UI only)
+  const recentInflow = transactions
+    .filter((t) => t.type === 'credit')
+    .slice(0, 20)
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+  const recentOutflow = transactions
+    .filter((t) => t.type === 'debit')
+    .slice(0, 20)
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+  const netFlow = recentInflow - recentOutflow;
+
   return (
     <>
       {!isUnlocked && <WalletLock onUnlock={handleUnlock} />}
@@ -1049,6 +1062,46 @@ export default function WalletPage() {
                 </Link>
               ) : content;
             })}
+          </div>
+
+          {/* Smart Insights Strip */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+            <div className="rounded-2xl bg-white/70 dark:bg-slate-950/60 border border-white/60 dark:border-slate-800 px-4 py-4 flex items-center justify-between shadow-sm backdrop-blur-md">
+              <div className="space-y-0.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">Inflow (Last 20)</p>
+                <p className="text-lg font-black tracking-tight">
+                  ₦{recentInflow.toLocaleString()}
+                </p>
+              </div>
+              <div className="size-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                <ArrowDownLeft className="size-5 text-emerald-500" />
+              </div>
+            </div>
+            <div className="rounded-2xl bg-white/70 dark:bg-slate-950/60 border border-white/60 dark:border-slate-800 px-4 py-4 flex items-center justify-between shadow-sm backdrop-blur-md">
+              <div className="space-y-0.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">Outflow (Last 20)</p>
+                <p className="text-lg font-black tracking-tight">
+                  ₦{recentOutflow.toLocaleString()}
+                </p>
+              </div>
+              <div className="size-10 rounded-full bg-rose-500/10 flex items-center justify-center">
+                <ArrowUpRight className="size-5 text-rose-500" />
+              </div>
+            </div>
+            <div className="rounded-2xl bg-slate-950 text-white px-4 py-4 flex items-center justify-between shadow-[0_24px_60px_rgba(15,23,42,0.55)] border border-white/10">
+              <div className="space-y-0.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/60">Net Flow Snapshot</p>
+                <p className="text-lg font-black tracking-tight flex items-center gap-1.5">
+                  {netFlow >= 0 ? '+' : '-'}₦{Math.abs(netFlow).toLocaleString()}
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <Activity className="size-5 text-emerald-400" />
+                <span className="text-[9px] uppercase tracking-widest font-black text-white/50">
+                  {netFlow >= 0 ? 'Net Positive' : 'Net Spend'}
+                </span>
+              </div>
+            </div>
           </div>
 
           <Tabs defaultValue="manage" className="space-y-6">
@@ -1813,7 +1866,7 @@ export default function WalletPage() {
           </div>
           <DialogTitle className="text-2xl font-black uppercase tracking-widest text-slate-900 dark:text-white mb-2">Transfer Restricted</DialogTitle>
           <DialogDescription className="text-sm font-medium text-slate-500 mb-6">
-            Paystack has restricted your account from making live transfers because it is currently in "Starter" mode.
+            Our payment provider has restricted this account from making live transfers because it is currently in "Starter" mode.
           </DialogDescription>
 
           <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-left mb-8">
@@ -1837,7 +1890,7 @@ export default function WalletPage() {
               Cancel
             </Button>
           </div>
-          <p className="text-[10px] text-slate-400 mt-6 font-medium">Use Simulation to test the wallet flow until your Paystack account is upgraded.</p>
+          <p className="text-[10px] text-slate-400 mt-6 font-medium">Use Simulation to test the wallet flow until your payment provider account is upgraded.</p>
         </DialogContent>
       </Dialog>
     </>

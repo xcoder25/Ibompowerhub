@@ -16,6 +16,13 @@ export default {
         code: ['monospace'],
       },
       colors: {
+        aks: {
+          green: '#0d5c2e',
+          'green-light': '#16a34a',
+          orange: '#f97316',
+          'orange-dark': '#ea580c',
+          white: '#ffffff',
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

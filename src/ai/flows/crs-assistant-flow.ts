@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * Simple Genkit-powered assistant for PowerHub CRS.
+ * Simple Genkit-powered assistant for Ibom PowerHub (Akwa Ibom).
  *
  * We bypass the higher-level prompt/flow wrappers (which were throwing
  * `content` errors) and call `ai.generate` directly.

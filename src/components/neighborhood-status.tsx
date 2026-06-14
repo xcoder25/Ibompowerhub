@@ -31,7 +31,7 @@ const statusConfig = {
 
 export default function NeighborhoodStatus() {
   const [reportSummaries, setReportSummaries] = useState(
-    'Power outage reported on Marian Road. Flash flood near 8 Miles. Waste bin at Watt Market is full.'
+    'Power outage reported on Oron Road, Uyo. Flash flood near Ikot Ekpene Road. Waste bin at Itam Market is full.'
   );
   const [status, setStatus] = useState<NeighborhoodStatusOutput | null>(null);
   const { isLoading, setIsLoading } = useLoading();

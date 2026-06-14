@@ -127,7 +127,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
     return (
         <SidebarProvider>
             <WalletMonitor />
-            <div className={cn("flex min-h-screen", isDashboard ? "bg-slate-50" : "bg-background")}>
+            <div className={cn("flex min-h-screen min-h-[100dvh]", isDashboard ? "bg-background" : "bg-background")}>
                 {!isMobile && <AppSidebar />}
                 <div className="flex flex-col flex-1">
                     <AppHeader />

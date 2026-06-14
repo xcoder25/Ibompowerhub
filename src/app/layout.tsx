@@ -1,5 +1,4 @@
-
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
 import MainLayout from '@/components/layout/main-layout';
@@ -9,6 +8,16 @@ import { AppInitializer } from '@/components/app-initializer';
 export const metadata: Metadata = {
   title: 'Arise AKS',
   description: 'Your digital gateway to Akwa Ibom State services — ARISE Agenda powered.',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#0d5c2e' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a2e14' },
+  ],
 };
 
 export default function RootLayout({

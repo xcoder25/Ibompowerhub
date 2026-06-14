@@ -50,7 +50,7 @@ const emergencyCoordinationPrompt = ai.definePrompt({
   name: 'emergencyCoordinationPrompt',
   input: { schema: EmergencyCoordinationInputSchema },
   output: { schema: EmergencyCoordinationOutputSchema },
-  system: `You are the Emergency Coordination AI Agent for Cross River State.
+  system: `You are the Emergency Coordination AI Agent for Akwa Ibom State.
 
 Your role is to coordinate responses between different service agents during emergencies.
 

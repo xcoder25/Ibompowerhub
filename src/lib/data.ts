@@ -195,9 +195,9 @@ export const emergencyContacts = [
 ];
 
 export const waterSchedule = [
-  { area: '8 Miles', days: 'Mon, Wed, Fri', time: '6am - 12pm' },
-  { area: 'State Housing', days: 'Tue, Thu, Sat', time: '6am - 12pm' },
-  { area: 'Marian', days: 'Daily', time: '5am - 10am' },
+  { area: 'Ewet Housing, Uyo', days: 'Mon, Wed, Fri', time: '6am - 12pm' },
+  { area: 'State Housing, Uyo', days: 'Tue, Thu, Sat', time: '6am - 12pm' },
+  { area: 'Itam / Ikot Ekpene Road, Uyo', days: 'Daily', time: '5am - 10am' },
 ];
 
 export const powerSchedule = [
