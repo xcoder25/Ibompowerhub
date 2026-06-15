@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { GlobalLoader } from '@/components/global-loader';
 import { usePathname } from 'next/navigation';
 
@@ -12,62 +12,113 @@ interface LoadingContextType {
 
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
+// Pages where the loader should NEVER show (splash screen handles them)
+const LOADER_EXCLUDED_PATHS = ['/', '/auth/login', '/auth/signup'];
+
 export const LoadingProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resolveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const showLoader = (duration: number = 3000) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, duration);
+  const isExcluded = LOADER_EXCLUDED_PATHS.includes(pathname);
+
+  const clearAllTimers = () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (resolveRef.current) clearTimeout(resolveRef.current);
   };
 
-  // Trigger loader on page switch (pathname changes)
-  useEffect(() => {
+  const showLoader = (duration: number = 2500) => {
+    if (isExcluded) return;
+    clearAllTimers();
     setIsLoading(true);
-    const timer = setTimeout(() => {
+    resolveRef.current = setTimeout(() => setIsLoading(false), duration);
+  };
+
+  // Show loader on route change — but NEVER on excluded pages,
+  // and only after a 200ms debounce so it never flashes right after the splash.
+  useEffect(() => {
+    clearAllTimers();
+
+    if (isExcluded) {
       setIsLoading(false);
-    }, 3000); // 3 seconds
-    return () => clearTimeout(timer);
+      return;
+    }
+
+    // 200ms debounce — prevents loader from appearing for instant navigations
+    debounceRef.current = setTimeout(() => {
+      setIsLoading(true);
+
+      // Resolve when document signals it is ready, with a 500ms grace period on top.
+      // Max cap: 4 seconds so it never hangs forever on slow pages.
+      const tryResolve = () => {
+        if (document.readyState === 'complete') {
+          resolveRef.current = setTimeout(() => setIsLoading(false), 500);
+        } else {
+          resolveRef.current = setTimeout(() => setIsLoading(false), 4000);
+        }
+      };
+
+      if (document.readyState === 'complete') {
+        tryResolve();
+      } else {
+        window.addEventListener('load', tryResolve, { once: true });
+        // Safety net: never hang longer than 4s
+        resolveRef.current = setTimeout(() => setIsLoading(false), 4000);
+      }
+    }, 200);
+
+    return () => {
+      clearAllTimers();
+      window.removeEventListener('load', () => {});
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   // Global click listener for buttons and links
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
+      if (isExcluded) return; // Never trigger on landing / auth pages
+
       const target = e.target as HTMLElement;
       const interactiveElement = target.closest('button, a, [role="button"]');
 
       if (interactiveElement) {
-        // Exclude specific elements to avoid annoying UX (like close/cancel buttons, switches, accordion headers, tab triggers)
-        const isSwitch = interactiveElement.getAttribute('role') === 'switch' || 
+        const isSwitch = interactiveElement.getAttribute('role') === 'switch' ||
                           interactiveElement.classList.contains('switch') ||
                           interactiveElement.closest('.switch');
-        const isDialogClose = interactiveElement.getAttribute('aria-label') === 'Close' || 
+        const isDialogClose = interactiveElement.getAttribute('aria-label') === 'Close' ||
                                interactiveElement.classList.contains('dialog-close') ||
                                interactiveElement.closest('[data-dialog-close]') ||
                                target.closest('button[class*="DialogClose"]') ||
                                target.closest('button[class*="close"]');
-        const isAccordionTrigger = interactiveElement.getAttribute('data-state') !== null && 
-                                    (interactiveElement.classList.contains('accordion-trigger') || 
+        const isAccordionTrigger = interactiveElement.getAttribute('data-state') !== null &&
+                                    (interactiveElement.classList.contains('accordion-trigger') ||
                                      interactiveElement.closest('.accordion-trigger'));
-        const isThemeToggle = interactiveElement.id === 'dark-mode' || 
+        const isThemeToggle = interactiveElement.id === 'dark-mode' ||
                               interactiveElement.closest('#dark-mode');
         const isTabTrigger = interactiveElement.getAttribute('role') === 'tab';
+        // Links that navigate within current page (#hash) should not trigger loader
+        const isHashLink = interactiveElement.tagName === 'A' &&
+                           (interactiveElement as HTMLAnchorElement).hash !== '' &&
+                           (interactiveElement as HTMLAnchorElement).pathname === window.location.pathname;
 
-        if (!isSwitch && !isDialogClose && !isAccordionTrigger && !isThemeToggle && !isTabTrigger) {
-          setIsLoading(true);
-          const timer = setTimeout(() => {
-            setIsLoading(false);
-          }, 3000);
-          return () => clearTimeout(timer);
+        if (!isSwitch && !isDialogClose && !isAccordionTrigger && !isThemeToggle && !isTabTrigger && !isHashLink) {
+          clearAllTimers();
+          // Small debounce so rapid clicks don't stack
+          debounceRef.current = setTimeout(() => {
+            setIsLoading(true);
+            // Auto-dismiss after 2.5s as a fallback
+            resolveRef.current = setTimeout(() => setIsLoading(false), 2500);
+          }, 80);
         }
       }
     };
 
     document.addEventListener('click', handleGlobalClick);
     return () => document.removeEventListener('click', handleGlobalClick);
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading, showLoader }}>
