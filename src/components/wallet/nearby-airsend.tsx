@@ -651,30 +651,29 @@ export function NearbyAirSend({ open, onOpenChange, currentBalance }: NearbyAirS
     Array.from({ length: 24 }, (_, i) => Math.sin(i * 0.5 + wavePhase) * 0.4 + 0.55),
     [wavePhase]);
 
+  // Minimal top strip — just engine label + live dot
   const AIBar = () => (
-    <div className="flex items-center gap-2 px-5 py-2.5 bg-black/50 border-b border-white/5 relative z-50 shrink-0">
-      <Cpu className="size-3.5 text-indigo-400 shrink-0" />
-      <span className="text-[9px] font-black uppercase tracking-[0.25em] text-indigo-400">HiAI Orion v5.0</span>
-      <div className="flex-1">
-        <NeuralWave wave={liveWave} color="#6366f1" />
+    <div className="flex items-center justify-between px-5 py-2 border-b border-white/[0.04] shrink-0">
+      <div className="flex items-center gap-1.5">
+        <div className="size-1.5 bg-indigo-500 rounded-full" />
+        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/20">Orion v5</span>
       </div>
       <div className="flex items-center gap-1.5">
-        <div className="size-1.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_#34d399]" />
-        <span className="text-[8px] font-mono text-emerald-400">LIVE</span>
+        <div className="size-1 bg-emerald-400 rounded-full animate-pulse" />
+        <span className="text-[7px] font-mono text-white/20">LIVE</span>
       </div>
     </div>
   );
 
+  // Minimal bottom — just reset/exit, no metrics clutter
   const HUDBar = () => (
-    <div className="px-6 py-3 border-t border-white/5 flex justify-between items-center bg-black/30 shrink-0">
-      <div className="flex gap-5">
-        <div className="text-center"><p className="text-[7px] font-black text-slate-600 uppercase">Latency</p><p className="text-[10px] font-black text-emerald-500 font-mono">1.2ms</p></div>
-        <div className="text-center"><p className="text-[7px] font-black text-slate-600 uppercase">Link</p><p className="text-[10px] font-black text-indigo-500 font-mono">AES-256</p></div>
-        <div className="text-center"><p className="text-[7px] font-black text-slate-600 uppercase">Engine</p><p className="text-[10px] font-black text-violet-500 font-mono">HiAI v5</p></div>
-      </div>
-      <Button variant="ghost" onClick={() => role ? resetFlows() : onOpenChange(false)} className="text-[9px] font-black uppercase text-slate-500 hover:text-white h-auto py-1.5 px-3">
-        {role ? '⟳ RESET' : '✕ EXIT'}
-      </Button>
+    <div className="px-5 py-2.5 border-t border-white/[0.04] flex justify-end shrink-0">
+      <button
+        onClick={() => role ? resetFlows() : onOpenChange(false)}
+        className="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-white/60 transition-colors"
+      >
+        {role ? '⟳ reset' : '✕ close'}
+      </button>
     </div>
   );
 
@@ -1289,31 +1288,17 @@ export function NearbyAirSend({ open, onOpenChange, currentBalance }: NearbyAirS
     return null;
   };
 
-  // ── Animated neural grid background ──────────────────────────────────────
-  const GridBg = () => (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <svg className="absolute inset-0 w-full h-full opacity-[0.04]" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="neural-grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-            <line x1="40" y1="0" x2="0" y2="0" stroke="#6366f1" strokeWidth="0.5" />
-            <line x1="0" y1="0" x2="0" y2="40" stroke="#6366f1" strokeWidth="0.5" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#neural-grid)" />
-      </svg>
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-indigo-600/8 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-48 h-48 bg-violet-600/5 rounded-full blur-2xl" />
-    </div>
-  );
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-[#020617] border border-white/10 rounded-[2.5rem] shadow-2xl shadow-black/80">
+      <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden bg-black border border-white/[0.06] rounded-3xl shadow-2xl shadow-black">
         <DialogTitle className="sr-only">AirSend — HiAI Orion</DialogTitle>
+        {/* Single subtle glow — no grid noise */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-indigo-600/5 blur-3xl" />
+        </div>
         <div className="relative flex flex-col max-h-[92dvh]">
-          <GridBg />
           <AIBar />
-          <div className="flex-1 overflow-y-auto overflow-x-hidden px-7 py-6 relative z-10 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-7 relative z-10 scrollbar-hide">
             {renderContent()}
           </div>
           <HUDBar />

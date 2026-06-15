@@ -5,7 +5,6 @@ require('dotenv').config({ path: './.env' });
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  /* config options here */
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -34,6 +33,17 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  // Increase chunk load timeout for slower/local network connections
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Give the browser 60 seconds to load a chunk before timing out
+      config.output = {
+        ...config.output,
+        chunkLoadTimeout: 60000,
+      };
+    }
+    return config;
   },
 };
 

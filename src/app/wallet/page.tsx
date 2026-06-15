@@ -1065,14 +1065,25 @@ export default function WalletPage() {
   return (
     <>
       {!isUnlocked && <WalletLock onUnlock={handleUnlock} />}
-      <main className="min-h-screen bg-[#f0f2f7] dark:bg-[#060810] pb-32 relative overflow-hidden">
-        {/* Premium layered background */}
-        <div className="fixed inset-0 bg-[#f0f2f7] dark:bg-[#060810] z-0" />
-        <div className="fixed top-0 left-0 right-0 h-72 bg-gradient-to-b from-emerald-600 to-transparent opacity-[0.07] dark:opacity-[0.12] z-0" />
-        <div className="fixed top-[-120px] right-[-80px] w-72 h-72 rounded-full bg-emerald-400/20 dark:bg-emerald-500/10 blur-[100px] z-0" />
-        <div className="fixed top-[200px] left-[-100px] w-80 h-80 rounded-full bg-indigo-400/10 dark:bg-indigo-500/10 blur-[120px] z-0" />
+      <main className="min-h-screen bg-black pb-32 relative overflow-hidden">
+        {/* Dynamic Orion Background */}
+        <div className="fixed inset-0 bg-black z-0" />
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="wallet-grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                <line x1="40" y1="0" x2="0" y2="0" stroke="#10b981" strokeWidth="0.5" />
+                <line x1="0" y1="0" x2="0" y2="40" stroke="#10b981" strokeWidth="0.5" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#wallet-grid)" />
+          </svg>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-emerald-900/20 rounded-full blur-[120px] mix-blend-screen opacity-50 animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-500/10 blur-[100px] mix-blend-screen" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-500/10 blur-[100px] mix-blend-screen" />
+        </div>
 
-        <div className="w-full max-w-full mx-auto px-4 sm:px-12 pt-4 sm:pt-12 pb-4 sm:pb-12 flex flex-col gap-3 sm:gap-12 relative z-10 overflow-hidden isolate">
+        <div className="w-full max-w-full mx-auto px-4 sm:px-12 pt-4 sm:pt-12 pb-4 sm:pb-12 flex flex-col gap-5 sm:gap-12 relative z-10 overflow-hidden isolate">
           {/* ── Header ── */}
           <div className="flex items-center justify-between pt-safe pt-2">
             <div className="flex items-center gap-2.5 shrink-0">
@@ -1106,12 +1117,12 @@ export default function WalletPage() {
           </div>
 
           {/* ── Premium Wallet Card ── */}
-          <div className="relative">
+          <div className="relative animate-in slide-in-from-bottom-8 fade-in duration-700 ease-out fill-mode-both">
             {/* Glow behind card */}
-            <div className="absolute -inset-2 bg-gradient-to-br from-emerald-500/30 via-emerald-400/10 to-indigo-500/20 rounded-[2.5rem] blur-2xl opacity-60 dark:opacity-40" />
+            <div className="absolute -inset-2 bg-gradient-to-br from-emerald-500/30 via-emerald-400/10 to-indigo-500/20 rounded-[3rem] blur-2xl opacity-60 mix-blend-screen" />
 
             <div
-              className={`relative w-full transition-transform duration-700 preserve-3d cursor-pointer ${isCardFlipped ? 'rotate-y-180' : ''}`}
+              className={`relative w-full transition-transform duration-1000 preserve-3d cursor-pointer ${isCardFlipped ? 'rotate-y-180' : ''}`}
               onDoubleClick={(e) => {
                 e.preventDefault();
                 setIsCardFlipped(!isCardFlipped);
@@ -1119,8 +1130,11 @@ export default function WalletPage() {
               }}
             >
               {/* FRONT */}
-              <Card className="relative overflow-hidden border-none shadow-2xl backface-hidden rounded-[1.75rem] sm:rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white">
-                <CardContent className="p-5 sm:p-8 relative z-10">
+              <Card className="relative overflow-hidden border border-white/[0.08] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] backface-hidden rounded-[2rem] sm:rounded-[3rem] bg-[#050505] text-white group">
+                {/* Holographic foil overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-emerald-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 transform -translate-x-full group-hover:translate-x-full ease-in-out" style={{ transitionProperty: 'transform, opacity' }} />
+                
+                <CardContent className="p-6 sm:p-10 relative z-10">
 
                   {/* Top row */}
                   <div className="flex justify-between items-start mb-6">
@@ -1187,24 +1201,27 @@ export default function WalletPage() {
               </Card>
 
               {/* BACK */}
-              <Card className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-950 border-none shadow-2xl rounded-[1.75rem] sm:rounded-[2.5rem] overflow-hidden text-white backface-hidden rotate-y-180">
-                <CardContent className="p-5 sm:p-8 relative z-10 h-full flex flex-col justify-between">
+              <Card className="absolute inset-0 bg-[#050505] border border-white/[0.08] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] rounded-[2rem] sm:rounded-[3rem] overflow-hidden text-white backface-hidden rotate-y-180 group">
+                {/* Holographic foil overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-amber-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 transform translate-x-full group-hover:-translate-x-full ease-in-out" style={{ transitionProperty: 'transform, opacity' }} />
+
+                <CardContent className="p-6 sm:p-10 relative z-10 h-full flex flex-col justify-between">
                   <div>
-                    <div className="flex justify-between items-start mb-5">
+                    <div className="flex justify-between items-start mb-6">
                       <div className="flex items-center gap-2">
                         <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
                         <p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">Account Info</p>
                       </div>
-                      <div className="size-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                      <div className="size-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
                         <Banknote className="size-4 text-amber-400" />
                       </div>
                     </div>
 
                     {walletData?.dva ? (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">Account Number</p>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-xl sm:text-3xl font-black font-mono tracking-widest text-white">{walletData?.dva?.account_number}</h3>
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-2xl sm:text-4xl font-black font-mono tracking-widest text-white drop-shadow-md">{walletData?.dva?.account_number}</h3>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1212,27 +1229,29 @@ export default function WalletPage() {
                                 copyToClipboard(walletData.dva.account_number);
                               }
                             }}
-                            className="size-8 rounded-xl bg-white/10 flex items-center justify-center border border-white/15 hover:bg-white/20 transition-all"
+                            className="size-8 rounded-xl bg-white/10 flex items-center justify-center border border-white/15 hover:bg-white/20 transition-all shadow-inner"
                           >
-                            {hasCopied ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5 text-slate-300" />}
+                            {hasCopied ? <Check className="size-4 text-emerald-400" /> : <Copy className="size-4 text-slate-300" />}
                           </button>
                         </div>
-                        <div className="flex items-center gap-2 pt-1">
+                        <div className="flex items-center gap-2 pt-2">
                           <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{walletData?.dva?.bank_name}</span>
                           <span className="size-1 rounded-full bg-slate-700" />
                           <span className="text-xs text-slate-500">{walletData?.dva?.account_name}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center py-4 text-center space-y-2">
-                        <Lock className="size-7 text-slate-600" />
+                      <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
+                        <div className="size-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                          <Lock className="size-5 text-slate-400" />
+                        </div>
                         <p className="text-sm font-bold text-slate-300">KYC Required</p>
                         <p className="text-[10px] text-slate-500 max-w-[180px]">Complete identity sync to unlock direct top-up.</p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex justify-between items-end pt-3 border-t border-white/[0.07]">
+                  <div className="flex justify-between items-end pt-4 border-t border-white/[0.08]">
                     <p className="text-[8px] text-slate-600 font-black uppercase tracking-widest">Direct Reserve Node</p>
                     <div className="flex items-center gap-1 opacity-50">
                       <RefreshCw className="size-2.5" />
@@ -1240,36 +1259,36 @@ export default function WalletPage() {
                     </div>
                   </div>
                 </CardContent>
-                <div className="absolute top-0 right-0 size-40 bg-amber-500/10 blur-[70px] rounded-full" />
-                <div className="absolute bottom-0 left-0 size-48 bg-slate-700/20 blur-[80px] rounded-full" />
+                <div className="absolute top-0 right-0 size-40 bg-amber-500/10 blur-[80px] rounded-full mix-blend-screen" />
+                <div className="absolute bottom-0 left-0 size-48 bg-slate-700/20 blur-[80px] rounded-full mix-blend-screen" />
               </Card>
             </div>
           </div>
 
 
           {/* ── Quick Actions Pill Bar ── */}
-          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[1.5rem] border border-white/60 dark:border-slate-800/80 shadow-sm overflow-hidden">
+          <div className="bg-[#050505]/80 backdrop-blur-3xl rounded-[1.75rem] border border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-700 delay-150 ease-out fill-mode-both">
             <div className="grid grid-cols-6 gap-0 sm:flex sm:overflow-x-auto sm:no-scrollbar">
               {[
-                { id: 'topup', icon: Plus, label: 'Add', bg: 'bg-emerald-500/10 dark:bg-emerald-500/15', icon_color: 'text-emerald-600 dark:text-emerald-400' },
-                { id: 'transfer', icon: Send, label: 'Send', bg: 'bg-slate-100 dark:bg-slate-800', icon_color: 'text-slate-700 dark:text-slate-200' },
-                { id: 'airsend', icon: Wifi, label: 'AirDrop', bg: 'bg-indigo-500/10 dark:bg-indigo-500/15', icon_color: 'text-indigo-600 dark:text-indigo-400' },
-                { id: 'flights', icon: Plane, label: 'Flights', bg: 'bg-sky-500/10 dark:bg-sky-500/15', icon_color: 'text-sky-600 dark:text-sky-400', href: '/flights' },
-                { id: 'bills', icon: Smartphone, label: 'Bills', bg: 'bg-amber-500/10 dark:bg-amber-500/15', icon_color: 'text-amber-600 dark:text-amber-400' },
-                { id: 'withdraw', icon: ArrowUpRight, label: 'Cash Out', bg: 'bg-rose-500/10 dark:bg-rose-500/15', icon_color: 'text-rose-600 dark:text-rose-400' },
+                { id: 'topup', icon: Plus, label: 'Add', bg: 'bg-emerald-500/10', hoverBg: 'group-hover:bg-emerald-500/20', icon_color: 'text-emerald-400' },
+                { id: 'transfer', icon: Send, label: 'Send', bg: 'bg-white/5', hoverBg: 'group-hover:bg-white/10', icon_color: 'text-slate-200' },
+                { id: 'airsend', icon: Wifi, label: 'AirDrop', bg: 'bg-indigo-500/10', hoverBg: 'group-hover:bg-indigo-500/20', icon_color: 'text-indigo-400' },
+                { id: 'flights', icon: Plane, label: 'Flights', bg: 'bg-sky-500/10', hoverBg: 'group-hover:bg-sky-500/20', icon_color: 'text-sky-400', href: '/flights' },
+                { id: 'bills', icon: Smartphone, label: 'Bills', bg: 'bg-amber-500/10', hoverBg: 'group-hover:bg-amber-500/20', icon_color: 'text-amber-400' },
+                { id: 'withdraw', icon: ArrowUpRight, label: 'Cash Out', bg: 'bg-rose-500/10', hoverBg: 'group-hover:bg-rose-500/20', icon_color: 'text-rose-400' },
               ].map((action) => {
                 const inner = (
                   <div
                     key={action.id}
-                    className="flex flex-col items-center gap-1.5 py-4 px-1 sm:min-w-[90px] sm:px-5 group cursor-pointer active:scale-90 transition-transform"
+                    className="flex flex-col items-center gap-2 py-4 px-1 sm:min-w-[100px] sm:px-6 group cursor-pointer active:scale-95 transition-transform"
                     onClick={() => {
                       if (action.id === 'airsend') setIsAirSendOpen(true);
                     }}
                   >
-                    <div className={`size-10 sm:size-11 rounded-2xl ${action.bg} flex items-center justify-center transition-all group-hover:scale-110`}>
+                    <div className={`size-11 sm:size-12 rounded-2xl ${action.bg} ${action.hoverBg} border border-white/[0.05] flex items-center justify-center transition-all group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]`}>
                       <action.icon className={`size-4.5 sm:size-5 ${action.icon_color}`} />
                     </div>
-                    <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider ${action.icon_color.split(' ')[0].replace('text-', 'text-')} opacity-70`}>{action.label}</span>
+                    <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${action.icon_color} opacity-70 group-hover:opacity-100 transition-opacity`}>{action.label}</span>
                   </div>
                 );
                 return action.href ? (
@@ -1280,39 +1299,44 @@ export default function WalletPage() {
           </div>
 
           {/* Smart Insights Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-            <div className="rounded-2xl bg-white/70 dark:bg-slate-950/60 border border-white/60 dark:border-slate-800 px-4 py-4 flex items-center justify-between shadow-sm backdrop-blur-md">
-              <div className="space-y-0.5">
-                <p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">Inflow (Last 20)</p>
-                <p className="text-lg font-black tracking-tight">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 animate-in slide-in-from-bottom-4 fade-in duration-700 delay-300 ease-out fill-mode-both">
+            <div className="rounded-[1.5rem] bg-[#050505]/80 border border-white/[0.06] px-5 py-5 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-3xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-2xl rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-emerald-500/10 transition-colors" />
+              <div className="space-y-1 relative z-10">
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">Inflow (Last 20)</p>
+                <p className="text-xl font-black tracking-tight text-white">
                   ₦{recentInflow.toLocaleString()}
                 </p>
               </div>
-              <div className="size-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <ArrowDownLeft className="size-5 text-emerald-500" />
+              <div className="size-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center relative z-10 shadow-inner">
+                <ArrowDownLeft className="size-5 text-emerald-400" />
               </div>
             </div>
-            <div className="rounded-2xl bg-white/70 dark:bg-slate-950/60 border border-white/60 dark:border-slate-800 px-4 py-4 flex items-center justify-between shadow-sm backdrop-blur-md">
-              <div className="space-y-0.5">
-                <p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">Outflow (Last 20)</p>
-                <p className="text-lg font-black tracking-tight">
+            
+            <div className="rounded-[1.5rem] bg-[#050505]/80 border border-white/[0.06] px-5 py-5 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-3xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 blur-2xl rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-rose-500/10 transition-colors" />
+              <div className="space-y-1 relative z-10">
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">Outflow (Last 20)</p>
+                <p className="text-xl font-black tracking-tight text-white">
                   ₦{recentOutflow.toLocaleString()}
                 </p>
               </div>
-              <div className="size-10 rounded-full bg-rose-500/10 flex items-center justify-center">
-                <ArrowUpRight className="size-5 text-rose-500" />
+              <div className="size-11 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center relative z-10 shadow-inner">
+                <ArrowUpRight className="size-5 text-rose-400" />
               </div>
             </div>
-            <div className="rounded-2xl bg-slate-950 text-white px-4 py-4 flex items-center justify-between shadow-[0_24px_60px_rgba(15,23,42,0.55)] border border-white/10">
-              <div className="space-y-0.5">
-                <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/60">Net Flow Snapshot</p>
-                <p className="text-lg font-black tracking-tight flex items-center gap-1.5">
+            
+            <div className="rounded-[1.5rem] bg-indigo-950/20 border border-indigo-500/20 px-5 py-5 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-3xl relative overflow-hidden group">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-indigo-500/10 blur-3xl rounded-full group-hover:bg-indigo-500/20 transition-colors" />
+              <div className="space-y-1 relative z-10">
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-indigo-300/60">Net Flow Snapshot</p>
+                <p className="text-xl font-black tracking-tight flex items-center gap-1.5 text-white">
                   {netFlow >= 0 ? '+' : '-'}₦{Math.abs(netFlow).toLocaleString()}
                 </p>
               </div>
-              <div className="flex flex-col items-end gap-1">
-                <Activity className="size-5 text-emerald-400" />
-                <span className="text-[9px] uppercase tracking-widest font-black text-white/50">
+              <div className="flex flex-col items-end gap-1 relative z-10">
+                <Activity className={`size-5 ${netFlow >= 0 ? 'text-emerald-400' : 'text-rose-400'}`} />
+                <span className="text-[9px] uppercase tracking-widest font-black text-indigo-200/50">
                   {netFlow >= 0 ? 'Net Positive' : 'Net Spend'}
                 </span>
               </div>
@@ -1345,42 +1369,43 @@ export default function WalletPage() {
             });
 
             return (
-              <div className="bg-white/70 dark:bg-slate-950/60 border border-white/60 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm backdrop-blur-md space-y-4">
+              <div className="bg-[#050505]/80 backdrop-blur-3xl border border-white/[0.06] rounded-[1.5rem] p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.5)] space-y-5 animate-in slide-in-from-bottom-4 fade-in duration-700 delay-500 ease-out fill-mode-both">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Spending Analytics</p>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white mt-0.5">7-Day Flow</h3>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Spending Analytics</p>
+                    <h3 className="text-xl font-black text-white mt-0.5 tracking-tight">7-Day Flow</h3>
                   </div>
-                  <div className="flex items-center gap-4 text-xs font-bold">
-                    <div className="flex items-center gap-1.5 text-emerald-600">
-                      <span className="size-2.5 rounded-full bg-emerald-500" />Credit
+                  <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-emerald-400">
+                      <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />Credit
                     </div>
-                    <div className="flex items-center gap-1.5 text-rose-600">
-                      <span className="size-2.5 rounded-full bg-rose-500" />Debit
+                    <div className="flex items-center gap-2 text-rose-400">
+                      <span className="size-2 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]" />Debit
                     </div>
                   </div>
                 </div>
-                <ResponsiveContainer width="100%" height={180}>
-                  <AreaChart data={days} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
+                <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart data={days} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="creditGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
                         <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="debitGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
+                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
                         <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                    <XAxis dataKey="label" tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                    <XAxis dataKey="label" tick={{ fontSize: 10, fontWeight: 900, fill: '#64748b' }} axisLine={false} tickLine={false} tickMargin={12} />
+                    <YAxis tick={{ fontSize: 10, fontWeight: 900, fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} tickMargin={12} />
                     <Tooltip
-                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 700 }}
+                      contentStyle={{ borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(5,5,5,0.9)', backdropFilter: 'blur(12px)', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', fontSize: '12px', fontWeight: 900, color: '#fff' }}
+                      itemStyle={{ fontWeight: 900 }}
                       formatter={(value: number, name: string) => [`₦${value.toLocaleString()}`, name === 'credit' ? 'Credit' : 'Debit']}
                     />
-                    <Area type="monotone" dataKey="credit" stroke="#10b981" strokeWidth={2} fill="url(#creditGrad)" dot={false} />
-                    <Area type="monotone" dataKey="debit" stroke="#f43f5e" strokeWidth={2} fill="url(#debitGrad)" dot={false} />
+                    <Area type="monotone" dataKey="credit" stroke="#34d399" strokeWidth={3} fill="url(#creditGrad)" dot={{ r: 0 }} activeDot={{ r: 6, fill: '#34d399', stroke: '#050505', strokeWidth: 3 }} />
+                    <Area type="monotone" dataKey="debit" stroke="#fb7185" strokeWidth={3} fill="url(#debitGrad)" dot={{ r: 0 }} activeDot={{ r: 6, fill: '#fb7185', stroke: '#050505', strokeWidth: 3 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
