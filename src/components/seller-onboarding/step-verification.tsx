@@ -107,41 +107,41 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+    <div className="space-y-3.5 sm:space-y-5 animate-in fade-in duration-300">
+      <div className="border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3">
         <div className="flex items-center gap-2 mb-1">
           <Badge className="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border-none font-bold uppercase text-[10px] tracking-wider">
             Step 6 of 7
           </Badge>
-          <span className="text-xs text-slate-400">• Trust & Safety</span>
+          <span className="text-[11px] text-slate-400">• Trust & Safety</span>
         </div>
-        <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+        <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
           Merchant & Farm Verification
         </h2>
-        <p className="text-slate-500 text-xs sm:text-sm mt-1">
-          Verify your identity to earn the <strong className="text-emerald-600">🌱 Verified Merchant Badge</strong> and unlock higher bulk trade limits.
+        <p className="text-slate-500 text-xs mt-0.5">
+          Verify your identity to earn the <strong className="text-emerald-600">🌱 Verified Merchant Badge</strong>.
         </p>
       </div>
 
       {/* Security notice */}
-      <Card className="rounded-2xl border-blue-500/20 bg-blue-500/5 text-slate-800 dark:text-slate-200">
-        <CardContent className="p-4 flex items-start gap-3">
-          <Lock className="size-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-          <div className="text-xs space-y-1">
-            <p className="font-bold text-blue-900 dark:text-blue-300">
+      <Card className="rounded-xl border-blue-500/20 bg-blue-500/5 text-slate-800 dark:text-slate-200">
+        <CardContent className="p-2.5 sm:p-3.5 flex items-start gap-2.5">
+          <Lock className="size-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+          <div className="text-xs space-y-0.5">
+            <p className="font-bold text-blue-900 dark:text-blue-300 text-[11px] sm:text-xs">
               Encrypted Government Identity Safeguard
             </p>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px] sm:text-xs">
               Your NIN or identity numbers are encrypted and accessible strictly to authorized state agricultural verifiers. They are <span className="font-bold">never</span> visible on your public storefront.
             </p>
           </div>
         </CardContent>
       </Card>
 
-      <div className="space-y-5">
+      <div className="space-y-3.5 sm:space-y-4">
         {/* ID Selection */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1">
             <Label className="text-xs font-bold text-slate-700 dark:text-slate-200">
               Government Identification Type <span className="text-emerald-600">*</span>
             </Label>
@@ -151,7 +151,7 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
                 handleVerificationChange('identificationType', val)
               }
             >
-              <SelectTrigger className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800">
+              <SelectTrigger className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800">
                 <SelectValue placeholder="Select ID Type" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -163,7 +163,7 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
             </Select>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="idNumber" className="text-xs font-bold text-slate-700 dark:text-slate-200">
               {data.verification.identificationType} Number <span className="text-emerald-600">*</span>
             </Label>
@@ -172,7 +172,7 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
               placeholder="e.g. 11-digit NIN or Voter VIN"
               value={data.verification.identificationNumber}
               onChange={(e) => handleVerificationChange('identificationNumber', e.target.value)}
-              className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+              className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
             />
             {errors.identificationNumber && (
               <p className="text-[11px] font-bold text-rose-500">
@@ -183,31 +183,31 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
         </div>
 
         {/* Uploads Grid */}
-        <div className="pt-2 space-y-4">
+        <div className="pt-1 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+            <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
               Verification Documents & Photos
             </h3>
-            <span className="text-[11px] text-slate-400">Max 5MB (JPEG, PNG, WebP)</span>
+            <span className="text-[10px] sm:text-[11px] text-slate-400">Max 5MB (JPEG, PNG)</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
             {/* Merchant Profile Photo */}
-            <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="size-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-                  <Camera className="size-4" />
+            <div className="p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <div className="size-7 sm:size-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                  <Camera className="size-3.5 sm:size-4" />
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                    Merchant / Manager Photo
+                    Merchant Photo
                   </h4>
-                  <p className="text-[10px] text-slate-400">Headshot or smiling portrait on the farm</p>
+                  <p className="text-[10px] text-slate-400">Headshot or portrait on the farm</p>
                 </div>
               </div>
 
               {data.verification.profilePhotoUrl ? (
-                <div className="relative size-20 rounded-xl overflow-hidden border">
+                <div className="relative size-16 sm:size-20 rounded-xl overflow-hidden border">
                   <img
                     src={data.verification.profilePhotoUrl}
                     alt="Profile"
@@ -222,9 +222,9 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
                   </button>
                 </div>
               ) : (
-                <label className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-colors">
-                  <Upload className="size-4 text-slate-400 mb-1" />
-                  <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                <label className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-colors">
+                  <Upload className="size-4 text-slate-400 mb-0.5" />
+                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
                     Upload Profile Picture
                   </span>
                   <input
@@ -238,10 +238,10 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
             </div>
 
             {/* Farm / Business Photos */}
-            <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="size-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-                  <FileCheck className="size-4" />
+            <div className="p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <div className="size-7 sm:size-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                  <FileCheck className="size-3.5 sm:size-4" />
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-slate-900 dark:text-white">
@@ -251,11 +251,11 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 items-center">
+              <div className="flex flex-wrap gap-1.5 items-center">
                 {(data.verification.farmPhotoUrls || []).map((img, idx) => (
                   <div
                     key={idx}
-                    className="relative size-16 rounded-xl overflow-hidden border flex-shrink-0"
+                    className="relative size-14 sm:size-16 rounded-xl overflow-hidden border flex-shrink-0"
                   >
                     <img src={img} alt="Farm" className="w-full h-full object-cover" />
                     <button
@@ -268,8 +268,8 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
                   </div>
                 ))}
 
-                <label className="size-16 border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors">
-                  <Upload className="size-3.5 text-slate-400 mb-0.5" />
+                <label className="size-14 sm:size-16 border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors flex-shrink-0">
+                  <Upload className="size-3 text-slate-400 mb-0.5" />
                   <span className="text-[9px] font-bold text-slate-500">Add Photo</span>
                   <input
                     type="file"

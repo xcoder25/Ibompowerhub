@@ -251,7 +251,7 @@ export function SellerOnboardingWizard() {
       <Progress value={progressPercent} className="h-1.5 bg-slate-100 dark:bg-slate-800" />
 
       {/* Mobile: horizontally scrollable step pills */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 lg:hidden scrollbar-none -mx-1 px-1">
+      <div className="flex gap-1.5 overflow-x-auto pb-1 lg:hidden scrollbar-none">
         {STEPS.map((s) => {
           const isCompleted = currentStep > s.step;
           const isCurrent = currentStep === s.step;
@@ -318,8 +318,8 @@ export function SellerOnboardingWizard() {
       </div>
 
       {/* Active Step Form Card */}
-      <Card className="rounded-2xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md overflow-hidden">
-        <CardContent className="p-4 sm:p-6 md:p-8">
+      <Card className="rounded-xl sm:rounded-2xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+        <CardContent className="p-3 sm:p-6 md:p-8">
           {currentStep === 1 && (
             <StepAccount
               data={formData}

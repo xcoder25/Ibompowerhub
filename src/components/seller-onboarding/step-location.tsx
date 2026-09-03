@@ -100,45 +100,45 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+      <div className="border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3">
         <div className="flex items-center gap-2 mb-1">
           <Badge className="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border-none font-bold uppercase text-[10px] tracking-wider">
             Step 5 of 7
           </Badge>
-          <span className="text-xs text-slate-400">• Strict Akwa Ibom State</span>
+          <span className="text-[11px] text-slate-400">• Strict Akwa Ibom State</span>
         </div>
-        <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+        <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
           Location & Logistics
         </h2>
-        <p className="text-slate-500 text-xs sm:text-sm mt-1">
+        <p className="text-slate-500 text-xs mt-0.5">
           Buyers and aggregators search produce by LGA and community corridor.
         </p>
       </div>
 
       {/* State Enforcement Card */}
-      <Card className="rounded-2xl border-emerald-500/25 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white overflow-hidden shadow-sm">
-        <CardContent className="p-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
-              <MapPin className="size-5" />
+      <Card className="rounded-xl border-emerald-500/25 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white overflow-hidden shadow-sm">
+        <CardContent className="p-2.5 sm:p-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="size-8 sm:size-9 rounded-lg sm:rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+              <MapPin className="size-4 sm:size-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+              <p className="text-[9px] sm:text-[10px] font-bold text-emerald-400 uppercase tracking-widest leading-none">
                 Exclusively For
               </p>
-              <h3 className="text-base font-black text-white">Akwa Ibom State, Nigeria</h3>
+              <h3 className="text-xs sm:text-base font-black text-white mt-0.5">Akwa Ibom State, Nigeria</h3>
             </div>
           </div>
-          <Badge className="bg-emerald-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-3 py-1">
-            Verified Territory
+          <Badge className="bg-emerald-500 text-slate-950 font-black text-[9px] sm:text-[10px] uppercase tracking-wider px-2 sm:px-3 py-0.5 sm:py-1 flex-shrink-0">
+            Verified
           </Badge>
         </CardContent>
       </Card>
 
-      <div className="space-y-5">
+      <div className="space-y-3.5 sm:space-y-5">
         {/* LGA & Ward Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1">
             <Label htmlFor="lga" className="text-xs font-bold text-slate-700 dark:text-slate-200">
               Local Government Area (31 LGAs) <span className="text-emerald-600">*</span>
             </Label>
@@ -146,7 +146,7 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
               value={data.location.lga}
               onValueChange={(val) => handleLocationChange('lga', val)}
             >
-              <SelectTrigger className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800">
+              <SelectTrigger className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800">
                 <SelectValue placeholder="Select Akwa Ibom LGA" />
               </SelectTrigger>
               <SelectContent className="rounded-xl max-h-60">
@@ -163,7 +163,7 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
                   </div>
                 </div>
                 {filteredLgas.map((lga) => (
-                  <SelectItem key={lga} value={lga} className="text-sm">
+                  <SelectItem key={lga} value={lga} className="text-xs sm:text-sm">
                     {lga}
                   </SelectItem>
                 ))}
@@ -172,7 +172,7 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
             {errors.lga && <p className="text-[11px] font-bold text-rose-500">{errors.lga}</p>}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="ward" className="text-xs font-bold text-slate-700 dark:text-slate-200">
               Ward <span className="text-emerald-600">*</span>
             </Label>
@@ -181,15 +181,15 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
               placeholder="e.g. Ward 1, Central, or Urban Ward 3"
               value={data.location.ward}
               onChange={(e) => handleLocationChange('ward', e.target.value)}
-              className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+              className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
             />
             {errors.ward && <p className="text-[11px] font-bold text-rose-500">{errors.ward}</p>}
           </div>
         </div>
 
         {/* Community & Physical Address */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1">
             <Label htmlFor="community" className="text-xs font-bold text-slate-700 dark:text-slate-200">
               Community / Village <span className="text-emerald-600">*</span>
             </Label>
@@ -198,14 +198,14 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
               placeholder="e.g. Ikot Oku Ikono, Afaha Eket, Nwaniba"
               value={data.location.communityVillage}
               onChange={(e) => handleLocationChange('communityVillage', e.target.value)}
-              className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+              className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
             />
             {errors.communityVillage && (
               <p className="text-[11px] font-bold text-rose-500">{errors.communityVillage}</p>
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="landmark" className="text-xs font-bold text-slate-700 dark:text-slate-200">
               Prominent Landmark (Optional)
             </Label>
@@ -214,12 +214,12 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
               placeholder="e.g. Behind Itam Market or Near Primary School"
               value={data.location.landmark || ''}
               onChange={(e) => handleLocationChange('landmark', e.target.value)}
-              className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+              className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
             />
           </div>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="address" className="text-xs font-bold text-slate-700 dark:text-slate-200">
             Physical Farm / Store / Dispatch Address <span className="text-emerald-600">*</span>
           </Label>
@@ -228,7 +228,7 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
             placeholder="e.g. Km 4 Ikot Ekpene Road, Beside Agro Service Center, Uyo"
             value={data.location.farmBusinessAddress}
             onChange={(e) => handleLocationChange('farmBusinessAddress', e.target.value)}
-            className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+            className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
           />
           {errors.farmBusinessAddress && (
             <p className="text-[11px] font-bold text-rose-500">{errors.farmBusinessAddress}</p>
@@ -236,16 +236,16 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
         </div>
 
         {/* Delivery & Logistics Section */}
-        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
           <div className="flex items-center gap-2">
             <Truck className="size-4 text-emerald-600" />
-            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+            <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
               Order Fulfillment & Delivery Options
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-1">
               <Label className="text-xs font-bold text-slate-700 dark:text-slate-200">
                 How do you deliver orders? <span className="text-emerald-600">*</span>
               </Label>
@@ -253,7 +253,7 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
                 value={data.delivery.deliveryMethod}
                 onValueChange={(val: DeliveryOption) => handleDeliveryChange('deliveryMethod', val)}
               >
-                <SelectTrigger className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800">
+                <SelectTrigger className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800">
                   <SelectValue placeholder="Delivery Method" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">

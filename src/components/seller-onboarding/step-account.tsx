@@ -80,36 +80,36 @@ export function StepAccount({ data, updateData, onNext, onSaveDraft, savingDraft
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
-        <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+    <div className="space-y-3.5 sm:space-y-5 animate-in fade-in duration-300">
+      <div className="border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3">
+        <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
           Merchant Contact & Account
         </h2>
-        <p className="text-slate-500 text-xs sm:text-sm mt-1">
+        <p className="text-slate-500 text-xs mt-0.5">
           Provide your primary contact and security credentials for your Akwa Ibom agro storefront.
         </p>
       </div>
 
       {user && (
-        <Card className="bg-emerald-500/10 border-emerald-500/25 rounded-2xl overflow-hidden">
-          <CardContent className="p-4 flex items-center gap-3.5">
-            <div className="size-10 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
-              <UserCheck className="size-5" />
+        <Card className="bg-emerald-500/10 border-emerald-500/25 rounded-xl overflow-hidden">
+          <CardContent className="p-2.5 sm:p-3.5 flex items-center gap-2.5">
+            <div className="size-8 sm:size-9 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+              <UserCheck className="size-4" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+              <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300 leading-tight">
                 Connected Citizen Account
               </p>
-              <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
-                Logged in as <span className="font-bold text-slate-900 dark:text-white">{user.email}</span>. Your merchant application will be linked directly to your state ID.
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate mt-0.5">
+                Logged in as <span className="font-bold text-slate-900 dark:text-white">{user.email}</span>. Linked to state ID.
               </p>
             </div>
           </CardContent>
         </Card>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div className="space-y-1">
           <Label htmlFor="firstName" className="text-xs font-bold text-slate-700 dark:text-slate-200">
             First Name <span className="text-emerald-600">*</span>
           </Label>
@@ -118,12 +118,12 @@ export function StepAccount({ data, updateData, onNext, onSaveDraft, savingDraft
             placeholder="e.g. Edidiong"
             value={data.account.firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
-            className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+            className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
           />
           {errors.firstName && <p className="text-[11px] font-bold text-rose-500">{errors.firstName}</p>}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="lastName" className="text-xs font-bold text-slate-700 dark:text-slate-200">
             Last Name <span className="text-emerald-600">*</span>
           </Label>
@@ -132,56 +132,56 @@ export function StepAccount({ data, updateData, onNext, onSaveDraft, savingDraft
             placeholder="e.g. Akpan"
             value={data.account.lastName}
             onChange={(e) => handleChange('lastName', e.target.value)}
-            className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+            className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
           />
           {errors.lastName && <p className="text-[11px] font-bold text-rose-500">{errors.lastName}</p>}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div className="space-y-1">
           <Label htmlFor="email" className="text-xs font-bold text-slate-700 dark:text-slate-200">
             Email Address <span className="text-emerald-600">*</span>
           </Label>
           <div className="relative">
-            <Mail className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Mail className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <Input
               id="email"
               type="email"
               placeholder="edidiong@akwaibomagro.ng"
               value={data.account.email}
               onChange={(e) => handleChange('email', e.target.value)}
-              className="pl-10 rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+              className="pl-9 rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
             />
           </div>
           {errors.email && <p className="text-[11px] font-bold text-rose-500">{errors.email}</p>}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="phone" className="text-xs font-bold text-slate-700 dark:text-slate-200">
             Primary Phone Number <span className="text-emerald-600">*</span>
           </Label>
           <div className="relative">
-            <Phone className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Phone className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <Input
               id="phone"
               type="tel"
               placeholder="0803 123 4567"
               value={data.account.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
-              className="pl-10 rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+              className="pl-9 rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
             />
           </div>
           {errors.phone && <p className="text-[11px] font-bold text-rose-500">{errors.phone}</p>}
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label htmlFor="whatsapp" className="text-xs font-bold text-slate-700 dark:text-slate-200">
-          WhatsApp Number (For instant buyer inquiries) <span className="text-emerald-600">*</span>
+          WhatsApp Number (Direct buyer chat) <span className="text-emerald-600">*</span>
         </Label>
         <div className="relative">
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 rounded-full bg-emerald-500 flex items-center justify-center text-[9px] text-white font-black">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 size-4 rounded-full bg-emerald-500 flex items-center justify-center text-[9px] text-white font-black">
             W
           </div>
           <Input
@@ -190,11 +190,11 @@ export function StepAccount({ data, updateData, onNext, onSaveDraft, savingDraft
             placeholder="0802 987 6543 (Buyers can chat directly on WhatsApp)"
             value={data.account.whatsapp}
             onChange={(e) => handleChange('whatsapp', e.target.value)}
-            className="pl-10 rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+            className="pl-9 rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
           />
         </div>
         {errors.whatsapp && <p className="text-[11px] font-bold text-rose-500">{errors.whatsapp}</p>}
-        <p className="text-[11px] text-slate-400">
+        <p className="text-[10px] sm:text-[11px] text-slate-400">
           Buyers across Uyo, Eket, and Ikot Ekpene often initiate bulk orders over WhatsApp.
         </p>
       </div>

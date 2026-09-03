@@ -148,19 +148,19 @@ export function StepProducts({ data, updateData, onNext, onPrev, onSaveDraft, sa
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="border-b border-slate-100 dark:border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="space-y-3.5 sm:space-y-5 animate-in fade-in duration-300">
+      <div className="border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge className="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border-none font-bold uppercase text-[10px] tracking-wider">
               Step 4 of 7
             </Badge>
-            <span className="text-xs text-slate-400">• Produce & Inventory</span>
+            <span className="text-[11px] text-slate-400">• Produce & Inventory</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Agricultural Products & Produce
           </h2>
-          <p className="text-slate-500 text-xs sm:text-sm mt-0.5">
+          <p className="text-slate-500 text-xs mt-0.5">
             List the agricultural produce, livestock, or inputs you have available for sale.
           </p>
         </div>
@@ -168,15 +168,15 @@ export function StepProducts({ data, updateData, onNext, onPrev, onSaveDraft, sa
         <Button
           type="button"
           onClick={openAddModal}
-          className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-10 px-4 gap-2 flex-shrink-0 shadow-sm"
+          className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-9 sm:h-10 px-3.5 gap-1.5 flex-shrink-0 shadow-sm self-start sm:self-auto"
         >
-          <Plus className="size-4" />
+          <Plus className="size-3.5" />
           <span>Add Product</span>
         </Button>
       </div>
 
       {mainError && (
-        <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-3 text-rose-700 dark:text-rose-300 text-xs font-semibold">
+        <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-2.5 text-rose-700 dark:text-rose-300 text-xs font-semibold">
           <AlertCircle className="size-4 flex-shrink-0" />
           <span>{mainError}</span>
         </div>
@@ -184,34 +184,34 @@ export function StepProducts({ data, updateData, onNext, onPrev, onSaveDraft, sa
 
       {/* Product List */}
       {data.products.length === 0 ? (
-        <Card className="rounded-3xl border-dashed border-2 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 text-center py-12 px-4">
-          <CardContent className="space-y-3">
-            <div className="size-14 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
-              <Package className="size-7" />
+        <Card className="rounded-xl border-dashed border-2 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 text-center py-8 sm:py-12 px-3">
+          <CardContent className="space-y-2.5">
+            <div className="size-11 sm:size-14 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
+              <Package className="size-5 sm:size-7" />
             </div>
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">
+            <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
               No products registered yet
             </h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Add your first agricultural product (e.g. Garri, Yellow Yam, Catfish, Fresh Eggs, Palm Oil) with unit pricing and availability.
+              Add your first agricultural produce (Garri, Yam, Catfish, Fresh Eggs, Palm Oil) with unit pricing.
             </p>
             <Button
               type="button"
               onClick={openAddModal}
-              className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-10 px-5 gap-1.5 shadow-sm"
+              className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-9 px-4 gap-1.5 shadow-sm"
             >
-              <Plus className="size-4" /> Add First Product
+              <Plus className="size-3.5" /> Add First Product
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-4">
           {data.products.map((prod, idx) => (
             <Card
               key={prod.id || idx}
-              className="rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs hover:shadow-md transition-shadow"
+              className="rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs hover:shadow-md transition-shadow"
             >
-              <CardContent className="p-4 flex gap-3.5">
+              <CardContent className="p-2.5 sm:p-4 flex gap-2.5 sm:gap-3.5">
                 {/* Product Image Thumbnail */}
                 <div className="size-20 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 flex items-center justify-center flex-shrink-0 overflow-hidden relative">
                   {prod.images && prod.images.length > 0 ? (
@@ -287,7 +287,7 @@ export function StepProducts({ data, updateData, onNext, onPrev, onSaveDraft, sa
 
       {/* Add / Edit Product Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-[94vw] sm:max-w-[550px] rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[94vw] sm:max-w-[550px] rounded-xl sm:rounded-2xl p-3 sm:p-6 max-h-[90vh] overflow-y-auto">
           <DialogHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
             <DialogTitle className="text-lg font-black text-slate-900 dark:text-white">
               {editingIndex !== null ? 'Edit Agricultural Product' : 'Add New Agricultural Product'}

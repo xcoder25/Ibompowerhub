@@ -54,24 +54,24 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+    <div className="space-y-3.5 sm:space-y-5 animate-in fade-in duration-300">
+      <div className="border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3">
         <div className="flex items-center gap-2 mb-1">
           <Badge className="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border-none font-bold uppercase text-[10px] tracking-wider">
             Step 3 of 7
           </Badge>
-          <span className="text-xs text-slate-400">• Business Profile</span>
+          <span className="text-[11px] text-slate-400">• Business Profile</span>
         </div>
-        <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+        <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
           Farm & Business Information
         </h2>
-        <p className="text-slate-500 text-xs sm:text-sm mt-1">
+        <p className="text-slate-500 text-xs mt-0.5">
           Tell buyers about your agricultural venture, enterprise structure, and operational background.
         </p>
       </div>
 
-      <div className="space-y-4">
-        <div className="space-y-1.5">
+      <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-1">
           <Label htmlFor="farmBusinessName" className="text-xs font-bold text-slate-700 dark:text-slate-200">
             Farm / Business Name <span className="text-emerald-600">*</span>
           </Label>
@@ -80,14 +80,14 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
             placeholder="e.g. Uyo Palm Ridge Farms or Ibom Agri-Hub"
             value={data.business.farmBusinessName}
             onChange={(e) => handleChange('farmBusinessName', e.target.value)}
-            className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+            className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
           />
           {errors.farmBusinessName && (
             <p className="text-[11px] font-bold text-rose-500">{errors.farmBusinessName}</p>
           )}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="businessDescription" className="text-xs font-bold text-slate-700 dark:text-slate-200">
             About Your Farm / Enterprise <span className="text-emerald-600">*</span>
           </Label>
@@ -97,27 +97,27 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
             placeholder="Describe what you cultivate, harvest, breed, or sell in Akwa Ibom State..."
             value={data.business.businessDescription}
             onChange={(e) => handleChange('businessDescription', e.target.value)}
-            className="rounded-xl text-sm border-slate-200 dark:border-slate-800 resize-none"
+            className="rounded-xl text-xs sm:text-sm border-slate-200 dark:border-slate-800 resize-none"
           />
           {errors.businessDescription && (
             <p className="text-[11px] font-bold text-rose-500">{errors.businessDescription}</p>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1">
             <Label htmlFor="businessPhone" className="text-xs font-bold text-slate-700 dark:text-slate-200">
               Business Phone <span className="text-emerald-600">*</span>
             </Label>
             <div className="relative">
-              <Phone className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Phone className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <Input
                 id="businessPhone"
                 type="tel"
                 placeholder="0803 000 1122"
                 value={data.business.businessPhone}
                 onChange={(e) => handleChange('businessPhone', e.target.value)}
-                className="pl-10 rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+                className="pl-9 rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
               />
             </div>
             {errors.businessPhone && (
@@ -125,19 +125,19 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="businessEmail" className="text-xs font-bold text-slate-700 dark:text-slate-200">
               Business Email <span className="text-emerald-600">*</span>
             </Label>
             <div className="relative">
-              <Mail className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <Input
                 id="businessEmail"
                 type="email"
                 placeholder="farm@akwaibomagro.ng"
                 value={data.business.businessEmail}
                 onChange={(e) => handleChange('businessEmail', e.target.value)}
-                className="pl-10 rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+                className="pl-9 rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
               />
             </div>
             {errors.businessEmail && (
@@ -146,8 +146,8 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1">
             <Label htmlFor="businessType" className="text-xs font-bold text-slate-700 dark:text-slate-200">
               Business Structure <span className="text-emerald-600">*</span>
             </Label>
@@ -155,12 +155,12 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
               value={data.business.businessType}
               onValueChange={(val: BusinessType) => handleChange('businessType', val)}
             >
-              <SelectTrigger className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800">
+              <SelectTrigger className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800">
                 <SelectValue placeholder="Select Business Type" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
                 {BUSINESS_TYPES.map((bt) => (
-                  <SelectItem key={bt} value={bt} className="text-sm">
+                  <SelectItem key={bt} value={bt} className="text-xs sm:text-sm">
                     {bt}
                   </SelectItem>
                 ))}
@@ -171,12 +171,12 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="yearEstablished" className="text-xs font-bold text-slate-700 dark:text-slate-200">
               Year Established <span className="text-emerald-600">*</span>
             </Label>
             <div className="relative">
-              <Calendar className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Calendar className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <Input
                 id="yearEstablished"
                 type="number"
@@ -185,7 +185,7 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
                 placeholder="e.g. 2020"
                 value={data.business.yearEstablished}
                 onChange={(e) => handleChange('yearEstablished', e.target.value)}
-                className="pl-10 rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+                className="pl-9 rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
               />
             </div>
             {errors.yearEstablished && (
@@ -195,38 +195,38 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
         </div>
 
         {/* CAC Number - Explicitly Optional */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <div className="flex items-center justify-between">
             <Label htmlFor="cacNumber" className="text-xs font-bold text-slate-700 dark:text-slate-200">
-              CAC Registration Number (Optional)
+              CAC Number (Optional)
             </Label>
-            <span className="text-[11px] font-semibold text-emerald-600">Not required for smallholder farmers</span>
+            <span className="text-[10px] font-semibold text-emerald-600">Not required for farmers</span>
           </div>
           <Input
             id="cacNumber"
-            placeholder="e.g. RC-1234567 or BN-987654 (Leave blank if not registered)"
+            placeholder="e.g. RC-1234567 (Leave blank if not registered)"
             value={data.business.cacNumber || ''}
             onChange={(e) => handleChange('cacNumber', e.target.value)}
-            className="rounded-xl h-11 text-sm border-slate-200 dark:border-slate-800"
+            className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
           />
-          <p className="text-[11px] text-slate-400">
+          <p className="text-[10px] sm:text-[11px] text-slate-400">
             We welcome unregistered individual smallholders, cooperatives, and community agrarian groups.
           </p>
         </div>
 
         {/* Dynamic Farm Details for Agricultural Producers */}
         {isProducer && (
-          <Card className="rounded-2xl border-emerald-500/20 bg-emerald-500/5 overflow-hidden mt-4">
-            <CardContent className="p-5 space-y-4">
+          <Card className="rounded-xl border-emerald-500/20 bg-emerald-500/5 overflow-hidden mt-3 sm:mt-4">
+            <CardContent className="p-3 sm:p-5 space-y-3 sm:space-y-4">
               <div className="flex items-center gap-2">
                 <Sprout className="size-4 text-emerald-600" />
-                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
                   Agricultural Cultivation & Farm Acreage
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                <div className="space-y-1.5 sm:col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5">
+                <div className="space-y-1 sm:col-span-2">
                   <Label htmlFor="farmSize" className="text-xs font-bold text-slate-700 dark:text-slate-200">
                     Farm Land / Pond / Facility Size
                   </Label>
@@ -235,11 +235,11 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
                     placeholder="e.g. 5, 12, or 25"
                     value={data.business.farmSize || ''}
                     onChange={(e) => handleChange('farmSize', e.target.value)}
-                    className="rounded-xl h-11 text-sm bg-white dark:bg-slate-900 border-slate-200"
+                    className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm bg-white dark:bg-slate-900 border-slate-200"
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label htmlFor="farmSizeUnit" className="text-xs font-bold text-slate-700 dark:text-slate-200">
                     Unit
                   </Label>
@@ -247,7 +247,7 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
                     value={data.business.farmSizeUnit || 'Hectares'}
                     onValueChange={(val: FarmSizeUnit) => handleChange('farmSizeUnit', val)}
                   >
-                    <SelectTrigger className="rounded-xl h-11 text-sm bg-white dark:bg-slate-900 border-slate-200">
+                    <SelectTrigger className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm bg-white dark:bg-slate-900 border-slate-200">
                       <SelectValue placeholder="Unit" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -259,7 +259,7 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <Label htmlFor="farmOwnership" className="text-xs font-bold text-slate-700 dark:text-slate-200">
                   Land / Facility Ownership Model
                 </Label>
@@ -267,7 +267,7 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
                   value={data.business.farmOwnership || 'Family Land'}
                   onValueChange={(val: FarmOwnership) => handleChange('farmOwnership', val)}
                 >
-                  <SelectTrigger className="rounded-xl h-11 text-sm bg-white dark:bg-slate-900 border-slate-200">
+                  <SelectTrigger className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm bg-white dark:bg-slate-900 border-slate-200">
                     <SelectValue placeholder="Select Ownership" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
