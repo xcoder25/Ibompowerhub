@@ -124,19 +124,17 @@ export function StepVerification({ data, updateData, onNext, onPrev, onSaveDraft
       </div>
 
       {/* Security notice */}
-      <Card className="rounded-xl border-blue-500/20 bg-blue-500/5 text-slate-800 dark:text-slate-200">
-        <CardContent className="p-2.5 sm:p-3.5 flex items-start gap-2.5">
-          <Lock className="size-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-          <div className="text-xs space-y-0.5">
-            <p className="font-bold text-blue-900 dark:text-blue-300 text-[11px] sm:text-xs">
-              Encrypted Government Identity Safeguard
-            </p>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px] sm:text-xs">
-              Your NIN or identity numbers are encrypted and accessible strictly to authorized state agricultural verifiers. They are <span className="font-bold">never</span> visible on your public storefront.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 text-slate-800 dark:text-slate-200 p-2.5 sm:p-3.5 flex items-start gap-2.5">
+        <Lock className="size-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+        <div className="text-xs space-y-0.5">
+          <p className="font-bold text-blue-900 dark:text-blue-300 text-[11px] sm:text-xs">
+            Encrypted Government Identity Safeguard
+          </p>
+          <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px] sm:text-xs">
+            Your NIN or identity numbers are encrypted and accessible strictly to authorized state agricultural verifiers. They are <span className="font-bold">never</span> visible on your public storefront.
+          </p>
+        </div>
+      </div>
 
       <div className="space-y-3.5 sm:space-y-4">
         {/* ID Selection */}

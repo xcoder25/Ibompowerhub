@@ -91,21 +91,19 @@ export function StepAccount({ data, updateData, onNext, onSaveDraft, savingDraft
       </div>
 
       {user && (
-        <Card className="bg-emerald-500/10 border-emerald-500/25 rounded-xl overflow-hidden">
-          <CardContent className="p-2.5 sm:p-3.5 flex items-center gap-2.5">
-            <div className="size-8 sm:size-9 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
-              <UserCheck className="size-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300 leading-tight">
-                Connected Citizen Account
-              </p>
-              <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate mt-0.5">
-                Logged in as <span className="font-bold text-slate-900 dark:text-white">{user.email}</span>. Linked to state ID.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-2.5 sm:p-3.5 flex items-center gap-2.5">
+          <div className="size-8 sm:size-9 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+            <UserCheck className="size-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300 leading-tight">
+              Connected Citizen Account
+            </p>
+            <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate mt-0.5">
+              Logged in as <span className="font-bold text-slate-900 dark:text-white">{user.email}</span>. Linked to state ID.
+            </p>
+          </div>
+        </div>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">

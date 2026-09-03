@@ -216,71 +216,69 @@ export function StepBusiness({ data, updateData, onNext, onPrev, onSaveDraft, sa
 
         {/* Dynamic Farm Details for Agricultural Producers */}
         {isProducer && (
-          <Card className="rounded-xl border-emerald-500/20 bg-emerald-500/5 overflow-hidden mt-3 sm:mt-4">
-            <CardContent className="p-3 sm:p-5 space-y-3 sm:space-y-4">
-              <div className="flex items-center gap-2">
-                <Sprout className="size-4 text-emerald-600" />
-                <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  Agricultural Cultivation & Farm Acreage
-                </h3>
-              </div>
+          <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 sm:p-5 space-y-3 sm:space-y-4 mt-3 sm:mt-4">
+            <div className="flex items-center gap-2">
+              <Sprout className="size-4 text-emerald-600" />
+              <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                Agricultural Cultivation & Farm Acreage
+              </h3>
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5">
-                <div className="space-y-1 sm:col-span-2">
-                  <Label htmlFor="farmSize" className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                    Farm Land / Pond / Facility Size
-                  </Label>
-                  <Input
-                    id="farmSize"
-                    placeholder="e.g. 5, 12, or 25"
-                    value={data.business.farmSize || ''}
-                    onChange={(e) => handleChange('farmSize', e.target.value)}
-                    className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm bg-white dark:bg-slate-900 border-slate-200"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <Label htmlFor="farmSizeUnit" className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                    Unit
-                  </Label>
-                  <Select
-                    value={data.business.farmSizeUnit || 'Hectares'}
-                    onValueChange={(val: FarmSizeUnit) => handleChange('farmSizeUnit', val)}
-                  >
-                    <SelectTrigger className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm bg-white dark:bg-slate-900 border-slate-200">
-                      <SelectValue placeholder="Unit" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                      <SelectItem value="Acres">Acres</SelectItem>
-                      <SelectItem value="Hectares">Hectares</SelectItem>
-                      <SelectItem value="Plots">Plots</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5">
+              <div className="space-y-1 sm:col-span-2">
+                <Label htmlFor="farmSize" className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                  Farm Land / Pond / Facility Size
+                </Label>
+                <Input
+                  id="farmSize"
+                  placeholder="e.g. 5, 12, or 25"
+                  value={data.business.farmSize || ''}
+                  onChange={(e) => handleChange('farmSize', e.target.value)}
+                  className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm bg-white dark:bg-slate-900 border-slate-200"
+                />
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="farmOwnership" className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                  Land / Facility Ownership Model
+                <Label htmlFor="farmSizeUnit" className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                  Unit
                 </Label>
                 <Select
-                  value={data.business.farmOwnership || 'Family Land'}
-                  onValueChange={(val: FarmOwnership) => handleChange('farmOwnership', val)}
+                  value={data.business.farmSizeUnit || 'Hectares'}
+                  onValueChange={(val: FarmSizeUnit) => handleChange('farmSizeUnit', val)}
                 >
                   <SelectTrigger className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm bg-white dark:bg-slate-900 border-slate-200">
-                    <SelectValue placeholder="Select Ownership" />
+                    <SelectValue placeholder="Unit" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
-                    <SelectItem value="Owned">Solely Owned</SelectItem>
-                    <SelectItem value="Family Land">Family Land</SelectItem>
-                    <SelectItem value="Leased">Leased / Rented Farmland</SelectItem>
-                    <SelectItem value="Community Land">Community / Cooperative Allocation</SelectItem>
-                    <SelectItem value="Other">Other Arrangement</SelectItem>
+                    <SelectItem value="Acres">Acres</SelectItem>
+                    <SelectItem value="Hectares">Hectares</SelectItem>
+                    <SelectItem value="Plots">Plots</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="farmOwnership" className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                Land / Facility Ownership Model
+              </Label>
+              <Select
+                value={data.business.farmOwnership || 'Family Land'}
+                onValueChange={(val: FarmOwnership) => handleChange('farmOwnership', val)}
+              >
+                <SelectTrigger className="rounded-xl h-10 sm:h-11 text-xs sm:text-sm bg-white dark:bg-slate-900 border-slate-200">
+                  <SelectValue placeholder="Select Ownership" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="Owned">Solely Owned</SelectItem>
+                  <SelectItem value="Family Land">Family Land</SelectItem>
+                  <SelectItem value="Leased">Leased / Rented Farmland</SelectItem>
+                  <SelectItem value="Community Land">Community / Cooperative Allocation</SelectItem>
+                  <SelectItem value="Other">Other Arrangement</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         )}
       </div>
 

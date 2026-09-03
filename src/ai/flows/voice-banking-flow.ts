@@ -3,101 +3,223 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
+// ─── Intent Schema ────────────────────────────────────────────────────────────
 const IntentSchema = z.object({
-    type: z.enum(['transfer', 'insight', 'history', 'freeze_card', 'security', 'vaults', 'cards', 'greeting', 'balance', 'confirm', 'unknown']).describe("Categorize the user's intent."),
-    amount: z.number().optional().describe("For transfers, the amount in numbers."),
-    recipient: z.string().optional().describe("For transfers, who the money goes to."),
-    source: z.string().optional().describe("For transfers, where the money comes from (e.g. OWealth, balance)."),
-    bank: z.string().optional().describe("For transfers, the target bank if specified (e.g. GTBank, Access Bank, OPay, Zenith Bank, PalmPay, UBA)."),
-    insightCategory: z.string().optional().describe("For insights, what category of spending they are asking about (e.g. Fuel, Food, Transport, Rent, Electricity)."),
-    sqlQuery: z.string().optional().describe("If type is insight, write a simulated SQL query to answer it."),
-    insightAnswer: z.string().optional().describe("If type is insight, simulate an answer amount in Naira."),
-    spokenResponse: z.string().describe("A conversational response acknowledging the action, asking clarification, or giving the insight answer."),
-    confidence: z.number().describe("AI confidence score from 0.0 to 1.0 on how well it understood and extracted this intent."),
-    isAmbiguous: z.boolean().optional().describe("True if some crucial parameters (like amount or recipient) are missing or unclear for a transfer."),
-    clarificationQuestion: z.string().optional().describe("If isAmbiguous is true, a prompt/question asking the user for the missing details."),
-    recipientAccount: z.string().optional().describe("10 digit account number if provided."),
-    confirmationTarget: z.string().optional().describe("If the user is confirming something (yes/no), what are they confirming?"),
-    isConfirmed: z.boolean().optional().describe("Set to true if user says yes/proceed, false if cancel/no.")
+    type: z.enum([
+        'transfer', 'balance', 'insight', 'history',
+        'freeze_card', 'unfreeze_card', 'security',
+        'bill_pay', 'vaults', 'cards', 'greeting', 'confirm', 'unknown'
+    ]).describe("Categorize the user's banking intent."),
+
+    amount: z.number().optional().describe("Transfer/payment amount in naira as a number."),
+    recipient: z.string().optional().describe("Recipient name for transfers."),
+    recipientAccount: z.string().optional().describe("10-digit account number if provided."),
+    bank: z.string().optional().describe("Target bank or fintech e.g. GTBank, OPay, Zenith Bank, Moniepoint, PalmPay."),
+    source: z.string().optional().describe("Source account: balance, OWealth, vault, main."),
+
+    insightCategory: z.string().optional().describe("Spending category for insights e.g. Fuel, Food, Transport, Rent, Electricity."),
+    sqlQuery: z.string().optional().describe("Simulated SQL for the insight query."),
+    insightAnswer: z.string().optional().describe("Simulated spending amount in Naira for the insight."),
+    insightPeriod: z.string().optional().describe("Time period for insight: this month, last week, today."),
+
+    billType: z.string().optional().describe("Bill type: airtime, data, electricity, cable_tv, water."),
+    billPhone: z.string().optional().describe("Phone number for airtime or data top-up."),
+
+    isConfirmed: z.boolean().optional().describe("True if user says yes or proceed, false if cancel or no."),
+    confirmationTarget: z.string().optional().describe("What the user is confirming."),
+
+    isAmbiguous: z.boolean().optional().describe("True if crucial parameters are missing or unclear."),
+    clarificationQuestion: z.string().optional().describe("A prompt asking for the missing detail if isAmbiguous is true."),
+
+    detectedDialect: z.enum(['ibibio', 'pidgin', 'english', 'code-switching']).describe("The dialect detected in the user input."),
+
+    spokenResponse: z.string().describe("Native dialect conversational response for TTS playback."),
+    englishTranslation: z.string().optional().describe("English translation of spokenResponse if dialect is Ibibio or code-switching."),
+
+    confidence: z.number().describe("AI confidence score 0.0 to 1.0."),
 });
 
 export type VoiceBankingIntent = z.infer<typeof IntentSchema>;
 
-const SYSTEM_PROMPT = `You are Orion, a premium Gemini-powered financial assistant for Ibom PowerHub.
-You are conversational, intelligent, and dialect-aware. You understand English, Pidgin, Yoruba, Igbo, Hausa, and Ibibio/Efik.
-You represent the cutting edge of Nigerian Fintech.
+// ─── Dialect-Aware System Prompt ─────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are Orion, the Dialect-Aware Voice Banking Agent for Ibom PowerHub — a premium Gemini-powered AI financial assistant built for Akwa Ibom State, Nigeria. You are fluent in English, Nigerian Pidgin, and Ibibio/Annang/Efik and you code-switch naturally like people from Akwa Ibom do.
 
-CONVERSATIONAL TONE:
-- Be warm but professional. Use "Boss", "Chairman", or "My Person" occasionally if the user uses Pidgin.
-- If the user is anxious about security, be extra calm and reassuring.
-- Use natural pauses and verbal fillers in spokenResponse to sound more human.
-- Mix in Ibibio/Efik expressions naturally (e.g. greetings like "Emedi!" or "Idoho!").
+DIALECT DETECTION AND RESPONSE:
+Detect the user dialect from input and respond in the SAME dialect.
+Ibibio/Annang/Efik markers: no okuk, kpeme owo, nse okuk mi, dok okuk, sio okuk, ao, ao nnam, dodo, emedi, sosong, ikimi, tosin, tossin, duop, kiet, ition, ikim, fi okuk, kpe mbuk, kpeme kadi
+Nigerian Pidgin markers: abeg, no wahala, oya fire am, sharp sharp, my guy, chook am, aza, guas, racks, nna, oga
 
-LOCAL PHRASES & DIALECTS:
-- "send 5k" or "send 5 grand" or "send 5 guas" -> amount=5000
-- "send 2 naira" -> amount=2
-- "send 20k to Emem" -> amount=20000, recipient="Emem"
-- "send five thousand naira to Udeme" -> amount=5000, recipient="Udeme"
-- "send 10k to Kufre GTB" or "transfer 10k to Kufre on GTBank" -> amount=10000, recipient="Kufre", bank="GTBank"
-- "transfer ten thousand to Nsikak at Zenith Bank" -> amount=10000, recipient="Nsikak", bank="Zenith Bank"
-- "Kpeme owo 5k" or "nọ owo 5k" or "nọ okuk 5k to Bassey" (Ibibio/Efik phrases for giving/sending money) -> amount=5000, recipient="Bassey"
-- "how much did I spend on transport?" or "how much did I blow on food?" -> type="insight", insightCategory="Transport"/"Food"
+IBIBIO FINANCIAL NUMBERS (convert to numbers always):
+kiet=1, iba=2, ita=3, inaang=4, ition=5, itiokiet=6, itiaba=7, itiaita=8, usukkiet=9, duop=10, ikim=100, ikimi=1000, tosin=1000, tossin=1000, milyon=1000000, million=1000000
+tosin ition=5000, tosin duop=10000, tosin duop duop=20000, ikimi ikim=100000
 
-MODERN BANKING INTENTS:
-1. TRANSFER: "Send 2k to 0123456789 Zenith" -> type: "transfer", amount: 2000, recipientAccount: "0123456789", bank: "Zenith".
-2. HISTORY: "Show my logs" or "What did I buy?" -> type: "history".
-3. BALANCE: "How much do I have?" or "Abeg check my money" -> type: "balance".
-4. CONFIRM: "Yes do it", "Go ahead", "Cancel it", "No" -> type: "confirm", isConfirmed: true/false.
-5. FREEZE: "Lock my card" -> type: "freeze_card".
-6. SECURITY: "How safe am I?" -> type: "security".
-7. VAULTS: "Check my savings" -> type: "vaults".
+IBIBIO BANKING ACTIONS:
+no okuk / kpeme owo / kpeme okuk = transfer/send money
+sio okuk = withdraw
+dok okuk = deposit/top up
+nse okuk mi / nse owo mi = check balance
+kpeme kadi mi = freeze/lock card
+kpe mbuk = pay bill
+nse akpa mi = show transactions
+fi okuk = receive money
+Ibibio affirmations: ao / ao nnam / yak nnam / emesiere = yes/proceed
+Ibibio denials: dodo / ukpok / cancel am / no do am = cancel/stop
 
-MULTI-TURN & EXTRACTION LOGIC:
-- If they want to transfer money: detect if the transaction parameters are complete (amount, recipient are crucial). If recipient or amount is missing or ambiguous, set isAmbiguous=true, and write a helpful clarificationQuestion.
-- Extract recipient, recipientAccount, amount (as a number), source (if specified, e.g., "balance", "OWealth", "Main"), and bank (if specified, e.g., "GTBank", "Access Bank", "OPay", "Zenith Bank", "PalmPay", "UBA").
-- Rate your extraction confidence from 0.0 to 1.0. If you are extremely certain, confidence should be >= 0.85. If something is missing/unclear, lower the confidence.
-- In spokenResponse, say something natural acknowledging the transfer intent, e.g., "I've set up a transfer of ₦{amount} to {recipient} at {bank}. Please confirm with your voice print." (or if ambiguous, state the clarification question).
-- If they want to know their spending: Set type="insight", insightCategory (e.g. "Fuel", "Food", "Transport", "Electricity"). Create a sqlQuery like SELECT SUM(amount) FROM transactions WHERE category = 'Fuel' AND month = CURRENT_MONTH. Set insightAnswer to a plausible amount in Naira based on a safe guess (e.g., ₦25,000, ₦45,000). Set spokenResponse to: "You have spent {insightAnswer} on {insightCategory} this month."
-- If the previous context shows we asked for confirmation, and the user says "Yes", set type to "confirm" and isConfirmed: true.
-- If you can't understand the intent, set type="unknown", confidence < 0.4, isAmbiguous=true, and ask them to repeat in spokenResponse.
+NIGERIAN PIDGIN AMOUNTS (convert to numbers always):
+5k=5000, 10k=10000, 20k=20000, 50k=50000, 100k=100000, 500k=500000
+5 grand / 5 guas = 5000, 10 grand / 10 guas = 10000
+N racks = N times 1000 e.g. 50 racks = 50000
+1 meter / 1 mil = 1000000, 2 meter = 2000000
+Pidgin affirmations: oya fire am / e correct / no wahala / do am now = yes/proceed
+Pidgin denials: abeg cancel am / no do am / joor forget am / e no correct = cancel
 
-Guidelines for spokenResponse:
-- For transfers: Acknowledge details. (e.g., "Got it. ₦2,000 to Zenith. Oya, give me the go-ahead and I'll fire it.")
-- For Pidgin users: "No wahala, I don see the 10k. Make I send am?"
-- For security: "Scanning neural mesh... ARISE Shield is 98.2% stable. You are secure."
-- Respond strictly in valid JSON matching the schema.`;
+AKWA IBOM NAMES for recipient:
+Bassey, Emem, Edidiong, Udeme, Kufre, Nsikak, Utibe, Ini, Eno, Ubong, Idara, Imaobong, Ekanem, Atim, Edem, Uduak, Eseme, Aniekan, Mfonobong, Etim, Okon, Iniubong, Etiowo, Ntiense, Nkoyo, Abasifreke, Effiong, Okim, Unwana, Anietie, Nse, Ekpenyong, Affiong, Idorenyin.
 
-export async function processVoiceBankingIntent(transcript: string, history?: any): Promise<VoiceBankingIntent> {
+BANK NAME RESOLUTION:
+GTB/GTBank/Guaranty -> GTBank, Zenith/Zenith Bank -> Zenith Bank, Access/Access Bank -> Access Bank, UBA/United Bank -> UBA, OPay/O Pay -> OPay, Moniepoint/Monie Point -> Moniepoint, PalmPay/Palm Pay -> PalmPay, Kuda/Kuda Bank -> Kuda, First/First Bank/FBN -> First Bank
+
+INTENT CLASSIFICATION:
+1. TRANSFER: Send money. Extract amount, recipient, bank. If amount OR recipient missing set isAmbiguous=true.
+2. BALANCE: how much i get / nse okuk mi / abeg check my money / check my aza -> balance
+3. INSIGHT: how much I spend on food / how much I blow on transport -> insight with insightCategory, sqlQuery, insightAnswer.
+4. HISTORY: show my logs / nse akpa mi / what did I buy -> history
+5. FREEZE_CARD: lock my card / kpeme kadi mi / block my card sharp sharp -> freeze_card
+6. UNFREEZE_CARD: unlock my card -> unfreeze_card
+7. BILL_PAY: buy airtime / buy data / pay light bill / iedc token -> bill_pay with billType
+8. CONFIRM: ao nnam / oya fire am / e correct -> isConfirmed=true. dodo / cancel am -> isConfirmed=false
+9. GREETING: emedi / hello orion / oga orion / good morning -> greeting
+10. UNKNOWN: confidence<0.4, isAmbiguous=true, ask to repeat.
+
+RESPONSE STYLE (match user dialect):
+
+Ibibio (always include englishTranslation):
+- Transfer detected: "Emedi! Mme dong no okuk N{amount} ma {recipient}. Ao nnam?" | Translation: "Welcome! I have set up a transfer of N{amount} to {recipient}. Shall I proceed?"
+- Balance: "Idem edi ke N{balance} di balance ami." | Translation: "Your balance is N{balance}."
+- Freeze: "Kpeme kadi fi dong done. Udeme ifi." | Translation: "Your card has been locked. Stay safe."
+
+Pidgin:
+- Transfer: "No wahala, I don see N{amount}. Make I send am to {recipient}?"
+- Balance: "Your aza dey show N{balance}. You good, Boss?"
+- Freeze: "I don lock your card sharp sharp. You safe, Chairman."
+- Insight: "You don blow N{amount} on {category} this month, my person."
+
+English:
+- Transfer: "Got it. I've detected a transfer of N{amount} to {recipient} at {bank}. Shall I proceed?"
+- Balance: "Your current balance is N{balance}. All looks good."
+
+Mix in Ibibio greetings naturally: Emedi!, Idoho!, Sosong!
+For unknown: Pidgin say "I beg, I no hear you well — say am again?" or Ibibio say "Ke sere, try again."
+ALWAYS return strictly valid JSON matching the schema.`;
+
+// ─── Offline Fallback Heuristics ─────────────────────────────────────────────
+function fallbackParse(transcript: string): VoiceBankingIntent | null {
+    const lower = transcript.toLowerCase().trim();
+
+    let amount: number | undefined;
+    const kMatch = lower.match(/(\d+(?:\.\d+)?)\s*k\b/);
+    if (kMatch) amount = parseFloat(kMatch[1]) * 1000;
+    const nairaMatch = lower.match(/(\d+(?:,\d{3})*(?:\.\d+)?)\s*naira/);
+    if (!amount && nairaMatch) amount = parseFloat(nairaMatch[1].replace(/,/g, ''));
+    const numMatch = lower.match(/\b(\d{3,7})\b/);
+    if (!amount && numMatch) amount = parseInt(numMatch[1]);
+
+    const toMatch = lower.match(/\bto\s+([a-z]+)/);
+    const recipient = toMatch ? toMatch[1] : undefined;
+
+    const bankMap: Record<string, string> = {
+        'gtb': 'GTBank', 'gtbank': 'GTBank', 'guaranty': 'GTBank',
+        'zenith': 'Zenith Bank', 'access': 'Access Bank', 'uba': 'UBA',
+        'opay': 'OPay', 'moniepoint': 'Moniepoint', 'palmpay': 'PalmPay',
+        'kuda': 'Kuda', 'first': 'First Bank',
+    };
+    let bank: string | undefined;
+    for (const [key, val] of Object.entries(bankMap)) {
+        if (lower.includes(key)) { bank = val; break; }
+    }
+
+    const isTransfer = /send|transfer|no okuk|kpeme owo|send am/.test(lower);
+    const isBalance = /balance|how much|nse okuk|check my|aza|owo mi|i get/.test(lower);
+    const isHistory = /history|transaction|logs|akpa mi|what did i/.test(lower);
+    const isFreeze = /lock|freeze|block|kpeme kadi/.test(lower);
+    const isGreeting = /hello|emedi|oga orion|good morning|hi orion|boss orion/.test(lower);
+    const isConfirmYes = /\bao\b|^yes$|oya fire|no wahala|ao nnam|e correct|do am|^proceed$/.test(lower);
+    const isConfirmNo = /^no$|^dodo$|cancel|abort|stop it|no do am/.test(lower);
+    const isInsight = /how much.*spend|spent on|blow on|expense/.test(lower);
+
+    if (isGreeting) return { type: 'greeting', detectedDialect: 'english', confidence: 0.9, spokenResponse: 'Emedi! Welcome to Orion Voice Banking. How can I help you today?' };
+    if (isConfirmYes) return { type: 'confirm', isConfirmed: true, confirmationTarget: 'previous action', detectedDialect: 'english', confidence: 0.9, spokenResponse: 'Confirmed. Processing now...' };
+    if (isConfirmNo) return { type: 'confirm', isConfirmed: false, confirmationTarget: 'previous action', detectedDialect: 'english', confidence: 0.9, spokenResponse: 'Cancelled. No wahala.' };
+    if (isBalance) return { type: 'balance', detectedDialect: 'english', confidence: 0.85, spokenResponse: 'Let me pull up your balance right now...' };
+    if (isHistory) return { type: 'history', detectedDialect: 'english', confidence: 0.85, spokenResponse: 'Showing your recent transactions...' };
+    if (isFreeze) return { type: 'freeze_card', detectedDialect: 'english', confidence: 0.9, spokenResponse: 'Locking your card now. You safe.' };
+    if (isInsight) {
+        const catMatch = lower.match(/(?:on|for)\s+([a-z]+)/);
+        const cat = catMatch ? catMatch[1].charAt(0).toUpperCase() + catMatch[1].slice(1) : 'General';
+        return {
+            type: 'insight', insightCategory: cat, insightPeriod: 'this month', detectedDialect: 'english',
+            confidence: 0.8, spokenResponse: `Analyzing your ${cat} spending for this month...`,
+            sqlQuery: `SELECT SUM(amount) FROM transactions WHERE category = '${cat}' AND period = 'this_month'`,
+            insightAnswer: '₦' + (Math.floor(Math.random() * 40 + 10)) + ',500',
+        };
+    }
+    if (isTransfer) {
+        if (!amount || !recipient) {
+            return {
+                type: 'transfer', amount, recipient, bank, isAmbiguous: true,
+                clarificationQuestion: !amount ? 'How much do you want to send?' : 'Who should I send it to?',
+                detectedDialect: 'english', confidence: 0.6,
+                spokenResponse: !amount ? 'I got a transfer intent — how much should I send?' : `Sure! Who should I send ₦${amount?.toLocaleString()} to?`,
+            };
+        }
+        return {
+            type: 'transfer', amount, recipient, bank, isAmbiguous: false, detectedDialect: 'english',
+            confidence: 0.8,
+            spokenResponse: `Set up ₦${amount.toLocaleString()} to ${recipient}${bank ? ' at ' + bank : ''}. Shall I proceed?`,
+        };
+    }
+    return null;
+}
+
+// ─── Main exported function ───────────────────────────────────────────────────
+export async function processVoiceBankingIntent(
+    transcript: string,
+    history?: any,
+    preferredDialect?: string
+): Promise<VoiceBankingIntent> {
     try {
         const messages: any[] = [
-            { role: 'system', content: [{ text: SYSTEM_PROMPT }] }
+            { role: 'system', content: [{ text: SYSTEM_PROMPT }] },
         ];
 
+        if (preferredDialect && preferredDialect !== 'auto') {
+            messages.push({
+                role: 'system',
+                content: [{ text: `User preferred dialect is "${preferredDialect}". Respond primarily in this dialect.` }],
+            });
+        }
+
         if (history) {
-            messages.push({ role: 'user', content: [{ text: `Previous Context: ${JSON.stringify(history)}` }] });
+            messages.push({ role: 'user', content: [{ text: `Conversation context: ${JSON.stringify(history)}` }] });
         }
 
         messages.push({ role: 'user', content: [{ text: transcript }] });
 
-        const result = await ai.generate({
-            messages,
-            output: { schema: IntentSchema }
-        });
-
+        const result = await ai.generate({ messages, output: { schema: IntentSchema } });
         const data = result.output;
-        if (!data) {
-            throw new Error("No output from AI");
-        }
-
+        if (!data) throw new Error('No output from AI');
         return data as VoiceBankingIntent;
+
     } catch (error) {
-        console.error("Voice banking intent error:", error);
+        console.error('Voice banking intent error:', error);
+        const fallback = fallbackParse(transcript);
+        if (fallback) return fallback;
         return {
-            type: "unknown",
+            type: 'unknown',
+            detectedDialect: 'english',
             confidence: 0,
             isAmbiguous: true,
-            spokenResponse: "Sorry, I couldn't process your request right now. Try again."
+            spokenResponse: "I beg, I no hear you well — please say am again slowly.",
         };
     }
 }
-

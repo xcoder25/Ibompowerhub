@@ -116,24 +116,22 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
       </div>
 
       {/* State Enforcement Card */}
-      <Card className="rounded-xl border-emerald-500/25 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white overflow-hidden shadow-sm">
-        <CardContent className="p-2.5 sm:p-4 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="size-8 sm:size-9 rounded-lg sm:rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
-              <MapPin className="size-4 sm:size-5" />
-            </div>
-            <div>
-              <p className="text-[9px] sm:text-[10px] font-bold text-emerald-400 uppercase tracking-widest leading-none">
-                Exclusively For
-              </p>
-              <h3 className="text-xs sm:text-base font-black text-white mt-0.5">Akwa Ibom State, Nigeria</h3>
-            </div>
+      <div className="rounded-xl border border-emerald-500/25 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white p-2.5 sm:p-4 flex items-center justify-between gap-2 shadow-sm">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="size-8 sm:size-9 rounded-lg sm:rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+            <MapPin className="size-4 sm:size-5" />
           </div>
-          <Badge className="bg-emerald-500 text-slate-950 font-black text-[9px] sm:text-[10px] uppercase tracking-wider px-2 sm:px-3 py-0.5 sm:py-1 flex-shrink-0">
-            Verified
-          </Badge>
-        </CardContent>
-      </Card>
+          <div>
+            <p className="text-[9px] sm:text-[10px] font-bold text-emerald-400 uppercase tracking-widest leading-none">
+              Exclusively For
+            </p>
+            <h3 className="text-xs sm:text-base font-black text-white mt-0.5">Akwa Ibom State, Nigeria</h3>
+          </div>
+        </div>
+        <Badge className="bg-emerald-500 text-slate-950 font-black text-[9px] sm:text-[10px] uppercase tracking-wider px-2 sm:px-3 py-0.5 sm:py-1 flex-shrink-0">
+          Verified
+        </Badge>
+      </div>
 
       <div className="space-y-3.5 sm:space-y-5">
         {/* LGA & Ward Row */}

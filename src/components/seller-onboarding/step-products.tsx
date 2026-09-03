@@ -184,103 +184,103 @@ export function StepProducts({ data, updateData, onNext, onPrev, onSaveDraft, sa
 
       {/* Product List */}
       {data.products.length === 0 ? (
-        <Card className="rounded-xl border-dashed border-2 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 text-center py-8 sm:py-12 px-3">
-          <CardContent className="space-y-2.5">
-            <div className="size-11 sm:size-14 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
-              <Package className="size-5 sm:size-7" />
-            </div>
-            <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-              No products registered yet
+        <div className="rounded-xl border-dashed border-2 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 text-center py-8 sm:py-12 px-3 space-y-2.5">
+          <div className="size-11 sm:size-14 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
+            <Package className="size-5 sm:size-7" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm sm:text-base text-slate-800 dark:text-slate-200">
+              No products added yet
             </h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Add your first agricultural produce (Garri, Yam, Catfish, Fresh Eggs, Palm Oil) with unit pricing.
+            <p className="text-xs text-slate-400 mt-0.5 max-w-xs mx-auto">
+              Add your cassava tubers, palm oil gallons, fresh catfish, or agro-supplies so buyers can see your stock.
             </p>
-            <Button
-              type="button"
-              onClick={openAddModal}
-              className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-9 px-4 gap-1.5 shadow-sm"
-            >
-              <Plus className="size-3.5" /> Add First Product
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+          <Button
+            type="button"
+            onClick={openAddModal}
+            variant="outline"
+            className="rounded-xl border-emerald-500/30 text-emerald-600 text-xs font-bold h-9 px-4 gap-1.5 mt-2"
+          >
+            <Plus className="size-3.5" />
+            <span>Add First Product</span>
+          </Button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-4">
           {data.products.map((prod, idx) => (
-            <Card
+            <div
               key={prod.id || idx}
-              className="rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs hover:shadow-md transition-shadow"
+              className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-4 flex gap-2.5 sm:gap-3.5 shadow-xs hover:shadow-md transition-shadow overflow-hidden"
             >
-              <CardContent className="p-2.5 sm:p-4 flex gap-2.5 sm:gap-3.5">
-                {/* Product Image Thumbnail */}
-                <div className="size-20 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 flex items-center justify-center flex-shrink-0 overflow-hidden relative">
-                  {prod.images && prod.images.length > 0 ? (
-                    <img
-                      src={prod.images[0]}
-                      alt={prod.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Package className="size-8 text-slate-400" />
-                  )}
-                  {prod.images && prod.images.length > 1 && (
-                    <span className="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] font-bold px-1.5 py-0.2 rounded">
-                      +{prod.images.length - 1}
-                    </span>
-                  )}
+              {/* Product Image Thumbnail */}
+              <div className="size-20 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 flex items-center justify-center flex-shrink-0 overflow-hidden relative">
+                {prod.images && prod.images.length > 0 ? (
+                  <img
+                    src={prod.images[0]}
+                    alt={prod.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Package className="size-8 text-slate-400" />
+                )}
+                {prod.images && prod.images.length > 1 && (
+                  <span className="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] font-bold px-1.5 py-0.2 rounded">
+                    +{prod.images.length - 1}
+                  </span>
+                )}
+              </div>
+
+              {/* Details */}
+              <div className="flex-1 min-w-0 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                      {prod.name}
+                    </h4>
+                    <Badge
+                      className={`text-[9px] font-bold border-none px-2 py-0.5 ${
+                        prod.availability === 'Available Now'
+                          ? 'bg-emerald-500/15 text-emerald-600'
+                          : prod.availability === 'Seasonal'
+                          ? 'bg-amber-500/15 text-amber-600'
+                          : 'bg-slate-500/15 text-slate-500'
+                      }`}
+                    >
+                      {prod.availability}
+                    </Badge>
+                  </div>
+                  <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                    {prod.category} • {prod.availableQuantity} {prod.unit}s in stock
+                  </p>
+                  <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 mt-1">
+                    ₦{Number(prod.price).toLocaleString()} <span className="text-[10px] font-medium text-slate-400">/ {prod.unit}</span>
+                  </p>
                 </div>
 
-                {/* Details */}
-                <div className="flex-1 min-w-0 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between gap-2">
-                      <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                        {prod.name}
-                      </h4>
-                      <Badge
-                        className={`text-[9px] font-bold border-none px-2 py-0.5 ${
-                          prod.availability === 'Available Now'
-                            ? 'bg-emerald-500/15 text-emerald-600'
-                            : prod.availability === 'Seasonal'
-                            ? 'bg-amber-500/15 text-amber-600'
-                            : 'bg-slate-500/15 text-slate-500'
-                        }`}
-                      >
-                        {prod.availability}
-                      </Badge>
-                    </div>
-                    <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                      {prod.category} • {prod.availableQuantity} {prod.unit}s in stock
-                    </p>
-                    <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 mt-1">
-                      ₦{Number(prod.price).toLocaleString()} <span className="text-[10px] font-medium text-slate-400">/ {prod.unit}</span>
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 mt-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEditModal(idx)}
-                      className="h-7 px-2 text-xs text-slate-600 hover:text-emerald-600 gap-1 rounded-lg"
-                    >
-                      <Edit2 className="size-3" /> Edit
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteProduct(idx)}
-                      className="h-7 px-2 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg"
-                    >
-                      <Trash2 className="size-3" />
-                    </Button>
-                  </div>
+                {/* Actions */}
+                <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 mt-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => openEditModal(idx)}
+                    className="h-7 px-2 text-xs text-slate-600 hover:text-emerald-600 gap-1 rounded-lg"
+                  >
+                    <Edit2 className="size-3" /> Edit
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteProduct(idx)}
+                    className="h-7 px-2 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg"
+                  >
+                    <Trash2 className="size-3" />
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}

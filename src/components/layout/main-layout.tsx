@@ -59,7 +59,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
     // Route flags moved here for accessibility in all return paths
     const isDashboard = pathname.startsWith('/dashboard');
     const isMapPage = pathname === '/map';
-    const isMarketPage = pathname === '/market';
+    const isMarketPage = pathname.startsWith('/market') || pathname.startsWith('/seller');
     const isFlightPage = pathname.startsWith('/flights');
     const isWalletPage = pathname.startsWith('/wallet');
     const isAuthPath = authRoutes.includes(pathname);
