@@ -41,7 +41,8 @@ export default function GovernmentPage() {
 
       <div className="container mx-auto px-4 sm:px-8 py-10 md:py-16 space-y-12 relative z-10 animate-in fade-in duration-1000">
 
-        {/* ── Dynamic Header ─�        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+        {/* Dynamic Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
            <div className="space-y-5 max-w-3xl">
               <div className="flex items-center gap-3">
                  <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-sm">
@@ -86,7 +87,6 @@ export default function GovernmentPage() {
                 </Card>
              </Link>
            ))}
-        </div>
         </div>
 
         {/* ── AI Service Directory ── */}
