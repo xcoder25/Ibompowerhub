@@ -147,9 +147,10 @@ export default function FlightBookingPage() {
             <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-8 relative z-20 pb-16">
                 <div className="bg-white/90 backdrop-blur-xl border border-white/90 rounded-3xl shadow-2xl shadow-green-900/10 overflow-hidden p-5 md:p-8">
                     <Tabs defaultValue="book" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 mb-6 h-14 rounded-2xl bg-slate-100 p-1">
-                            <TabsTrigger value="book" className="rounded-xl font-bold text-sm md:text-base data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Book a Flight</TabsTrigger>
-                            <TabsTrigger value="track" className="rounded-xl font-bold text-sm md:text-base data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Track Flight</TabsTrigger>
+                        <TabsList className="grid w-full grid-cols-3 mb-6 h-14 rounded-2xl bg-slate-100 p-1">
+                            <TabsTrigger value="book" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Book a Flight</TabsTrigger>
+                            <TabsTrigger value="track" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Track Flight</TabsTrigger>
+                            <TabsTrigger value="board" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Airport Board (QUO)</TabsTrigger>
                         </TabsList>
                         
                         <TabsContent value="book" className="m-0 border-none outline-none">
@@ -332,6 +333,79 @@ export default function FlightBookingPage() {
                                         </div>
                                     </div>
                                 )}
+                            </div>
+                        </TabsContent>
+
+                        {/* Victor Attah Airport Live Flight Board Tab */}
+                        <TabsContent value="board" className="m-0 border-none outline-none">
+                            <div className="p-2 md:p-4 space-y-6">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+                                    <div>
+                                        <h2 className="text-xl font-black text-slate-900">Victor Attah Int'l Airport (QUO)</h2>
+                                        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-0.5">Live Daily Flight Departures & Arrivals</p>
+                                    </div>
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">
+                                        <span className="size-2 rounded-full bg-green-600 animate-pulse" />
+                                        Airport Terminal Active
+                                    </span>
+                                </div>
+
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-xs">
+                                        <thead>
+                                            <tr className="bg-slate-50 text-slate-500 font-black uppercase text-[10px] tracking-wider border-b border-slate-200">
+                                                <th className="text-left py-3 px-4">Flight</th>
+                                                <th className="text-left py-3 px-4">Airline</th>
+                                                <th className="text-left py-3 px-4">Route</th>
+                                                <th className="text-left py-3 px-4">Scheduled</th>
+                                                <th className="text-left py-3 px-4">Gate</th>
+                                                <th className="text-right py-3 px-4">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
+                                            <tr className="hover:bg-slate-50/80 transition-colors">
+                                                <td className="py-3 px-4 font-black font-mono text-green-700">QI 0101</td>
+                                                <td className="py-3 px-4 font-bold">Ibom Air</td>
+                                                <td className="py-3 px-4">Uyo (QUO) → Lagos (LOS)</td>
+                                                <td className="py-3 px-4 font-mono font-bold">08:30 AM</td>
+                                                <td className="py-3 px-4">Gate 02</td>
+                                                <td className="py-3 px-4 text-right"><span className="px-2 py-0.5 rounded-md bg-green-100 text-green-800 font-bold text-[10px]">Departed</span></td>
+                                            </tr>
+                                            <tr className="hover:bg-slate-50/80 transition-colors">
+                                                <td className="py-3 px-4 font-black font-mono text-green-700">QI 0204</td>
+                                                <td className="py-3 px-4 font-bold">Ibom Air</td>
+                                                <td className="py-3 px-4">Uyo (QUO) → Abuja (ABV)</td>
+                                                <td className="py-3 px-4 font-mono font-bold">11:15 AM</td>
+                                                <td className="py-3 px-4">Gate 01</td>
+                                                <td className="py-3 px-4 text-right"><span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 font-bold text-[10px]">Boarding</span></td>
+                                            </tr>
+                                            <tr className="hover:bg-slate-50/80 transition-colors">
+                                                <td className="py-3 px-4 font-black font-mono text-green-700">QI 0103</td>
+                                                <td className="py-3 px-4 font-bold">Ibom Air</td>
+                                                <td className="py-3 px-4">Uyo (QUO) → Lagos (LOS)</td>
+                                                <td className="py-3 px-4 font-mono font-bold">01:45 PM</td>
+                                                <td className="py-3 px-4">Gate 02</td>
+                                                <td className="py-3 px-4 text-right"><span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold text-[10px]">On Schedule</span></td>
+                                            </tr>
+                                            <tr className="hover:bg-slate-50/80 transition-colors">
+                                                <td className="py-3 px-4 font-black font-mono text-green-700">QI 0308</td>
+                                                <td className="py-3 px-4 font-bold">Ibom Air</td>
+                                                <td className="py-3 px-4">Abuja (ABV) → Uyo (QUO)</td>
+                                                <td className="py-3 px-4 font-mono font-bold">03:30 PM</td>
+                                                <td className="py-3 px-4">Arr 01</td>
+                                                <td className="py-3 px-4 text-right"><span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold text-[10px]">In Flight</span></td>
+                                            </tr>
+                                            <tr className="hover:bg-slate-50/80 transition-colors">
+                                                <td className="py-3 px-4 font-black font-mono text-green-700">QI 0105</td>
+                                                <td className="py-3 px-4 font-bold">Ibom Air</td>
+                                                <td className="py-3 px-4">Uyo (QUO) → Lagos (LOS)</td>
+                                                <td className="py-3 px-4 font-mono font-bold">05:20 PM</td>
+                                                <td className="py-3 px-4">Gate 03</td>
+                                                <td className="py-3 px-4 text-right"><span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold text-[10px]">On Schedule</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </TabsContent>
                     </Tabs>

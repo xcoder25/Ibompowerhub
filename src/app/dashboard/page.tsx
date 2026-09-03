@@ -45,6 +45,8 @@ import {
   RefreshCw,
   Brain,
   Vote,
+  Waves,
+  Landmark,
 } from 'lucide-react';
 import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -54,6 +56,7 @@ import { Progress } from '@/components/ui/progress';
 import { useUser } from '@/firebase';
 import { VoiceBankingWidget } from '@/components/voice-banking';
 import { EmergencySOS } from '@/components/emergency-sos';
+import { FloodSensorWidget } from '@/components/floodsense/flood-sensor-widget';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit, doc, onSnapshot, where } from 'firebase/firestore';
 import {
@@ -115,21 +118,25 @@ function getTimeGreeting() {
 }
 
 const services = [
-  { id: 'government', title: 'Gov Nexus', icon: Building2, href: '/government', color: 'from-blue-600/20 to-blue-700/10', iconColor: 'text-blue-700', borderColor: 'border-blue-200/60' },
-  { id: 'health', title: 'Bio-Matrix', icon: HeartPulse, href: '/health', color: 'from-rose-500/20 to-rose-600/10', iconColor: 'text-rose-600', borderColor: 'border-rose-200/60' },
-  { id: 'education', title: 'Learn Matrix', icon: GraduationCap, href: '/education', color: 'from-orange-500/20 to-orange-600/10', iconColor: 'text-orange-600', borderColor: 'border-orange-200/60' },
-  { id: 'access', title: 'Shield Gate', icon: ShieldCheck, href: '/access', color: 'from-indigo-600/20 to-indigo-700/10', iconColor: 'text-indigo-600', borderColor: 'border-indigo-200/60' },
-  { id: 'power', title: 'Grid Master', icon: Zap, href: '/power', color: 'from-amber-500/20 to-amber-600/10', iconColor: 'text-amber-600', borderColor: 'border-amber-200/60' },
-  { id: 'voting', title: 'Civil Ledger', icon: Vote, href: '/voting', color: 'from-purple-500/20 to-purple-600/10', iconColor: 'text-purple-600', borderColor: 'border-purple-200/60' },
-  { id: 'property', title: 'Real Estate', icon: Home, href: '/property', color: 'from-emerald-500/20 to-emerald-600/10', iconColor: 'text-emerald-600', borderColor: 'border-emerald-200/60' },
-  { id: 'forums', title: 'Townhall', icon: MessageSquare, href: '/forums', color: 'from-slate-500/20 to-slate-600/10', iconColor: 'text-slate-600', borderColor: 'border-slate-200/60' },
+  { id: 'floodsense', title: 'FloodSense AKS', icon: Waves, href: '/floodsense', color: 'from-blue-600/20 to-blue-700/10', iconColor: 'text-blue-600', borderColor: 'border-blue-200/60' },
+  { id: 'lgas', title: '31 LGAs Hub', icon: Landmark, href: '/lgas', color: 'from-emerald-600/20 to-emerald-700/10', iconColor: 'text-emerald-600', borderColor: 'border-emerald-200/60' },
+  { id: 'arise', title: 'ARISE Monitor', icon: Sparkles, href: '/arise', color: 'from-purple-600/20 to-purple-700/10', iconColor: 'text-purple-600', borderColor: 'border-purple-200/60' },
+  { id: 'calendar', title: 'Market Calendar', icon: Store, href: '/market/calendar', color: 'from-amber-500/20 to-amber-600/10', iconColor: 'text-amber-600', borderColor: 'border-amber-200/60' },
+  { id: 'government', title: 'Government', icon: Building2, href: '/government', color: 'from-blue-600/20 to-blue-700/10', iconColor: 'text-blue-700', borderColor: 'border-blue-200/60' },
+  { id: 'health', title: 'Healthcare', icon: HeartPulse, href: '/health', color: 'from-rose-500/20 to-rose-600/10', iconColor: 'text-rose-600', borderColor: 'border-rose-200/60' },
+  { id: 'education', title: 'Schools & Education', icon: GraduationCap, href: '/education', color: 'from-orange-500/20 to-orange-600/10', iconColor: 'text-orange-600', borderColor: 'border-orange-200/60' },
+  { id: 'power', title: 'Electricity & Power', icon: Zap, href: '/power', color: 'from-amber-500/20 to-amber-600/10', iconColor: 'text-amber-600', borderColor: 'border-amber-200/60' },
+  { id: 'flights', title: 'Ibom Air', icon: Plane, href: '/flights', color: 'from-emerald-500/20 to-emerald-600/10', iconColor: 'text-emerald-600', borderColor: 'border-emerald-200/60' },
+  { id: 'voting', title: 'Civic Polls', icon: Vote, href: '/voting', color: 'from-purple-500/20 to-purple-600/10', iconColor: 'text-purple-600', borderColor: 'border-purple-200/60' },
+  { id: 'property', title: 'Housing & Land', icon: Home, href: '/property', color: 'from-teal-500/20 to-teal-600/10', iconColor: 'text-teal-600', borderColor: 'border-teal-200/60' },
+  { id: 'forums', title: 'Community Forum', icon: MessageSquare, href: '/forums', color: 'from-slate-500/20 to-slate-600/10', iconColor: 'text-slate-600', borderColor: 'border-slate-200/60' },
 ];
 
 const stats = [
-  { label: 'Grid Resonance', value: '49.8Hz', icon: Zap, color: 'text-amber-600', bg: 'bg-amber-500/15', progress: 98 },
-  { label: 'State Security', value: 'OPTIMAL', icon: ShieldCheck, color: 'text-indigo-600', bg: 'bg-indigo-500/15', progress: 100 },
-  { label: 'Civil Trust', value: '94%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-500/15', progress: 94 },
-  { label: 'Neural Sync', value: 'ACTIVE', icon: Brain, color: 'text-blue-600', bg: 'bg-blue-500/15', progress: 87 },
+  { label: 'Power Grid Frequency', value: '49.8 Hz (Normal)', icon: Zap, color: 'text-amber-600', bg: 'bg-amber-500/15', progress: 98 },
+  { label: 'State Security Level', value: 'Peaceful & Secure', icon: ShieldCheck, color: 'text-indigo-600', bg: 'bg-indigo-500/15', progress: 100 },
+  { label: 'Citizen Satisfaction', value: '94%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-500/15', progress: 94 },
+  { label: 'State Digital Hub', value: 'Online', icon: Brain, color: 'text-blue-600', bg: 'bg-blue-500/15', progress: 100 },
 ];
 
 type LiveTransaction = {
@@ -524,6 +531,11 @@ export default function DashboardPage() {
           </Card>
         )}
 
+        {/* FloodSense AKS Real-Time Telemetry Widget */}
+        <div className="mb-8">
+          <FloodSensorWidget />
+        </div>
+
         {/* Quick Access Services - 3D glass tiles - wrapped in card */}
         <Card className="glass-card border-0 mb-8">
           <CardHeader className="border-b border-slate-200/60 pb-4">
@@ -643,7 +655,7 @@ export default function DashboardPage() {
 
         {/* ── Status Matrix ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-           {/* Orion State Briefing */}
+           {/* Resident State Briefing */}
            <Card className="bg-indigo-950 border-none rounded-3xl overflow-hidden shadow-2xl relative group h-full">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent" />
               <div className="p-8 relative z-10 space-y-6 flex flex-col h-full">
@@ -651,29 +663,29 @@ export default function DashboardPage() {
                     <div className="size-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-xl border border-white/10 group-hover:scale-110 transition-transform">
                        <Brain className="size-7 text-blue-400" />
                     </div>
-                    <Badge className="bg-emerald-500/20 text-emerald-400 border-none font-black uppercase text-[9px] tracking-widest px-3 py-1">Neural Active</Badge>
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-none font-black uppercase text-[9px] tracking-widest px-3 py-1">Services Online</Badge>
                  </div>
                  <div className="space-y-4">
-                    <h3 className="text-white font-black text-2xl tracking-tighter uppercase leading-none italic">"Emedi! All systems are optimal for Sector IV today."</h3>
-                    <p className="text-white/60 text-sm font-medium leading-relaxed">
-                       Grid capacity is at 84%. Your gate pass ARISE-9024 is pre-verified for your evening entry.
+                    <h3 className="text-white font-bold text-xl tracking-tight leading-snug">"Emedi! Welcome to your daily Akwa Ibom update."</h3>
+                    <p className="text-white/70 text-sm font-medium leading-relaxed">
+                       State power supply is steady, markets are open, and road transit across Uyo, Eket, and Ikot Ekpene is moving smoothly.
                     </p>
                  </div>
                  <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
-                     <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Personalized Insights</p>
-                     <Button variant="ghost" size="sm" className="h-8 text-[9px] font-black uppercase tracking-widest text-white hover:bg-white/10">Full Forecast</Button>
+                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Daily Resident Summary</p>
+                     <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/10">Explore More</Button>
                  </div>
               </div>
               <div className="absolute top-[-20%] right-[-10%] size-64 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
            </Card>
 
-           {/* Telemetry Snapshot */}
+           {/* Power Grid Status Snapshot */}
            <Card className="lg:col-span-2 bg-white dark:bg-slate-900 border-none shadow-2xl rounded-3xl overflow-hidden p-0 relative h-full">
               <div className="grid grid-cols-1 md:grid-cols-2 h-full">
                  <div className="p-8 space-y-8 border-r border-slate-100 dark:border-white/5">
                     <div className="flex items-center gap-3">
                        <Zap className="size-5 text-amber-500 animate-pulse" />
-                       <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter text-xl">GRID LOGISTICS</h4>
+                       <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-base">ELECTRICITY SUPPLY FEEDERS</h4>
                     </div>
                     <div className="space-y-6">
                        {[{ area: 'Shelter Afrique', status: 'Optimal', load: '12MW' }, { area: 'Uyo Metropolis', status: 'Maintenance', load: '4MW' }].map(node => (

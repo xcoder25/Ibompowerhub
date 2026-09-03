@@ -35,11 +35,14 @@ export const transactions = [
 ];
 
 export const services = [
+  { id: 'floodsense', name: 'FloodSense AKS', iconId: 'floodsense', description: 'Early warning & water level radar', href: '/floodsense' },
+  { id: 'lgas-explorer', name: '31 LGAs Explorer', iconId: 'lgas-explorer', description: 'Explore all council areas', href: '/lgas' },
+  { id: 'arise-tracker', name: 'ARISE Tracker', iconId: 'arise-tracker', description: 'State infrastructure & projects', href: '/arise' },
+  { id: 'market-calendar', name: 'Urua Market Calendar', iconId: 'market-calendar', description: '8-day cycle & commodity prices', href: '/market/calendar' },
   { id: 'agro-connect', name: 'AgroConnect', iconId: 'agro-connect', description: 'Fresh farm produce near you', href: '/market' },
   { id: 'skills-hub', name: 'SkillsHub', iconId: 'skills-hub', description: 'Find reliable artisans', href: '/skills' },
-  { id: 'laundry-hub', name: 'LaundryHub', iconId: 'laundry-hub', description: 'Convenient laundry services', href: '#' },
-  { id: 'clean-aks', name: 'CleanAKS', iconId: 'clean-aks', description: 'Report waste issues', href: '/waste' },
-  { id: 'transport-guide', name: 'Transport Guide', iconId: 'transport-guide', description: 'Fares and routes', href: '/transport' },
+  { id: 'transport-guide', name: 'Transport & Marine', iconId: 'transport-guide', description: 'Fares, flights & waterways', href: '/transport' },
+  { id: 'clean-aks', name: 'CleanAKS', iconId: 'clean-aks', description: 'Report waste & environment', href: '/waste' },
   { id: 'community-safety', name: 'Community Safety', iconId: 'community-safety', description: 'Stay safe and informed', href: '/alerts' },
 ];
 
@@ -244,15 +247,23 @@ export const newsArticles = [
 ];
 
 export const popularRoutes = [
-  { from: 'Ibom Plaza', to: 'Itam Park', fare: '₦200' },
-  { from: 'Oron Road', to: 'UNIUYO Town Campus', fare: '₦150' },
-  { from: 'Shelter Afrique', to: 'Plaza', fare: '₦300' },
-  { from: 'Aka Road', to: 'Ibom Hall', fare: '₦100' },
+  { from: 'Ibom Plaza', to: 'Itam Park', fare: '₦400' },
+  { from: 'Oron Road', to: 'UNIUYO Town Campus', fare: '₦300' },
+  { from: 'Shelter Afrique', to: 'Plaza', fare: '₦500' },
+  { from: 'Aka Road', to: 'Ibom Hall', fare: '₦300' },
+  { from: 'Uyo (Itam Park)', to: 'Eket Urban', fare: '₦1,800' },
+  { from: 'Uyo (Itam Park)', to: 'Ikot Ekpene (Raffia City)', fare: '₦1,500' },
+  { from: 'Uyo', to: 'Oron Beach Jetty', fare: '₦2,000' },
+  { from: 'Oron Jetty (Marine Speedboat)', to: 'Calabar Marina', fare: '₦3,500' },
 ];
 
 export const fareEstimates: { [key: string]: string } = {
-  'ibom plaza-itam park': '₦200',
-  'oron road-uniuyo town campus': '₦150',
-  'shelter afrique-plaza': '₦300',
-  'aka road-ibom hall': '₦100',
+  'ibom plaza-itam park': '₦400',
+  'oron road-uniuyo town campus': '₦300',
+  'shelter afrique-plaza': '₦500',
+  'aka road-ibom hall': '₦300',
+  'uyo-eket': '₦1,800',
+  'uyo-ikot ekpene': '₦1,500',
+  'uyo-oron': '₦2,000',
+  'oron-calabar': '₦3,500',
 };

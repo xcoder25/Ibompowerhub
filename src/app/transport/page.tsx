@@ -225,6 +225,52 @@ export default function TransportPage() {
           </div>
         </div>
 
+        {/* Coastal Marine Waterway & Ferry Guide */}
+        <div className="bg-gradient-to-r from-blue-950/40 via-slate-900/80 to-slate-900 border border-blue-500/20 rounded-3xl p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="size-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
+                <Navigation className="size-6 rotate-45" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white tracking-tight">Oron – Calabar Marine Waterway Line</h3>
+                <p className="text-xs text-slate-400">Coastal passenger speedboats & vehicular ferry transit across the Cross River Estuary</p>
+              </div>
+            </div>
+            <Badge className="bg-blue-600 text-white font-bold text-xs px-3 py-1">
+              Waterway Active • Normal Tides
+            </Badge>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/5 space-y-2">
+              <div className="text-xs font-bold text-blue-400 uppercase tracking-wider">Line 1: Passenger Speedboat</div>
+              <div className="text-sm font-bold text-white">Oron Beach Jetty ⇄ Calabar Marina</div>
+              <div className="text-xs text-slate-400">Duration: ~40 - 50 mins</div>
+              <div className="text-sm font-black text-emerald-400 pt-1">₦3,500 / passenger</div>
+              <div className="text-[11px] text-slate-500">Includes mandatory life jacket and safety brief</div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/5 space-y-2">
+              <div className="text-xs font-bold text-blue-400 uppercase tracking-wider">Line 2: Coastal Shuttle</div>
+              <div className="text-sm font-bold text-white">Oron Jetty ⇄ Ibeno / Eastern Obolo</div>
+              <div className="text-xs text-slate-400">Duration: ~1h 15 mins</div>
+              <div className="text-sm font-black text-emerald-400 pt-1">₦4,500 / passenger</div>
+              <div className="text-[11px] text-slate-500">Departs 7:00 AM & 2:00 PM daily</div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/5 space-y-2">
+              <div className="text-xs font-bold text-blue-400 uppercase tracking-wider">Marine Safety Advisory</div>
+              <div className="text-xs text-slate-300 leading-relaxed">
+                Operated under National Inland Waterways Authority (NIWA) safety supervision. Night travel after 6:30 PM is prohibited.
+              </div>
+              <div className="pt-2 text-xs font-semibold text-blue-400">
+                Oron Marine Command: 0803 444 8899
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </main>
   );

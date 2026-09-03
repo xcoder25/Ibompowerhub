@@ -39,32 +39,32 @@ export default function EducationPage() {
       
       <div className="container mx-auto px-4 sm:px-8 py-10 md:py-16 space-y-12 relative z-10 animate-in fade-in duration-1000">
 
-        {/* ── Dynamic Header ── */}
+        {/* ── Education Header ── */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
            <div className="space-y-5 max-w-3xl">
               <div className="flex items-center gap-3">
                  <div className="size-10 rounded-2xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shadow-sm">
                     <GraduationCap className="size-5 text-orange-600" />
                  </div>
-                 <Badge className="bg-orange-600/10 text-orange-600 border-none px-4 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-sm">
-                   Knowledge Nexus V3
+                 <Badge className="bg-orange-600/10 text-orange-600 border-none px-4 py-1.5 rounded-xl font-bold uppercase text-xs tracking-wider shadow-sm">
+                   State Educational Institutions
                  </Badge>
               </div>
-              <h1 className="text-5xl md:text-8xl font-black tracking-tightest text-slate-950 dark:text-white leading-none uppercase">
-                LEARN<span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent italic">MATRIX</span>
+              <h1 className="text-4xl md:text-6xl font-black tracking-tight text-slate-950 dark:text-white leading-none uppercase">
+                SCHOOLS & <span className="text-orange-500">EDUCATION</span>
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed max-w-xl">
-                 Verified educational infrastructure under the ARISE Agenda. Access schools, specialized colleges, and neural learning hubs.
+              <p className="text-slate-600 dark:text-slate-300 font-medium text-base md:text-lg leading-relaxed max-w-xl">
+                 Explore model primary schools, government colleges, state polytechnics, and universities across Akwa Ibom State.
               </p>
            </div>
            
-           <div className="flex items-center gap-6 bg-slate-50 dark:bg-slate-900/40 backdrop-blur-xl p-6 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-inner">
-              <div className="size-14 rounded-2xl bg-orange-500/10 flex items-center justify-center">
-                 <Brain className="size-7 text-orange-600" />
+           <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-900/40 backdrop-blur-xl p-5 rounded-[2rem] border border-slate-200 dark:border-white/10 shadow-sm">
+              <div className="size-12 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                 <GraduationCap className="size-6 text-orange-600" />
               </div>
               <div>
-                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Arise Learning AI</p>
-                 <p className="text-xl font-black text-slate-900 dark:text-white">ACTIVE</p>
+                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">State Literacy Index</p>
+                 <p className="text-xl font-bold text-slate-900 dark:text-white">91.5% Active</p>
               </div>
            </div>
         </div>

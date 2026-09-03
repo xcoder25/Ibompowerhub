@@ -6,8 +6,14 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AppInitializer } from '@/components/app-initializer';
 
 export const metadata: Metadata = {
-  title: 'Arise AKS',
-  description: 'Your digital gateway to Akwa Ibom State services — ARISE Agenda powered.',
+  title: 'Ibom PowerHub | Akwa Ibom State',
+  description: 'The Digital Super-App & Civic Utility Gateway for Akwa Ibom State — Power, FloodSense, 31 LGAs, ARISE Agenda, and Transit.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Ibom PowerHub'
+  }
 };
 
 export const viewport: Viewport = {

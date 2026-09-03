@@ -463,3 +463,55 @@ export const DAILY_PROVERBS = [
         language: "Ibibio"
     },
 ];
+
+// ─── Annang Language Phrases & Dictionary ─────────────────────────────────────
+export const ANNANG_DICTIONARY = [
+    { english: "Good morning", dialect: "Emesiere nsong", language: "Annang", category: "greetings" },
+    { english: "Welcome", dialect: "Emedi o", language: "Annang", category: "greetings" },
+    { english: "How are you?", dialect: "Idem mfo song?", language: "Annang", category: "greetings" },
+    { english: "Thank you", dialect: "Sosongo etieti", language: "Annang", category: "greetings" },
+    { english: "Water", dialect: "Mmung", language: "Annang", category: "nature" },
+    { english: "Money", dialect: "Okuk", language: "Annang", category: "commerce" },
+    { english: "Market", dialect: "Urua / Udua", language: "Annang", category: "commerce" },
+    { english: "King / Paramount Ruler", dialect: "Obong Annang", language: "Annang", category: "civic" },
+    { english: "Raffia cloth", dialect: "Ikpa Ikot", language: "Annang", category: "culture" },
+    { english: "Palm wine", dialect: "Ukod / Nsung ukod", language: "Annang", category: "culture" },
+    { english: "God is great", dialect: "Abasi kpon", language: "Annang", category: "religion" },
+];
+
+// ─── Oro (Oron) Language Phrases & Dictionary ────────────────────────────────
+export const ORO_DICTIONARY = [
+    { english: "Good morning", dialect: "Mesiere", language: "Oro", category: "greetings" },
+    { english: "Welcome", dialect: "De nsi", language: "Oro", category: "greetings" },
+    { english: "How are you?", dialect: "Idem owo mfo?", language: "Oro", category: "greetings" },
+    { english: "Thank you", dialect: "Sosongo", language: "Oro", category: "greetings" },
+    { english: "Water / Ocean", dialect: "Mmong / Inyang", language: "Oro", category: "nature" },
+    { english: "Crayfish", dialect: "Uroŋ (Oron Crayfish)", language: "Oro", category: "food" },
+    { english: "Fish", dialect: "Iyak", language: "Oro", category: "food" },
+    { english: "Boat / Canoe", dialect: "Ubom", language: "Oro", category: "transport" },
+    { english: "Sea breeze", dialect: "Etim inyang", language: "Oro", category: "nature" },
+    { english: "King / Royal Father", dialect: "Ahta Oro (Paramount Ruler of Oro Nation)", language: "Oro", category: "civic" },
+    { english: "God", dialect: "Abasi Odudu", language: "Oro", category: "religion" },
+];
+
+// ─── Speech Synthesis Pronunciation Helper ────────────────────────────────────
+export function playNativePronunciation(text: string, rate: number = 0.85) {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+        console.warn('Speech synthesis not supported on this browser.');
+        return false;
+    }
+
+    try {
+        window.speechSynthesis.cancel(); // Stop any currently speaking utterance
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = rate;
+        utterance.pitch = 1.0;
+        utterance.lang = 'en-NG'; // Nigerian English accent cadence is closest for phonetic Ibibio/Annang
+        window.speechSynthesis.speak(utterance);
+        return true;
+    } catch (e) {
+        console.error('Speech synthesis error:', e);
+        return false;
+    }
+}
+

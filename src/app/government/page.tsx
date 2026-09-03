@@ -41,54 +41,52 @@ export default function GovernmentPage() {
 
       <div className="container mx-auto px-4 sm:px-8 py-10 md:py-16 space-y-12 relative z-10 animate-in fade-in duration-1000">
 
-        {/* ── Dynamic Header ── */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+        {/* ── Dynamic Header ─�        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
            <div className="space-y-5 max-w-3xl">
               <div className="flex items-center gap-3">
                  <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-sm">
                     <Landmark className="size-5 text-emerald-600" />
                  </div>
-                 <Badge className="bg-emerald-600/10 text-emerald-600 border-none px-4 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-sm">
-                   Institutional Nexus V4
+                 <Badge className="bg-emerald-600/10 text-emerald-600 border-none px-4 py-1.5 rounded-xl font-bold uppercase text-xs tracking-wider shadow-sm">
+                   Akwa Ibom State Ministries & Agencies
                  </Badge>
               </div>
-              <h1 className="text-5xl md:text-8xl font-black tracking-tightest text-slate-950 dark:text-white leading-none">
-                STATE<span className="bg-gradient-to-r from-emerald-500 to-amber-500 bg-clip-text text-transparent italic">NEXUS</span>
+              <h1 className="text-4xl md:text-6xl font-black tracking-tight text-slate-950 dark:text-white leading-none uppercase">
+                GOVERNMENT <span className="text-emerald-600">SERVICES</span>
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed max-w-xl">
-                 Secure digital infrastructure for the ARISE Agenda. Access government protocols, revenue channels, and civic initiatives.
+              <p className="text-slate-600 dark:text-slate-300 font-medium text-base md:text-lg leading-relaxed max-w-xl">
+                 Official directory and digital access for state ministries, internal revenue service (AKIRS), and civil secretariats.
               </p>
            </div>
            
-           <div className="flex items-center gap-6 bg-slate-50 dark:bg-slate-900/40 backdrop-blur-xl p-6 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-inner">
-              <div className="size-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                 <Globe className="size-7 text-emerald-600" />
+           <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-900/40 backdrop-blur-xl p-5 rounded-[2rem] border border-slate-200 dark:border-white/10 shadow-sm">
+              <div className="size-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                 <Globe className="size-6 text-emerald-600" />
               </div>
               <div>
-                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Governance Online</p>
-                 <p className="text-xl font-black text-slate-900 dark:text-white">100% <span className="text-sm font-bold text-emerald-500">READY</span></p>
+                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Government Portal</p>
+                 <p className="text-xl font-bold text-slate-900 dark:text-white">Active & Verified</p>
               </div>
            </div>
         </div>
 
-        {/* ── Quick Access Nexus ── */}
+        {/* ── Quick Access Services ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
            {quickLinks.map((link) => (
              <Link key={link.label} href={link.href}>
-                <Card className="group bg-white dark:bg-slate-900/60 backdrop-blur-3xl border-none shadow-xl rounded-[2.5rem] p-8 hover:-translate-y-2 transition-all duration-500 overflow-hidden relative">
-                   <div className={cn("size-16 rounded-[1.5rem] bg-gradient-to-br flex items-center justify-center shadow-lg mb-6 group-hover:scale-110 transition-transform duration-500", link.color, link.shadow)}>
-                      <link.icon className="size-8 text-white" />
+                <Card className="group bg-white dark:bg-slate-900/60 backdrop-blur-3xl border border-slate-100 dark:border-white/5 shadow-xl rounded-[2rem] p-6 hover:-translate-y-1 transition-all duration-300 overflow-hidden relative">
+                   <div className={cn("size-14 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-md mb-5 group-hover:scale-105 transition-transform duration-300", link.color, link.shadow)}>
+                      <link.icon className="size-7 text-white" />
                    </div>
-                   <h3 className="text-xl font-black text-slate-950 dark:text-white mb-2">{link.label}</h3>
-                   <p className="text-xs text-slate-500 font-medium leading-relaxed mb-6">{link.desc}</p>
-                   <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                      Open Nexus <ArrowRight className="size-3" />
+                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{link.label}</h3>
+                   <p className="text-xs text-slate-500 font-medium leading-relaxed mb-4">{link.desc}</p>
+                   <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                      Open Service <ArrowRight className="size-3" />
                    </div>
-                   {/* Abstract element */}
-                   <div className="absolute -bottom-10 -right-10 size-32 bg-white/5 rounded-full pointer-events-none group-hover:bg-white/10 transition-colors" />
                 </Card>
              </Link>
            ))}
+        </div>
         </div>
 
         {/* ── AI Service Directory ── */}

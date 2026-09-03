@@ -40,31 +40,33 @@ export default function HealthPage() {
       
       <div className="container mx-auto px-4 sm:px-8 py-10 md:py-16 space-y-12 relative z-10 animate-in fade-in duration-1000">
 
-        {/* ── Futuristic Header ── */}
+        {/* ── Healthcare Header ── */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
            <div className="space-y-5 max-w-3xl">
               <div className="flex items-center gap-3">
                  <div className="size-10 rounded-2xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20 shadow-sm">
                     <HeartPulse className="size-5 text-rose-600" />
                  </div>
-                 <Badge className="bg-rose-600/10 text-rose-600 border-none px-4 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-sm">
-                   Bio-Digital Nexus V2.1
+                 <Badge className="bg-rose-600/10 text-rose-600 border-none px-4 py-1.5 rounded-xl font-bold uppercase text-xs tracking-wider shadow-sm">
+                   State Healthcare & Medical Centers
                  </Badge>
               </div>
-              <h1 className="text-5xl md:text-8xl font-black tracking-tightest text-slate-950 dark:text-white leading-none uppercase">
-                HEALTH<span className="bg-gradient-to-r from-rose-500 to-red-500 bg-clip-text text-transparent italic">MATRIX</span>
+              <h1 className="text-4xl md:text-6xl font-black tracking-tight text-slate-950 dark:text-white leading-none uppercase">
+                HEALTHCARE <span className="text-rose-600">CENTERS</span>
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed max-w-xl">
-                 Real-time access to Akwa Ibom medical infrastructure. Verified by the State Health Ledger.
+              <p className="text-slate-600 dark:text-slate-300 font-medium text-base md:text-lg leading-relaxed max-w-xl">
+                 Find hospitals, specialist medical centers, clinics, and 24-hour pharmacies across Akwa Ibom State.
               </p>
            </div>
            
-           <div className="flex-shrink-0 bg-slate-950 text-white p-6 rounded-[2.5rem] border border-white/5 shadow-2xl space-y-4 w-full lg:w-72 relative group overflow-hidden">
+           <div className="flex-shrink-0 bg-slate-950 text-white p-6 rounded-[2rem] border border-white/10 shadow-2xl space-y-3 w-full lg:w-72 relative group overflow-hidden">
               <div className="flex items-center justify-between relative z-10">
-                 <Brain className="size-6 text-rose-400 group-hover:rotate-12 transition-transform" />
-                 <Badge className="bg-rose-500/20 text-rose-400 border-none text-[8px] font-black uppercase tracking-widest">Orion Diagnostic</Badge>
+                 <HeartPulse className="size-6 text-rose-400" />
+                 <Badge className="bg-rose-500/20 text-rose-400 border-none text-[10px] font-bold uppercase">24/7 Hotlines</Badge>
               </div>
-              <p className="text-xs font-bold leading-relaxed relative z-10 italic">"Boss, I've mapped 14 active clinics near your current node."</p>
+              <p className="text-xs font-semibold leading-relaxed relative z-10 text-slate-200">
+                Need urgent medical care? Ibom Specialty Hospital and St. Luke's Anua are open 24 hours daily.
+              </p>
               <div className="absolute -bottom-10 -right-10 size-32 bg-rose-500/10 blur-[40px] rounded-full pointer-events-none" />
            </div>
         </div>

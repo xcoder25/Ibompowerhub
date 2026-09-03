@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.example.app',
-  appName: 'nextn',
+  appId: 'com.ibompowerhub.app',
+  appName: 'Ibom PowerHub',
   webDir: '.next'
 };
 

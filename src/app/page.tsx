@@ -7,7 +7,7 @@ import {
   ArrowRight, MapPin, Wallet, Plane, Zap, Shield,
   ChevronDown, Star, Users, Building2, Wifi, Phone,
   CheckCircle2, Sparkles, Globe, Lock, BadgeCheck, Menu, X,
-  ChevronRight, Landmark, Leaf, Fish, Droplets
+  ChevronRight, Landmark, Leaf, Fish, Droplets, Waves
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SplashScreen } from '@/components/splash-screen';
@@ -31,7 +31,7 @@ const ONBOARDING_SLIDES = [
     badge: 'ARISE Agenda',
     title: 'Everything Akwa Ibom,',
     titleHighlight: 'In One App.',
-    desc: 'Pay bills, verify your identity, explore services, and connect with your community — all powered by the ARISE agenda.',
+    desc: 'Pay bills, verify your identity, monitor flood levels, and connect with all 31 LGAs — all powered by the ARISE agenda.',
     imageSrc: '/akwa_ibom_hero.png',
   },
   {
@@ -73,12 +73,12 @@ const ONBOARDING_SLIDES = [
 
 // ─── Desktop feature cards (AKS branded) ─────────────────────────────────────
 const FEATURES = [
+  { icon: Waves, title: 'FloodSense AKS', desc: 'Real-time flood radar, water telemetry & drainage response.', color: 'from-blue-600 to-teal-500', bg: 'bg-blue-600/10', textColor: 'text-blue-600' },
+  { icon: Landmark, title: '31 LGAs Explorer', desc: 'Comprehensive guide to councils, resources & governance.', color: 'from-aks-green to-aks-green-light', bg: 'bg-aks-green/10', textColor: 'text-aks-green' },
   { icon: Wallet, title: 'Smart Wallet', desc: 'Send, receive and manage money with bank-grade security.', color: 'from-aks-green to-aks-green-light', bg: 'bg-aks-green/10', textColor: 'text-aks-green' },
-  { icon: MapPin, title: 'Interactive Map', desc: 'Discover services, businesses, and government locations.', color: 'from-aks-green to-aks-orange', bg: 'bg-aks-green/10', textColor: 'text-aks-green' },
-  { icon: Plane, title: 'Flight Booking', desc: 'Search and book domestic flights with real-time availability.', color: 'from-aks-orange-dark to-aks-orange', bg: 'bg-aks-orange/10', textColor: 'text-aks-orange-dark' },
+  { icon: Plane, title: 'Ibom Air & Marine', desc: 'Flight booking from Victor Attah Airport & coastal ferries.', color: 'from-aks-orange-dark to-aks-orange', bg: 'bg-aks-orange/10', textColor: 'text-aks-orange-dark' },
   { icon: Zap, title: 'Utility Payments', desc: 'Pay electricity, water, and government fees instantly.', color: 'from-aks-orange to-amber-400', bg: 'bg-aks-orange/10', textColor: 'text-aks-orange' },
-  { icon: Shield, title: 'KYC Verification', desc: 'Quick identity verification through Smile ID biometrics.', color: 'from-aks-green to-aks-orange', bg: 'bg-aks-green/10', textColor: 'text-aks-green' },
-  { icon: Globe, title: 'Ibibio AI', desc: 'Translate and speak in native Ibibio/Efik language.', color: 'from-aks-green-light to-aks-orange', bg: 'bg-aks-orange/10', textColor: 'text-aks-orange' },
+  { icon: Globe, title: 'Tri-Dialect AI', desc: 'Translate and speak in native Ibibio, Annang & Oro languages.', color: 'from-aks-green-light to-aks-orange', bg: 'bg-aks-orange/10', textColor: 'text-aks-orange' },
 ];
 
 const STATS = [

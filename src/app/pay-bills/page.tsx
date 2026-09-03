@@ -173,23 +173,23 @@ function PayBillsContent() {
 
                 <div className="max-w-4xl mx-auto relative z-10 space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 text-left">
                     <div className="space-y-4">
-                        <Badge className="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-[0.4em] shadow-2xl backdrop-blur-md italic">
-                            Utility Hub · Flutterwave Matrix Node
+                        <Badge className="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 px-6 py-2 rounded-full font-bold text-xs uppercase tracking-wider shadow-2xl backdrop-blur-md">
+                            Akwa Ibom Utility Payments
                         </Badge>
-                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white uppercase italic leading-none pt-2">
-                            State <br /> <span className="text-emerald-500 font-medium tracking-normal italic uppercase">Settlement.</span>
+                        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white uppercase leading-none pt-2">
+                            Pay Bills & <span className="text-emerald-400">Utilities</span>
                         </h1>
-                        <p className="text-slate-400 text-sm md:text-base max-w-2xl leading-relaxed font-bold uppercase tracking-widest opacity-80 italic text-left">
-                            Seamless utility settlement protocol frequency registry. Manage power, water, and connectivity terminal nodes across the unified state hub matrix.
+                        <p className="text-slate-300 text-sm md:text-base max-w-2xl leading-relaxed font-medium">
+                            Buy prepaid electricity tokens, pay water bills, buy airtime, internet data, and cable TV subscriptions with instant token delivery.
                         </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-6 pt-4">
-                        <div className="flex items-center gap-3 text-emerald-400 font-bold text-[9px] uppercase tracking-[0.3em] bg-white/5 border border-white/10 px-6 py-3 rounded-2xl backdrop-blur-md italic">
-                            <ShieldCheck className="size-4" /> Secured Frequency Link
+                    <div className="flex flex-wrap gap-4 pt-2">
+                        <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-md">
+                            <ShieldCheck className="size-4" /> 100% Secure Transactions
                         </div>
-                        <div className="flex items-center gap-3 text-orange-400 font-bold text-[9px] uppercase tracking-[0.3em] bg-white/5 border border-white/10 px-6 py-3 rounded-2xl backdrop-blur-md italic">
-                            <Activity className="size-4" /> Live Hub Sync
+                        <div className="flex items-center gap-2 text-orange-400 font-bold text-xs bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-md">
+                            <Activity className="size-4" /> Instant Meter & Token Delivery
                         </div>
                     </div>
                 </div>
@@ -201,17 +201,17 @@ function PayBillsContent() {
 
                     <div className="flex flex-wrap items-center gap-3 border-b border-slate-50 dark:border-slate-800 pb-8 mb-10 overflow-x-auto no-scrollbar">
                         {[
-                            { id: 'AIRTIME', label: 'Airtime Hub', icon: Smartphone, clr: 'bg-emerald-50 text-emerald-600' },
-                            { id: 'DATA', label: 'Connectivity Sync', icon: Wifi, clr: 'bg-blue-50 text-blue-600' },
-                            { id: 'CABLE', label: 'Media Protocol', icon: Tv, clr: 'bg-purple-50 text-purple-600' },
-                            { id: 'POWER', label: 'Energy Node', icon: Bolt, clr: 'bg-orange-50 text-orange-600' },
-                            { id: 'WATER', label: 'Supply Matrix', icon: Droplets, clr: 'bg-sky-50 text-sky-600' },
+                            { id: 'AIRTIME', label: 'Airtime', icon: Smartphone, clr: 'bg-emerald-50 text-emerald-600' },
+                            { id: 'DATA', label: 'Internet Data', icon: Wifi, clr: 'bg-blue-50 text-blue-600' },
+                            { id: 'CABLE', label: 'Cable TV', icon: Tv, clr: 'bg-purple-50 text-purple-600' },
+                            { id: 'POWER', label: 'Electricity Token', icon: Bolt, clr: 'bg-orange-50 text-orange-600' },
+                            { id: 'WATER', label: 'Water Bill', icon: Droplets, clr: 'bg-sky-50 text-sky-600' },
                         ].map(cat => (
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCategory(cat.id as any)}
                                 className={cn(
-                                    "flex items-center gap-3.5 px-6 py-3.5 rounded-2xl font-bold text-[9px] uppercase tracking-[0.3em] italic transition-all duration-500",
+                                    "flex items-center gap-2.5 px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all duration-300",
                                     activeCategory === cat.id
                                         ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-xl scale-105'
                                         : 'bg-slate-50 dark:bg-slate-950 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
@@ -224,14 +224,14 @@ function PayBillsContent() {
 
                     <div className="grid lg:grid-cols-2 gap-16 text-left">
                         <div className="space-y-8">
-                            <div className="space-y-2">
-                                <h3 className="text-xl font-bold tracking-tighter text-slate-900 dark:text-white uppercase italic leading-none pt-1">Node Input Configuration</h3>
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] opacity-60 italic">Define Settlement Parameters Terminal Frequency</p>
+                            <div className="space-y-1">
+                                <h3 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Payment Details</h3>
+                                <p className="text-xs text-slate-500 font-medium">Select provider and enter your account or meter number</p>
                             </div>
 
                             <div className="space-y-8">
                                 <div className="space-y-3">
-                                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] italic leading-none">Select Provider Node Matrix</label>
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Service Provider</label>
                                     <div className="grid grid-cols-2 gap-3">
                                         {categories.length > 0 ? (
                                             categories.map(cat => (

@@ -36,7 +36,12 @@ import {
   LayoutDashboard,
   Wifi,
   Activity,
-  Globe
+  Globe,
+  Waves,
+  Landmark,
+  Sparkles,
+  Store,
+  Plane
 } from 'lucide-react';
 import {
   Sidebar,
@@ -62,19 +67,24 @@ import { useAdmin } from '@/hooks/use-admin';
 const mainNav = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/map', icon: Map, label: 'Map View' },
+  { href: '/floodsense', icon: Waves, label: 'FloodSense AKS' },
+  { href: '/lgas', icon: Landmark, label: '31 LGAs Explorer' },
   { href: '/alerts', icon: Bell, label: 'Alerts' },
 ];
 
 const servicesNav = [
   { href: '/services', icon: GanttChartSquare, label: 'All Services' },
   { href: '/market', icon: ShoppingBag, label: 'AgroConnect' },
+  { href: '/market/calendar', icon: Store, label: 'Urua Calendar' },
   { href: '/wallet', icon: Wallet, label: 'Ibom X' },
   { href: '/skills', icon: Wrench, label: 'SkillsHub' },
+  { href: '/flights', icon: Plane, label: 'Ibom Air' },
   { href: '/transport', icon: Bus, label: 'Transport Guide' },
   { href: '/live-tracking', icon: Navigation, label: 'Live Tracking' },
 ];
 
 const communityNav = [
+  { href: '/arise', icon: Sparkles, label: 'ARISE Monitor' },
   { href: '/news', icon: Newspaper, label: 'News' },
   { href: '/events', icon: Calendar, label: 'Events' },
   { href: '/forums', icon: MessageSquare, label: 'Forums' },
@@ -84,11 +94,12 @@ const communityNav = [
 
 const reportNav = [
   { href: '/issues', icon: Lightbulb, label: 'All Issues' },
+  { href: '/floodsense', icon: Waves, label: 'Flood Radar' },
   { href: '/safety', icon: Shield, label: 'Safety' },
   { href: '/waste', icon: Trash2, label: 'Waste' },
   { href: '/water', icon: Droplets, label: 'Water' },
   { href: '/power', icon: Power, label: 'Power' },
-]
+];
 
 export function AppSidebar() {
   const pathname = usePathname();
