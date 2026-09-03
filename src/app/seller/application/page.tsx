@@ -154,12 +154,12 @@ export default function SellerApplicationStatusPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/80 dark:bg-slate-950 py-10 px-4 sm:px-6">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-50/80 dark:bg-slate-950 py-5 sm:py-10 px-3.5 sm:px-6">
+      <div className="max-w-3xl mx-auto space-y-5 sm:space-y-6">
         {/* Top Header Card */}
-        <Card className="rounded-[2.5rem] border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
+        <Card className="rounded-2xl sm:rounded-[2.5rem] border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
           <div
-            className={`p-6 sm:p-8 text-white relative overflow-hidden ${
+            className={`p-4 sm:p-8 text-white relative overflow-hidden ${
               status === 'APPROVED'
                 ? 'bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-950'
                 : status === 'REQUIRES_CHANGES'

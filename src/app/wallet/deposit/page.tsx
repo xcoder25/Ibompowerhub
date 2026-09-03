@@ -87,11 +87,11 @@ export default function WalletDepositPage() {
 
     setLoadingPaystack(true);
     try {
-      await loadPaystackScript();
-
       const paystackKey =
         process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY ||
         'pk_test_c665e8d6411f589db7a7ebff9f75ec51be52e690';
+
+      await loadPaystackScript(paystackKey);
 
       const ref = `topup_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
 

@@ -345,36 +345,21 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
       </div>
 
       {/* Navigation Buttons */}
-      <div className="pt-4 flex items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onPrev}
-          className="rounded-xl text-xs font-bold h-11 border-slate-200 gap-1.5"
-        >
-          <ArrowLeft className="size-4" />
-          <span>Previous</span>
-        </Button>
-
+      <div className="pt-4 space-y-2 border-t border-slate-100 dark:border-slate-800">
+        {onSaveDraft && (
+          <Button type="button" variant="outline" onClick={onSaveDraft} disabled={savingDraft}
+            className="w-full rounded-xl text-xs font-bold h-10 border-slate-200">
+            {savingDraft ? 'Saving Draft...' : 'Save Draft'}
+          </Button>
+        )}
         <div className="flex items-center gap-2">
-          {onSaveDraft && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onSaveDraft}
-              disabled={savingDraft}
-              className="rounded-xl text-xs font-bold h-11"
-            >
-              {savingDraft ? 'Saving...' : 'Save Draft'}
-            </Button>
-          )}
-
-          <Button
-            type="button"
-            onClick={handleContinue}
-            className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 px-6 shadow-md shadow-emerald-600/20 gap-2"
-          >
-            <span>Continue to Verification</span>
+          <Button type="button" variant="outline" onClick={onPrev}
+            className="rounded-xl text-xs font-bold h-11 border-slate-200 gap-1 px-3 flex-shrink-0">
+            <ArrowLeft className="size-4" />
+          </Button>
+          <Button type="button" onClick={handleContinue}
+            className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 px-4 shadow-md shadow-emerald-600/20 gap-2">
+            <span>Continue</span>
             <ArrowRight className="size-4" />
           </Button>
         </div>

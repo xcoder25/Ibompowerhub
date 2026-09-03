@@ -251,25 +251,17 @@ export function StepAccount({ data, updateData, onNext, onSaveDraft, savingDraft
       )}
 
       {/* Navigation Buttons */}
-      <div className="pt-4 flex items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800">
-        {onSaveDraft ? (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onSaveDraft}
-            disabled={savingDraft}
-            className="rounded-xl text-xs font-bold h-11 border-slate-200"
-          >
+      <div className="pt-4 space-y-2 border-t border-slate-100 dark:border-slate-800">
+        {onSaveDraft && (
+          <Button type="button" variant="outline" onClick={onSaveDraft} disabled={savingDraft}
+            className="w-full rounded-xl text-xs font-bold h-10 border-slate-200">
             {savingDraft ? 'Saving Draft...' : 'Save Draft'}
           </Button>
-        ) : (
-          <div />
         )}
-
         <Button
           type="button"
           onClick={handleContinue}
-          className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 px-6 shadow-md shadow-emerald-600/20 gap-2"
+          className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 shadow-md shadow-emerald-600/20 gap-2"
         >
           <span>Continue to Seller Type</span>
           <ArrowRight className="size-4" />

@@ -28,6 +28,7 @@ import {
   Lock,
   ArrowDownLeft,
   ArrowUpRight,
+  ArrowRight,
   TrendingUp,
   Store,
   FileText,
@@ -52,6 +53,7 @@ export default function WalletDashboardPage() {
   const [copied, setCopied] = useState(false);
   const [recentTxns, setRecentTxns] = useState<Transaction[]>([]);
   const [airsendOpen, setAirsendOpen] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
 
   // Load wallet document
   const walletDocRef = useMemoFirebase(
@@ -131,6 +133,10 @@ export default function WalletDashboardPage() {
     setTimeout(() => setCopied(false), 2500);
   };
 
+  if (isLocked) {
+    return <WalletLock onUnlock={() => setIsLocked(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50/80 dark:bg-slate-950 pb-24 selection:bg-emerald-500/20">
       {/* Background Ambience */}
@@ -160,7 +166,14 @@ export default function WalletDashboardPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <WalletLock />
+            <button
+              type="button"
+              onClick={() => setIsLocked(true)}
+              className="size-9 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-emerald-600 shadow-xs transition-colors"
+              title="Lock Wallet"
+            >
+              <Lock className="size-4" />
+            </button>
           </div>
         </div>
 
@@ -456,21 +469,12 @@ export default function WalletDashboardPage() {
         </div>
       </div>
 
-      {/* AirSend Modal */}
-      {airsendOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
-            <NearbyAirSend />
-            <Button
-              variant="outline"
-              onClick={() => setAirsendOpen(false)}
-              className="w-full mt-4 rounded-xl text-xs h-10"
-            >
-              Close AirSend
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* AirSend Component */}
+      <NearbyAirSend
+        open={airsendOpen}
+        onOpenChange={setAirsendOpen}
+        currentBalance={balance}
+      />
     </div>
   );
 }

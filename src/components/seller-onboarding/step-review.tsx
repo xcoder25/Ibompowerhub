@@ -424,46 +424,33 @@ export function StepReview({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="pt-4 flex items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onPrev}
-          disabled={isSubmitting}
-          className="rounded-xl text-xs font-bold h-11 border-slate-200 gap-1.5"
-        >
-          <ArrowLeft className="size-4" />
-          <span>Previous</span>
-        </Button>
-
+      <div className="pt-4 space-y-2 border-t border-slate-100 dark:border-slate-800">
+        {onSaveDraft && (
+          <Button type="button" variant="outline" onClick={onSaveDraft} disabled={savingDraft || isSubmitting}
+            className="w-full rounded-xl text-xs font-bold h-10 border-slate-200">
+            {savingDraft ? 'Saving Draft...' : 'Save Draft'}
+          </Button>
+        )}
         <div className="flex items-center gap-2">
-          {onSaveDraft && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onSaveDraft}
-              disabled={savingDraft || isSubmitting}
-              className="rounded-xl text-xs font-bold h-11"
-            >
-              {savingDraft ? 'Saving...' : 'Save Draft'}
-            </Button>
-          )}
-
+          <Button type="button" variant="outline" onClick={onPrev} disabled={isSubmitting}
+            className="rounded-xl text-xs font-bold h-12 border-slate-200 gap-1 px-3 flex-shrink-0">
+            <ArrowLeft className="size-4" />
+          </Button>
           <Button
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black h-11 px-8 shadow-lg shadow-emerald-600/30 gap-2 text-sm"
+            className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black h-12 px-4 shadow-lg shadow-emerald-600/30 gap-2"
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
-                <span>Submitting Application...</span>
+                <span>Submitting...</span>
               </>
             ) : (
               <>
                 <Send className="size-4" />
-                <span>Submit Seller Application</span>
+                <span>Submit Application</span>
               </>
             )}
           </Button>

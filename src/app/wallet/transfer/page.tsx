@@ -86,9 +86,9 @@ export default function WalletTransferPage() {
             return;
           }
 
-          const res = await resolveBankAccount(accountNumber, bankCode);
-          if (res && res.account_name) {
-            setAccountName(res.account_name);
+          const res = await resolveBankAccount('', accountNumber, bankCode);
+          if (res && res.data && res.data.account_name) {
+            setAccountName(res.data.account_name);
           } else {
             // Simulated fallbacks for local test accounts
             const selectedBank = NIGERIAN_BANKS.find((b) => b.code === bankCode)?.name || 'Bank';

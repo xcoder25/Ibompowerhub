@@ -237,59 +237,89 @@ export function SellerOnboardingWizard() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Progress Bar & Header */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-slate-600 dark:text-slate-400">
-            Step {currentStep} of {STEPS.length}: <strong className="text-slate-900 dark:text-white">{STEPS[currentStep - 1].title}</strong>
-          </span>
-          <span className="font-black text-emerald-600">{progressPercent}% Complete</span>
-        </div>
-        <Progress value={progressPercent} className="h-2 bg-slate-100 dark:bg-slate-800" />
+    <div className="space-y-4">
+      {/* Progress Header — step counter + % */}
+      <div className="flex items-center justify-between text-xs">
+        <span className="font-bold text-slate-600 dark:text-slate-400">
+          Step {currentStep} of {STEPS.length}:{' '}
+          <strong className="text-slate-900 dark:text-white">{STEPS[currentStep - 1].title}</strong>
+        </span>
+        <span className="font-black text-emerald-600">{progressPercent}%</span>
+      </div>
 
-        {/* Horizontal Step Pills Indicator */}
-        <div className="hidden lg:grid grid-cols-7 gap-2 pt-2">
-          {STEPS.map((s) => {
-            const isCompleted = currentStep > s.step;
-            const isCurrent = currentStep === s.step;
-            return (
-              <button
-                key={s.step}
-                type="button"
-                onClick={() => {
-                  if (currentStep > s.step) setCurrentStep(s.step);
-                }}
-                disabled={currentStep < s.step}
-                className={cn(
-                  "p-2.5 rounded-xl text-left border transition-all select-none flex flex-col justify-between",
-                  isCurrent
-                    ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                    : isCompleted
-                    ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer"
-                    : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200/60 dark:border-slate-800 opacity-60 cursor-not-allowed"
+      {/* Progress Bar */}
+      <Progress value={progressPercent} className="h-1.5 bg-slate-100 dark:bg-slate-800" />
+
+      {/* Mobile: horizontally scrollable step pills */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 lg:hidden scrollbar-none -mx-1 px-1">
+        {STEPS.map((s) => {
+          const isCompleted = currentStep > s.step;
+          const isCurrent = currentStep === s.step;
+          const Icon = s.icon;
+          return (
+            <button
+              key={s.step}
+              type="button"
+              onClick={() => { if (currentStep > s.step) setCurrentStep(s.step); }}
+              disabled={currentStep < s.step}
+              className={cn(
+                'flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[10px] font-bold border transition-all whitespace-nowrap',
+                isCurrent
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                  : isCompleted
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20 cursor-pointer'
+                  : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 opacity-50 cursor-not-allowed'
+              )}
+            >
+              {isCompleted ? (
+                <Check className="size-2.5 stroke-[3]" />
+              ) : (
+                <Icon className="size-2.5" />
+              )}
+              {s.title}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Desktop: 7-col grid */}
+      <div className="hidden lg:grid grid-cols-7 gap-2">
+        {STEPS.map((s) => {
+          const isCompleted = currentStep > s.step;
+          const isCurrent = currentStep === s.step;
+          const Icon = s.icon;
+          return (
+            <button
+              key={s.step}
+              type="button"
+              onClick={() => { if (currentStep > s.step) setCurrentStep(s.step); }}
+              disabled={currentStep < s.step}
+              className={cn(
+                'p-2.5 rounded-xl text-left border transition-all select-none flex flex-col justify-between',
+                isCurrent
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                  : isCompleted
+                  ? 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer'
+                  : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-200/60 dark:border-slate-800 opacity-60 cursor-not-allowed'
+              )}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-black uppercase tracking-wider">{s.desc}</span>
+                {isCompleted ? (
+                  <Check className="size-3 text-emerald-600 stroke-[3]" />
+                ) : (
+                  <Icon className="size-3 opacity-80" />
                 )}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider">
-                    {s.desc}
-                  </span>
-                  {isCompleted ? (
-                    <Check className="size-3 text-emerald-600 stroke-[3]" />
-                  ) : (
-                    <s.icon className="size-3 opacity-80" />
-                  )}
-                </div>
-                <span className="text-xs font-bold truncate">{s.title}</span>
-              </button>
-            );
-          })}
-        </div>
+              </div>
+              <span className="text-xs font-bold truncate">{s.title}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Active Step Form Card */}
-      <Card className="rounded-3xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
-        <CardContent className="p-5 sm:p-8 md:p-10">
+      <Card className="rounded-2xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md overflow-hidden">
+        <CardContent className="p-4 sm:p-6 md:p-8">
           {currentStep === 1 && (
             <StepAccount
               data={formData}
