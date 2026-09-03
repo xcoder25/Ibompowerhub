@@ -281,34 +281,34 @@ export default function DashboardPage() {
         <div className="absolute bottom-20 right-1/3 w-48 h-48 rounded-full bg-amber-300/20 blur-3xl animate-float" style={{ animationDelay: '-4s' }} />
       </div>
 
-      <div className="relative flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+      <div className="relative flex-1 p-3.5 sm:p-6 md:p-8 max-w-7xl mx-auto">
 
         {/* Header: greeting + search + profile */}
-        <header className="mb-8 md:mb-10 space-y-4">
+        <header className="mb-5 sm:mb-8 md:mb-10 space-y-3 sm:space-y-4">
           {/* Row 1: Greeting + Weather */}
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium mb-0.5">{greeting}</p>
-              <h1 className="font-headline text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-slate-500 text-xs sm:text-sm font-medium mb-0.5">{greeting}</p>
+              <h1 className="font-headline text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 truncate">
                 {firstName}! <span className="text-gradient">👋</span>
               </h1>
               {!kycLoading && !isFullyVerified && (
-                <Link href="/kyc" className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-[11px] font-bold text-amber-700 hover:bg-amber-100 transition-colors">
+                <Link href="/kyc" className="inline-flex items-center gap-1.5 mt-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 bg-amber-50 border border-amber-200 rounded-full text-[10px] sm:text-[11px] font-bold text-amber-700 hover:bg-amber-100 transition-colors">
                   <ShieldCheck className="size-3" />
                   Complete KYC ({kycCompletedCount}/6)
                 </Link>
               )}
-              <p className="text-slate-500 text-sm mt-1 hidden sm:block">Your gateway to Akwa Ibom State&apos;s digital services</p>
+              <p className="text-slate-500 text-xs sm:text-sm mt-1 hidden sm:block">Your gateway to Akwa Ibom State&apos;s digital services</p>
             </div>
 
             {/* Weather Widget — right-aligned on same line as name */}
-            <div className="flex items-center gap-3 px-4 py-2 rounded-xl glass-card border border-white/50 bg-white/40 shadow-sm transition-all hover:bg-white/60 flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl glass-card border border-white/50 bg-white/40 shadow-sm transition-all hover:bg-white/60 flex-shrink-0">
               {weatherLoading ? (
                 <>
-                  <div className="h-6 w-6 rounded-full bg-slate-200 animate-pulse" />
+                  <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-slate-200 animate-pulse" />
                   <div className="flex flex-col gap-1">
-                    <div className="h-4 w-16 rounded bg-slate-200 animate-pulse" />
-                    <div className="h-3 w-24 rounded bg-slate-100 animate-pulse" />
+                    <div className="h-3.5 w-12 sm:w-16 rounded bg-slate-200 animate-pulse" />
+                    <div className="h-2.5 w-16 sm:w-24 rounded bg-slate-100 animate-pulse hidden sm:block" />
                   </div>
                 </>
               ) : weather ? (() => {
@@ -325,27 +325,27 @@ export default function DashboardPage() {
                         : 'text-sky-500';
                 return (
                   <>
-                    <WeatherIcon className={`h-6 w-6 ${iconColor}`} />
+                    <WeatherIcon className={`h-5 w-5 sm:h-6 sm:w-6 ${iconColor}`} />
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-900 leading-tight">{weather.temperature}° {weather.city}</span>
-                      <div className="flex gap-2 text-[10px] text-slate-500 font-medium mt-0.5">
-                        <span className="flex items-center gap-0.5"><Droplets className="h-3 w-3 text-blue-500" /> {weather.humidity}%</span>
-                        <span className="flex items-center gap-0.5"><Wind className="h-3 w-3 text-slate-400" /> {weather.windSpeed} km/h</span>
+                      <span className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">{weather.temperature}° {weather.city}</span>
+                      <div className="flex gap-1.5 sm:gap-2 text-[9px] sm:text-[10px] text-slate-500 font-medium mt-0.5">
+                        <span className="flex items-center gap-0.5"><Droplets className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-blue-500" /> {weather.humidity}%</span>
+                        <span className="hidden sm:flex items-center gap-0.5"><Wind className="h-3 w-3 text-slate-400" /> {weather.windSpeed} km/h</span>
                       </div>
                     </div>
                   </>
                 );
               })() : (
                 <>
-                  <Cloud className="h-6 w-6 text-slate-400" />
-                  <span className="text-sm text-slate-500">Weather unavailable</span>
+                  <Cloud className="h-5 w-5 sm:h-6 sm:w-6 text-slate-400" />
+                  <span className="text-xs sm:text-sm text-slate-500">Weather unavailable</span>
                 </>
               )}
             </div>
           </div>
 
           {/* Row 2: Search + Profile */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <div className="flex-1 relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-green-600 transition-colors" />
               <input
@@ -353,19 +353,19 @@ export default function DashboardPage() {
                 placeholder="Search services..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl glass-card border border-white/50 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 transition-all"
+                className="w-full pl-9 pr-4 py-2 sm:py-2.5 rounded-xl glass-card border border-white/50 text-xs sm:text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-400/50 transition-all"
               />
             </div>
             <Link href="/profile" className="flex-shrink-0">
-              <div className="p-2.5 rounded-xl glass-card border border-white/50 hover:border-white/80 glass-card-hover cursor-pointer flex items-center justify-center">
-                <User className="h-5 w-5 text-green-700" />
+              <div className="p-2 sm:p-2.5 rounded-xl glass-card border border-white/50 hover:border-white/80 glass-card-hover cursor-pointer flex items-center justify-center">
+                <User className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-green-700" />
               </div>
             </Link>
           </div>
         </header>
 
         {/* Hero Section with Governor & Scrolling Text */}
-        <Card className="border-0 overflow-hidden mb-8 shadow-xl rounded-2xl">
+        <Card className="border-0 overflow-hidden mb-6 md:mb-8 shadow-xl rounded-2xl">
           <CardContent className="p-0">
             <div
               className="relative text-white overflow-hidden"
@@ -378,26 +378,26 @@ export default function DashboardPage() {
 
               <div className="relative z-10 flex flex-col md:flex-row">
                 {/* Left: Scrolling Text Content */}
-                <div className="flex-1 p-6 md:p-10 flex flex-col justify-between">
+                <div className="flex-1 p-4 sm:p-6 md:p-10 flex flex-col justify-between">
                   <div>
                     {/* Animated text container */}
-                    <div className="relative h-[140px] md:h-[160px] overflow-hidden mb-6">
+                    <div className="relative h-[115px] sm:h-[135px] md:h-[160px] overflow-hidden mb-3.5 sm:mb-6">
                       {heroSlides.map((slide, idx) => (
                         <div
                           key={idx}
-                          className="absolute inset-0 flex flex-col justify-center space-y-3 transition-all duration-700 ease-in-out"
+                          className="absolute inset-0 flex flex-col justify-center space-y-1.5 sm:space-y-3 transition-all duration-700 ease-in-out"
                           style={{
                             opacity: heroSlide === idx ? 1 : 0,
                             transform: heroSlide === idx ? 'translateY(0)' : (heroSlide > idx ? 'translateY(-30px)' : 'translateY(30px)'),
                           }}
                         >
-                          <Badge className="w-fit mb-1 bg-white/20 text-white border-white/30 text-xs">
+                          <Badge className="w-fit mb-0.5 bg-white/20 text-white border-white/30 text-[10px] sm:text-xs">
                             {slide.badge}
                           </Badge>
-                          <h2 className="text-2xl md:text-3xl font-extrabold leading-tight tracking-tight">
+                          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold leading-tight tracking-tight">
                             {slide.title}
                           </h2>
-                          <p className="text-white/85 text-sm md:text-base max-w-lg leading-relaxed">
+                          <p className="text-white/85 text-xs sm:text-sm md:text-base max-w-lg leading-relaxed line-clamp-2 sm:line-clamp-none">
                             {slide.description}
                           </p>
                         </div>
@@ -405,12 +405,12 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Slide indicators */}
-                    <div className="flex items-center gap-2 mb-6">
+                    <div className="flex items-center gap-1.5 sm:gap-2 mb-4 sm:mb-6">
                       {heroSlides.map((_, idx) => (
                         <button
                           key={idx}
                           onClick={() => setHeroSlide(idx)}
-                          className={`h-1.5 rounded-full transition-all duration-500 ${heroSlide === idx ? 'w-8 bg-white' : 'w-4 bg-white/30 hover:bg-white/50'
+                          className={`h-1.5 rounded-full transition-all duration-500 ${heroSlide === idx ? 'w-6 sm:w-8 bg-white' : 'w-3 sm:w-4 bg-white/30 hover:bg-white/50'
                             }`}
                         />
                       ))}
@@ -420,18 +420,18 @@ export default function DashboardPage() {
                   {/* CTA Button */}
                   <Button
                     asChild
-                    size="lg"
-                    className="w-fit bg-white text-green-700 hover:bg-green-50 rounded-xl shadow-lg font-semibold"
+                    size="sm"
+                    className="w-fit bg-white text-green-700 hover:bg-green-50 rounded-xl shadow-lg font-semibold text-xs sm:text-sm h-8 sm:h-10 px-3.5 sm:px-4"
                   >
                     <Link href="/services">
-                      Explore Services <ArrowRight className="ml-2 h-4 w-4" />
+                      Explore Services <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                     </Link>
                   </Button>
                 </div>
 
                 {/* Right: Slide Image (transitions with text) */}
                 <div className="flex-shrink-0 relative w-full md:w-72 lg:w-80">
-                  <div className="h-48 md:h-full md:min-h-[320px] relative overflow-hidden">
+                  <div className="h-36 sm:h-48 md:h-full md:min-h-[320px] relative overflow-hidden">
                     {heroSlides.map((slide, idx) => (
                       <img
                         key={idx}
@@ -448,8 +448,8 @@ export default function DashboardPage() {
               </div>
 
               {/* Feature Quick Links Row */}
-              <div className="relative z-10 px-6 md:px-10 pb-6">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="relative z-10 px-4 sm:px-6 md:px-10 pb-4 sm:pb-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
                   {[
                     { icon: Map, label: 'Live Map', desc: 'Real-time alerts across AKS', href: '/map' },
                     { icon: Store, label: 'Marketplace', desc: 'Shop from local sellers', href: '/market' },
@@ -458,15 +458,15 @@ export default function DashboardPage() {
                   ].map((feature, idx) => (
                     <Link key={feature.label} href={feature.href} className="group">
                       <div
-                        className="p-3 md:p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all cursor-pointer h-full flex flex-col justify-between"
+                        className="p-2.5 sm:p-3 md:p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all cursor-pointer h-full flex flex-col justify-between"
                         style={{ animationDelay: `${idx * 80}ms` }}
                       >
                         <div>
-                          <feature.icon className="h-5 w-5 mb-1.5" />
-                          <p className="font-semibold text-sm">{feature.label}</p>
-                          <p className="text-xs text-white/60 mt-0.5 hidden sm:block">{feature.desc}</p>
+                          <feature.icon className="h-4 sm:h-5 w-4 sm:w-5 mb-1" />
+                          <p className="font-semibold text-xs sm:text-sm truncate">{feature.label}</p>
+                          <p className="text-[11px] text-white/60 mt-0.5 hidden sm:block truncate">{feature.desc}</p>
                         </div>
-                        <div className="mt-2 flex items-center text-[11px] text-white/70 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <div className="mt-1 flex items-center text-[10px] sm:text-[11px] text-white/70 opacity-80 group-hover:opacity-100 transition-opacity">
                           <span>Open</span>
                           <ArrowRight className="ml-1 h-3 w-3" />
                         </div>
@@ -531,45 +531,103 @@ export default function DashboardPage() {
           </Card>
         )}
 
-        {/* FloodSense AKS Real-Time Telemetry Widget */}
-        <div className="mb-8">
+        {/* FloodSense AKS Real-Time Telemetry */}
+        {/* Mobile: Ultra-compact live telemetry indicator badge leading to /floodsense */}
+        <div className="md:hidden mb-5">
+          <Link href="/floodsense" className="block group">
+            <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 border border-blue-500/25 shadow-md text-white hover:border-blue-400/40 transition-colors">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="size-8.5 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30 flex-shrink-0 p-1.5">
+                  <Waves className="size-4 animate-pulse" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-bold text-white tracking-tight truncate">FloodSense AKS</p>
+                    <span className="flex h-1.5 w-1.5 relative flex-shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 truncate">6 Live IoT Nodes • Normal (Safe)</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-[11px] font-bold text-blue-400 flex-shrink-0 pl-2">
+                <span>View Radar</span>
+                <ChevronRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Desktop: Full IoT telemetry widget */}
+        <div className="hidden md:block mb-8">
           <FloodSensorWidget />
         </div>
 
-        {/* Quick Access Services - 3D glass tiles - wrapped in card */}
-        <Card className="glass-card border-0 mb-8">
-          <CardHeader className="border-b border-slate-200/60 pb-4">
-            <CardTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <LayoutDashboard className="h-5 w-5 text-green-700" />
-              Quick Access Services
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              {services.map((service) => (
-                <Link key={service.id} href={service.href}>
-                  <Card className="glass-card glass-card-hover card-3d h-full overflow-hidden border-0 group cursor-pointer">
-                    <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
-                      <div className={`p-3 rounded-xl bg-gradient-to-br ${service.color} border ${service.borderColor} group-hover:scale-110 transition-transform duration-300`}>
-                        <service.icon className={`h-5 w-5 ${service.iconColor}`} />
-                      </div>
-                      <CardTitle className="font-headline text-xs font-semibold text-slate-900 truncate w-full">
-                        {service.title}
-                      </CardTitle>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Quick Access Services */}
+        {/* Desktop: Full 12-tile spread */}
+        <div className="hidden md:block mb-8">
+          <Card className="glass-card border-0">
+            <CardHeader className="border-b border-slate-200/60 pb-4">
+              <CardTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <LayoutDashboard className="h-5 w-5 text-green-700" />
+                Quick Access Services
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {services.map((service) => (
+                  <Link key={service.id} href={service.href}>
+                    <Card className="glass-card glass-card-hover card-3d h-full overflow-hidden border-0 group cursor-pointer">
+                      <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
+                        <div className={`p-3 rounded-xl bg-gradient-to-br ${service.color} border ${service.borderColor} group-hover:scale-110 transition-transform duration-300`}>
+                          <service.icon className={`h-5 w-5 ${service.iconColor}`} />
+                        </div>
+                        <CardTitle className="font-headline text-xs font-semibold text-slate-900 truncate w-full">
+                          {service.title}
+                        </CardTitle>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Mobile: Compact essential shortcuts header with 'All Services' link */}
+        <div className="md:hidden mb-5">
+          <div className="flex items-center justify-between mb-2.5 px-1">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+              <LayoutDashboard className="h-3.5 w-3.5 text-green-700" />
+              Quick Shortcuts
+            </h2>
+            <Link href="/services" className="text-xs font-bold text-green-700 hover:text-green-800 flex items-center gap-0.5">
+              All Services ({services.length}) <ChevronRight className="size-3" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {services.slice(0, 4).map((service) => (
+              <Link key={service.id} href={service.href} className="group">
+                <div className="p-2 sm:p-2.5 rounded-2xl glass-card border border-white/60 bg-white/70 shadow-xs flex flex-col items-center gap-1.5 text-center group-active:scale-95 transition-transform">
+                  <div className={`p-2 rounded-xl bg-gradient-to-br ${service.color} border ${service.borderColor}`}>
+                    <service.icon className={`h-4 w-4 ${service.iconColor}`} />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-800 truncate w-full">
+                    {service.title.split(' ')[0]}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
 
         {/* 🔴 REAL-TIME Activity Feed */}
-        <Card className="glass-card border-0 mb-8">
-          <CardHeader className="border-b border-slate-200/60 pb-4 px-6 pt-6">
+        <Card className="glass-card border-0 mb-6 md:mb-8">
+          <CardHeader className="border-b border-slate-200/60 pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Clock className="h-5 w-5 text-green-700" />
+              <CardTitle className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-green-700" />
                 Live Transactions
               </CardTitle>
               <div className="flex items-center gap-1.5">
@@ -580,114 +638,166 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="p-0">
             {txLoading ? (
-              <div className="divide-y divide-slate-200/60">
-                {[1,2,3].map(i => (
-                  <div key={i} className="p-4 px-6 flex items-center gap-4">
-                    <div className="size-9 rounded-xl bg-slate-200 animate-pulse flex-shrink-0" />
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-3 w-40 bg-slate-200 rounded animate-pulse" />
-                      <div className="h-2.5 w-24 bg-slate-100 rounded animate-pulse" />
-                    </div>
-                    <div className="h-4 w-16 bg-slate-200 rounded animate-pulse" />
-                  </div>
-                ))}
+              <div className="p-4 flex items-center gap-3">
+                <div className="size-9 rounded-xl bg-slate-200 animate-pulse flex-shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-3 w-32 bg-slate-200 rounded animate-pulse" />
+                  <div className="h-2 w-20 bg-slate-100 rounded animate-pulse" />
+                </div>
+                <div className="h-4 w-12 bg-slate-200 rounded animate-pulse" />
               </div>
             ) : liveTransactions.length === 0 ? (
-              <div className="text-center py-12 px-6">
-                <div className="size-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
-                  <Wifi className="size-7 text-slate-400" />
+              <div className="text-center py-8 px-4">
+                <div className="size-11 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-2">
+                  <Wifi className="size-5 text-slate-400" />
                 </div>
-                <p className="font-semibold text-slate-600 text-sm">No transactions yet</p>
-                <p className="text-xs text-slate-400 mt-1">Your live transaction history will appear here</p>
+                <p className="font-semibold text-slate-600 text-xs sm:text-sm">No transactions yet</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Your live transaction activity will appear here</p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-200/60">
-                {liveTransactions.map((tx) => {
-                  const isCredit = tx.type === 'credit';
-                  const isAirSend = tx.description?.toLowerCase().includes('airsend') || tx.reference?.includes('HIAI') || tx.reference?.includes('AIR');
-                  return (
-                    <div key={tx.id} className="p-4 px-6 hover:bg-slate-50/50 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className={`p-2 rounded-xl border flex-shrink-0 ${
-                          isAirSend
-                            ? 'bg-indigo-500/10 border-indigo-200/50'
-                            : isCredit
-                              ? 'bg-emerald-500/15 border-emerald-200/50'
-                              : 'bg-rose-500/10 border-rose-200/50'
-                        }`}>
-                          {isAirSend
-                            ? <Brain className="h-5 w-5 text-indigo-600" />
-                            : isCredit
-                              ? <ArrowDownLeft className="h-5 w-5 text-emerald-600" />
-                              : <ArrowUpRight className="h-5 w-5 text-rose-500" />
-                          }
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-900 text-sm truncate">{tx.description || (isCredit ? 'Credit' : 'Debit')}</p>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            {isAirSend && (
-                              <span className="text-[8px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 border border-indigo-200/50 px-1.5 py-0.5 rounded-full">HiAI AirSend</span>
-                            )}
-                            <p className="text-xs text-slate-500">{tx.status}</p>
+              <>
+                {/* Mobile: Strictly only ONE recent transaction */}
+                <div className="md:hidden divide-y divide-slate-200/60">
+                  {liveTransactions.slice(0, 1).map((tx) => {
+                    const isCredit = tx.type === 'credit';
+                    const isAirSend = tx.description?.toLowerCase().includes('airsend') || tx.reference?.includes('HIAI') || tx.reference?.includes('AIR');
+                    return (
+                      <div key={tx.id} className="p-3.5 px-4 hover:bg-slate-50/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-xl border flex-shrink-0 ${
+                            isAirSend
+                              ? 'bg-indigo-500/10 border-indigo-200/50'
+                              : isCredit
+                                ? 'bg-emerald-500/15 border-emerald-200/50'
+                                : 'bg-rose-500/10 border-rose-200/50'
+                          }`}>
+                            {isAirSend
+                              ? <Brain className="h-4 w-4 text-indigo-600" />
+                              : isCredit
+                                ? <ArrowDownLeft className="h-4 w-4 text-emerald-600" />
+                                : <ArrowUpRight className="h-4 w-4 text-rose-500" />
+                            }
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-slate-900 text-xs truncate">{tx.description || (isCredit ? 'Credit' : 'Debit')}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              {isAirSend && (
+                                <span className="text-[8px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 border border-indigo-200/50 px-1 py-0.2 rounded-full">HiAI AirSend</span>
+                              )}
+                              <p className="text-[11px] text-slate-500">{tx.status}</p>
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className={`font-bold text-xs sm:text-sm ${
+                              isCredit ? 'text-emerald-600' : 'text-rose-500'
+                            }`}>{isCredit ? '+' : '-'}₦{Number(tx.amount).toLocaleString()}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">
+                              {tx.timestamp?.toDate ? tx.timestamp.toDate().toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'Recent'}
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right flex-shrink-0">
-                          <p className={`font-bold text-sm ${
-                            isCredit ? 'text-emerald-600' : 'text-rose-500'
-                          }`}>{isCredit ? '+' : '-'}₦{Number(tx.amount).toLocaleString()}</p>
-                          <p className="text-[10px] text-slate-400 mt-0.5">
-                            {tx.timestamp?.toDate ? tx.timestamp.toDate().toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'Recent'}
-                          </p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop: Up to 5 transactions */}
+                <div className="hidden md:block divide-y divide-slate-200/60">
+                  {liveTransactions.slice(0, 5).map((tx) => {
+                    const isCredit = tx.type === 'credit';
+                    const isAirSend = tx.description?.toLowerCase().includes('airsend') || tx.reference?.includes('HIAI') || tx.reference?.includes('AIR');
+                    return (
+                      <div key={tx.id} className="p-4 px-6 hover:bg-slate-50/50 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className={`p-2 rounded-xl border flex-shrink-0 ${
+                            isAirSend
+                              ? 'bg-indigo-500/10 border-indigo-200/50'
+                              : isCredit
+                                ? 'bg-emerald-500/15 border-emerald-200/50'
+                                : 'bg-rose-500/10 border-rose-200/50'
+                          }`}>
+                            {isAirSend
+                              ? <Brain className="h-5 w-5 text-indigo-600" />
+                              : isCredit
+                                ? <ArrowDownLeft className="h-5 w-5 text-emerald-600" />
+                                : <ArrowUpRight className="h-5 w-5 text-rose-500" />
+                            }
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-slate-900 text-sm truncate">{tx.description || (isCredit ? 'Credit' : 'Debit')}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              {isAirSend && (
+                                <span className="text-[8px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 border border-indigo-200/50 px-1.5 py-0.5 rounded-full">HiAI AirSend</span>
+                              )}
+                              <p className="text-xs text-slate-500">{tx.status}</p>
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className={`font-bold text-sm ${
+                              isCredit ? 'text-emerald-600' : 'text-rose-500'
+                            }`}>{isCredit ? '+' : '-'}₦{Number(tx.amount).toLocaleString()}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">
+                              {tx.timestamp?.toDate ? tx.timestamp.toDate().toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'Recent'}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+
+                {/* Footer link to view full history */}
+                <div className="p-2.5 sm:p-3 bg-slate-50/60 border-t border-slate-200/60 text-center">
+                  <Link href="/transactions" className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-green-700 hover:text-green-800 transition-colors w-full py-1">
+                    <span>View Full Transaction History</span>
+                    <ArrowRight className="size-3.5" />
+                  </Link>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
 
         {/* Emergency SOS */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <EmergencySOS />
         </div>
 
         {/* ── Status Matrix ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-8 mb-6 md:mb-8">
            {/* Resident State Briefing */}
-           <Card className="bg-indigo-950 border-none rounded-3xl overflow-hidden shadow-2xl relative group h-full">
+           <Card className="bg-indigo-950 border-none rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl relative group h-full">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent" />
-              <div className="p-8 relative z-10 space-y-6 flex flex-col h-full">
+              <div className="p-5 sm:p-7 md:p-8 relative z-10 space-y-4 sm:space-y-6 flex flex-col h-full">
                  <div className="flex items-center justify-between">
-                    <div className="size-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-xl border border-white/10 group-hover:scale-110 transition-transform">
-                       <Brain className="size-7 text-blue-400" />
+                    <div className="size-12 sm:size-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-xl border border-white/10 group-hover:scale-110 transition-transform">
+                       <Brain className="size-6 sm:size-7 text-blue-400" />
                     </div>
-                    <Badge className="bg-emerald-500/20 text-emerald-400 border-none font-black uppercase text-[9px] tracking-widest px-3 py-1">Services Online</Badge>
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-none font-black uppercase text-[9px] tracking-widest px-2.5 sm:px-3 py-0.5 sm:py-1">Services Online</Badge>
                  </div>
-                 <div className="space-y-4">
-                    <h3 className="text-white font-bold text-xl tracking-tight leading-snug">"Emedi! Welcome to your daily Akwa Ibom update."</h3>
-                    <p className="text-white/70 text-sm font-medium leading-relaxed">
+                 <div className="space-y-2.5 sm:space-y-4">
+                    <h3 className="text-white font-bold text-lg sm:text-xl tracking-tight leading-snug">"Emedi! Welcome to your daily Akwa Ibom update."</h3>
+                    <p className="text-white/70 text-xs sm:text-sm font-medium leading-relaxed">
                        State power supply is steady, markets are open, and road transit across Uyo, Eket, and Ikot Ekpene is moving smoothly.
                     </p>
                  </div>
-                 <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
+                 <div className="mt-auto pt-4 sm:pt-6 border-t border-white/10 flex items-center justify-between">
                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Daily Resident Summary</p>
-                     <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/10">Explore More</Button>
+                     <Button variant="ghost" size="sm" className="h-7 sm:h-8 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/10">Explore More</Button>
                  </div>
               </div>
               <div className="absolute top-[-20%] right-[-10%] size-64 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
            </Card>
 
            {/* Power Grid Status Snapshot */}
-           <Card className="lg:col-span-2 bg-white dark:bg-slate-900 border-none shadow-2xl rounded-3xl overflow-hidden p-0 relative h-full">
+           <Card className="lg:col-span-2 bg-white dark:bg-slate-900 border-none shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden p-0 relative h-full">
               <div className="grid grid-cols-1 md:grid-cols-2 h-full">
-                 <div className="p-8 space-y-8 border-r border-slate-100 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                       <Zap className="size-5 text-amber-500 animate-pulse" />
-                       <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-base">ELECTRICITY SUPPLY FEEDERS</h4>
+                 <div className="p-5 sm:p-7 md:p-8 space-y-6 sm:space-y-8 border-b md:border-b-0 md:border-r border-slate-100 dark:border-white/5">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                       <Zap className="size-4 sm:size-5 text-amber-500 animate-pulse" />
+                       <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs sm:text-base">ELECTRICITY SUPPLY FEEDERS</h4>
                     </div>
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                        {[{ area: 'Shelter Afrique', status: 'Optimal', load: '12MW' }, { area: 'Uyo Metropolis', status: 'Maintenance', load: '4MW' }].map(node => (
                           <div key={node.area} className="flex items-center justify-between">
                              <span className="text-slate-500 font-bold text-xs">{node.area}</span>
@@ -699,21 +809,21 @@ export default function DashboardPage() {
                        ))}
                     </div>
                  </div>
-                 <div className="p-8 space-y-8 bg-slate-50/50 dark:bg-slate-950/50">
-                    <div className="flex items-center gap-3">
-                       <ShieldCheck className="size-5 text-indigo-500" />
-                       <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter text-xl">SECURE ACCESS</h4>
+                 <div className="p-5 sm:p-7 md:p-8 space-y-6 sm:space-y-8 bg-slate-50/50 dark:bg-slate-950/50">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                       <ShieldCheck className="size-4 sm:size-5 text-indigo-500" />
+                       <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter text-lg sm:text-xl">SECURE ACCESS</h4>
                     </div>
-                    <div className="space-y-4">
-                       <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                             <div className="size-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500"><Shield className="size-4" /></div>
+                    <div className="space-y-3 sm:space-y-4">
+                       <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 flex items-center justify-between">
+                          <div className="flex items-center gap-2.5 sm:gap-3">
+                             <div className="size-7 sm:size-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500"><Shield className="size-3.5 sm:size-4" /></div>
                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">ID Sync</p>
                           </div>
                           <p className="font-black text-xs text-indigo-500 uppercase tracking-widest">Pre-Verified</p>
                        </div>
                        <Link href="/access" className="block">
-                          <Button className="w-full h-12 rounded-xl bg-slate-950 text-white hover:bg-indigo-600 transition-all font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-indigo-500/20">Initialize Gate Sync</Button>
+                          <Button className="w-full h-11 sm:h-12 rounded-xl bg-slate-950 text-white hover:bg-indigo-600 transition-all font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-indigo-500/20">Initialize Gate Sync</Button>
                        </Link>
                     </div>
                  </div>

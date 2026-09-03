@@ -237,79 +237,79 @@ export function VoiceBankingWidget() {
     };
 
     return (
-        <Card className="relative overflow-hidden border-0 shadow-2xl bg-[#0B1121] rounded-[2rem] col-span-1 lg:col-span-2 group">
+        <Card className="relative overflow-hidden border-0 shadow-2xl bg-[#0B1121] rounded-2xl sm:rounded-[2rem] col-span-1 lg:col-span-2 group">
             {/* Visual background rings */}
             <div className="absolute inset-0 z-0">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-gradient-to-br from-emerald-600/15 via-teal-600/10 to-sky-600/15 blur-[120px] rounded-full pointer-events-none" />
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] mix-blend-overlay" />
             </div>
 
-            <CardContent className="relative z-10 p-4 sm:p-10 flex flex-col md:flex-row items-center gap-4 md:gap-10">
+            <CardContent className="relative z-10 p-4 sm:p-7 md:p-9 flex flex-col md:flex-row items-center gap-5 md:gap-8">
 
-                <div className="flex-1 text-center md:text-left">
-                    <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
-                        <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors px-3 py-1 font-bold tracking-widest uppercase text-[10px]">
-                            <Sparkles className="h-3 w-3 mr-1.5" /> Edge Voice AI
+                <div className="flex-1 text-center md:text-left w-full">
+                    <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-3">
+                        <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors px-2.5 py-0.5 font-bold tracking-widest uppercase text-[9px] sm:text-[10px]">
+                            <Sparkles className="h-3 w-3 mr-1 text-emerald-400" /> Edge Voice AI
                         </Badge>
-                        <Badge className="bg-sky-500/10 text-sky-400 border border-sky-500/20 px-3 py-1 text-[10px] font-bold">
+                        <Badge className="bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold">
                             {getLangLabel(detectedLang)}
                         </Badge>
                     </div>
 
-                    <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight mb-2 md:mb-4">
-                        Dialect-Aware <br className="hidden sm:block" />
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight mb-2">
+                        Dialect-Aware <br className="hidden sm:inline" />
                         <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400 bg-clip-text text-transparent">Voice Banking</span>
                     </h2>
 
-                    <p className="text-slate-400 text-xs sm:text-base leading-relaxed mb-4 md:mb-8 max-w-md mx-auto md:mx-0 font-medium">
-                        Speak naturally in English, Yoruba, Igbo, Hausa, or Pidgin. Authorize transfers with your unique voice print, and ask your "Audio CFO" for insights.
+                    <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-3 md:mb-6 max-w-md mx-auto md:mx-0 font-medium">
+                        Speak naturally in English, Yoruba, Igbo, Hausa, or Pidgin. Authorize transfers with your unique voice print and get instant Audio CFO insights.
                     </p>
 
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                        <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-                            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Voice 2FA
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                        <div className="flex items-center gap-1 text-[11px] text-slate-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">
+                            <ShieldCheck className="h-3 w-3 text-emerald-400" /> Voice 2FA
                         </div>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-                            <Zap className="h-3.5 w-3.5 text-amber-400" /> AI LLM Agent
+                        <div className="flex items-center gap-1 text-[11px] text-slate-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">
+                            <Zap className="h-3 w-3 text-amber-400" /> AI Agent
                         </div>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full cursor-pointer hover:bg-white/10 transition-colors" onClick={() => handleRealtimeIntent("how much did I spend on fuel this month?")}>
-                            <Database className="h-3.5 w-3.5 text-sky-400" /> Test SQL Demo
+                        <div className="flex items-center gap-1 text-[11px] text-slate-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full cursor-pointer hover:bg-white/10 transition-colors" onClick={() => handleRealtimeIntent("how much did I spend on fuel this month?")}>
+                            <Database className="h-3 w-3 text-sky-400" /> Test SQL
                         </div>
                     </div>
                 </div>
 
-                <div className="flex-1 w-full max-w-sm flex flex-col items-center justify-center min-h-[320px] bg-slate-900/40 border border-white/5 rounded-3xl p-6 relative">
+                <div className="w-full md:w-auto md:min-w-[280px] max-w-sm flex flex-col items-center justify-center min-h-[220px] sm:min-h-[260px] bg-slate-900/50 border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-5 relative shadow-inner">
                     
                     {/* Live Match Accuracy Meter / Status indicator */}
-                    <div className="absolute top-4 right-4 flex items-center gap-1.5">
+                    <div className="absolute top-3 right-3 flex items-center gap-1.5">
                         {confidence > 0 && (
-                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-black/40 border border-white/10">
+                            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-black/50 border border-white/10">
                                 <span className={cn(
-                                    "h-2 w-2 rounded-full",
+                                    "h-1.5 w-1.5 rounded-full",
                                     confidence >= 0.8 ? "bg-emerald-400 animate-pulse" :
                                     confidence >= 0.55 ? "bg-amber-400" : "bg-red-500 animate-pulse"
                                 )} />
-                                <span className="text-white/80">Match: {Math.round(confidence * 100)}%</span>
+                                <span className="text-white/80">{Math.round(confidence * 100)}%</span>
                             </div>
                         )}
                         {retryCount > 0 && (
                             <Badge className="bg-red-500/20 text-red-400 border border-red-500/30 text-[9px] animate-pulse">
-                                <RefreshCw className="h-2.5 w-2.5 mr-1 animate-spin" /> Retry #{retryCount}
+                                <RefreshCw className="h-2.5 w-2.5 mr-1 animate-spin" /> #{retryCount}
                             </Badge>
                         )}
                     </div>
 
-                    <div className="h-[210px] w-full flex items-center justify-center mb-4 overflow-hidden relative">
+                    <div className="h-[130px] sm:h-[150px] w-full flex items-center justify-center mb-3 overflow-hidden relative">
                         {actionPreview ? (
                             <div className="w-full">{actionPreview}</div>
                         ) : state === 'LISTENING' ? (
-                            <div className="flex flex-col items-center gap-4 w-full">
+                            <div className="flex flex-col items-center gap-2 sm:gap-3 w-full">
                                 {/* Waveform Visualizer */}
-                                <div className="flex items-center gap-[3px] h-16 justify-center w-full">
+                                <div className="flex items-center gap-[2px] sm:gap-[3px] h-12 justify-center w-full">
                                     {waveform.bars.map((bar, i) => (
                                         <div
                                             key={i}
-                                            className="w-[3px] rounded-full bg-gradient-to-t from-emerald-500 to-teal-400 transition-all duration-75"
+                                            className="w-[2.5px] sm:w-[3px] rounded-full bg-gradient-to-t from-emerald-500 to-teal-400 transition-all duration-75"
                                             style={{
                                                 height: `${Math.max(8, bar)}%`,
                                                 opacity: 0.3 + (bar / 100) * 0.7
@@ -318,20 +318,20 @@ export function VoiceBankingWidget() {
                                     ))}
                                 </div>
 
-                                <div className="text-center px-4 w-full max-h-24 overflow-y-auto">
+                                <div className="text-center px-3 w-full max-h-20 overflow-y-auto">
                                     {transcript ? (
-                                        <p className="text-white text-sm font-semibold leading-relaxed">
+                                        <p className="text-white text-xs sm:text-sm font-semibold leading-relaxed">
                                             "{transcript}"
                                             {interimTranscript && (
                                                 <span className="text-emerald-400/80 italic font-normal"> {interimTranscript}</span>
                                             )}
                                         </p>
                                     ) : interimTranscript ? (
-                                        <p className="text-emerald-400/90 text-sm font-medium italic">
+                                        <p className="text-emerald-400/90 text-xs sm:text-sm font-medium italic">
                                             "{interimTranscript}"
                                         </p>
                                     ) : (
-                                        <p className="text-emerald-400 font-bold uppercase tracking-widest text-xs animate-pulse">
+                                        <p className="text-emerald-400 font-bold uppercase tracking-widest text-[11px] animate-pulse">
                                             Listening...
                                         </p>
                                     )}
@@ -339,12 +339,12 @@ export function VoiceBankingWidget() {
                             </div>
                         ) : (
                             <div className="text-center">
-                                <Mic className="h-10 w-10 text-slate-600 mb-2 mx-auto" />
-                                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
-                                    Tap the Mic & Speak
+                                <Mic className="h-7 w-7 text-slate-500 mb-1.5 mx-auto" />
+                                <p className="text-slate-400 font-bold uppercase tracking-widest text-[9px] sm:text-[10px]">
+                                    Tap Mic to Command
                                 </p>
-                                <p className="text-slate-600 text-xs mt-1 max-w-[200px]">
-                                    e.g., "Send 10k to Udeme" or "How much did I spend on fuel?"
+                                <p className="text-slate-500 text-[11px] mt-0.5 max-w-[200px]">
+                                    e.g., "Send ₦5,000 to Udeme" or "Check fuel expense"
                                 </p>
                             </div>
                         )}
@@ -362,7 +362,7 @@ export function VoiceBankingWidget() {
                         <Button
                             onClick={handleMicClick}
                             className={cn(
-                                "relative z-10 w-20 h-20 rounded-full shadow-2xl transition-all duration-500 flex items-center justify-center overflow-hidden border",
+                                "relative z-10 w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-2xl transition-all duration-500 flex items-center justify-center overflow-hidden border",
                                 state === 'IDLE'
                                     ? "bg-slate-800 hover:bg-slate-700 border-white/10 hover:scale-105"
                                     : state === 'SUCCESS' || state === 'INSIGHTS'
@@ -374,14 +374,14 @@ export function VoiceBankingWidget() {
                                                 : "bg-emerald-500 border-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.35)]"
                             )}
                         >
-                            {state === 'IDLE' && <Mic className="h-8 w-8 text-white" />}
+                            {state === 'IDLE' && <Mic className="h-6 w-6 sm:h-7 sm:w-7 text-white" />}
                             {state === 'LISTENING' && (
-                                <div className="w-4 h-4 bg-white rounded-full animate-ping" />
+                                <div className="w-3.5 h-3.5 bg-white rounded-full animate-ping" />
                             )}
-                            {state === 'PROCESSING' && <Loader2 className="h-8 w-8 text-white animate-spin" />}
-                            {state === 'BIOMETRICS' && <Fingerprint className="h-8 w-8 text-white animate-pulse" />}
-                            {state === 'CLARIFY' && <AlertTriangle className="h-8 w-8 text-white" />}
-                            {(state === 'SUCCESS' || state === 'INSIGHTS') && <CheckCircle2 className="h-8 w-8 text-white" />}
+                            {state === 'PROCESSING' && <Loader2 className="h-6 w-6 sm:h-7 sm:w-7 text-white animate-spin" />}
+                            {state === 'BIOMETRICS' && <Fingerprint className="h-6 w-6 sm:h-7 sm:w-7 text-white animate-pulse" />}
+                            {state === 'CLARIFY' && <AlertTriangle className="h-6 w-6 sm:h-7 sm:w-7 text-white" />}
+                            {(state === 'SUCCESS' || state === 'INSIGHTS') && <CheckCircle2 className="h-6 w-6 sm:h-7 sm:w-7 text-white" />}
                         </Button>
                     </div>
 

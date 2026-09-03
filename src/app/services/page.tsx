@@ -4,11 +4,15 @@ import { services } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import {
   ArrowRight, Zap, Building2, HeartPulse, GraduationCap, ShoppingBag,
-  Shield, Plane, Droplets, Trash2, Globe, Search, ChevronRight
+  Shield, Plane, Droplets, Trash2, Globe, Search, ChevronRight, Waves, Landmark, Sparkles, Store
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const serviceIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  floodsense: Waves,
+  lgas: Landmark,
+  arise: Sparkles,
+  'market/calendar': Store,
   government: Building2, health: HeartPulse, education: GraduationCap,
   market: ShoppingBag, safety: Shield, flights: Plane, water: Droplets,
   waste: Trash2, power: Zap,
