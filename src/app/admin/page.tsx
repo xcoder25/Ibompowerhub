@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
     Users,
     Wallet,
@@ -17,7 +18,8 @@ import {
     Search,
     Filter,
     MoreVertical,
-    ExternalLink
+    ExternalLink,
+    Store
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,6 +57,11 @@ export default function AdminDashboard() {
                     <p className="text-slate-500 font-medium">Monitoring Akwa Ibom State's Digital Ecosystem — ARISE Agenda Hub</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <Link href="/admin/sellers">
+                        <Button className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20">
+                            <Store className="mr-2 h-4 w-4" /> Agro Sellers Desk
+                        </Button>
+                    </Link>
                     <Button variant="outline" className="rounded-xl border-slate-200">
                         <FileText className="mr-2 h-4 w-4" /> Export Data
                     </Button>
