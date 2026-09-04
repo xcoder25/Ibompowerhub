@@ -6,7 +6,7 @@ import {
   Power, Zap, ZapOff, AlertTriangle, CheckCircle2, Clock, 
   MapPin, ChevronRight, BatteryFull, Activity, 
   Cpu, LayoutGrid, ShieldCheck, ArrowRight, CreditCard, 
-  TrendingUp, Lightbulb
+  TrendingUp, Lightbulb, Loader2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
