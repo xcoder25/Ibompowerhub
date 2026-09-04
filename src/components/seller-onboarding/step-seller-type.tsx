@@ -66,24 +66,24 @@ export function StepSellerType({ data, updateData, onNext, onPrev, onSaveDraft, 
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3">
+    <div className="space-y-3.5 sm:space-y-5 animate-in fade-in duration-300">
+      <div className="border-b border-slate-100 dark:border-slate-800 pb-2 sm:pb-3">
         <div className="flex items-center gap-2 mb-1">
           <Badge className="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border-none font-bold uppercase text-[10px] tracking-wider">
             Step 2 of 7
           </Badge>
           <span className="text-[11px] text-slate-400">• Multi-select allowed</span>
         </div>
-        <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+        <h2 className="text-base sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
           What type of agricultural merchant are you?
         </h2>
-        <p className="text-slate-500 text-xs mt-0.5">
+        <p className="text-slate-500 text-[11px] sm:text-xs mt-0.5">
           Select all categories that apply to your operations in Akwa Ibom State.
         </p>
       </div>
 
       {error && (
-        <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-2.5 text-rose-700 dark:text-rose-300 text-xs font-semibold">
+        <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-2.5 text-rose-700 dark:text-rose-300 text-xs font-semibold">
           <AlertCircle className="size-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -99,7 +99,7 @@ export function StepSellerType({ data, updateData, onNext, onPrev, onSaveDraft, 
               key={type.id}
               onClick={() => toggleType(type.id)}
               className={cn(
-                "p-3 sm:p-4 rounded-xl sm:rounded-2xl border text-left cursor-pointer transition-all duration-200 relative group flex flex-col justify-between select-none",
+                "p-2.5 sm:p-4 rounded-xl border text-left cursor-pointer transition-all duration-200 relative group flex flex-col justify-between select-none",
                 isSelected
                   ? "bg-emerald-500/10 border-emerald-500/40 shadow-sm ring-1 ring-emerald-500/20"
                   : "bg-white dark:bg-slate-900/60 border-slate-200/80 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-slate-50/50"

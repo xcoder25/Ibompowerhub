@@ -22,7 +22,7 @@ export default function BecomeSellerPage() {
         <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-amber-500/8 blur-[80px]" />
       </div>
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 pt-3 sm:pt-6 pb-8 space-y-3.5 sm:space-y-5">
+      <div className="relative z-10 max-w-2xl mx-auto px-2.5 sm:px-6 pt-2 sm:pt-6 pb-24 sm:pb-8 space-y-3 sm:space-y-5">
         {/* Top Nav Row */}
         <div className="flex items-center justify-between gap-2">
           <Link
@@ -44,8 +44,8 @@ export default function BecomeSellerPage() {
           </Link>
         </div>
 
-        {/* Hero Banner — compact mobile padding (p-3.5 on mobile, p-6 on desktop) */}
-        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-950 text-white p-3.5 sm:p-6 border border-emerald-500/20 shadow-md">
+        {/* Hero Banner — compact padding on mobile, spacious on desktop */}
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-950 text-white p-3 sm:p-6 border border-emerald-500/20 shadow-sm">
           <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/15 rounded-full blur-2xl pointer-events-none" />
           <div className="relative z-10 space-y-2 sm:space-y-3">
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-black uppercase tracking-widest">
@@ -53,7 +53,7 @@ export default function BecomeSellerPage() {
               Akwa Ibom Agro Marketplace
             </div>
 
-            <h1 className="text-lg sm:text-2xl font-black tracking-tight leading-snug">
+            <h1 className="text-base sm:text-2xl font-black tracking-tight leading-snug">
               Register as an{' '}
               <span className="text-emerald-400">Agro Merchant</span>
             </h1>
@@ -70,7 +70,7 @@ export default function BecomeSellerPage() {
                 { icon: TrendingUp, label: 'Zero Fees', sub: 'Keep 100%' },
                 { icon: Truck, label: 'Logistics', sub: 'State-wide' },
               ].map(({ icon: Icon, label, sub }) => (
-                <div key={label} className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 text-center">
+                <div key={label} className="p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 text-center">
                   <Icon className="size-3 text-emerald-400 mx-auto mb-0.5" />
                   <p className="font-black text-[10px] sm:text-[11px] text-white leading-tight">{label}</p>
                   <p className="text-[9px] sm:text-[10px] text-white/60 leading-none mt-0.5">{sub}</p>

@@ -149,7 +149,7 @@ export function StepProducts({ data, updateData, onNext, onPrev, onSaveDraft, sa
 
   return (
     <div className="space-y-3.5 sm:space-y-5 animate-in fade-in duration-300">
-      <div className="border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+      <div className="border-b border-slate-100 dark:border-slate-800 pb-2 sm:pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge className="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border-none font-bold uppercase text-[10px] tracking-wider">
@@ -157,10 +157,10 @@ export function StepProducts({ data, updateData, onNext, onPrev, onSaveDraft, sa
             </Badge>
             <span className="text-[11px] text-slate-400">• Produce & Inventory</span>
           </div>
-          <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-base sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Agricultural Products & Produce
           </h2>
-          <p className="text-slate-500 text-xs mt-0.5">
+          <p className="text-slate-500 text-[11px] sm:text-xs mt-0.5">
             List the agricultural produce, livestock, or inputs you have available for sale.
           </p>
         </div>

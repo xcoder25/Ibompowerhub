@@ -81,11 +81,11 @@ export function StepAccount({ data, updateData, onNext, onSaveDraft, savingDraft
 
   return (
     <div className="space-y-3.5 sm:space-y-5 animate-in fade-in duration-300">
-      <div className="border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3">
-        <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+      <div className="border-b border-slate-100 dark:border-slate-800 pb-2 sm:pb-3">
+        <h2 className="text-base sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
           Merchant Contact & Account
         </h2>
-        <p className="text-slate-500 text-xs mt-0.5">
+        <p className="text-slate-500 text-[11px] sm:text-xs mt-0.5">
           Provide your primary contact and security credentials for your Akwa Ibom agro storefront.
         </p>
       </div>

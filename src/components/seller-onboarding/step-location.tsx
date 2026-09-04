@@ -99,18 +99,18 @@ export function StepLocation({ data, updateData, onNext, onPrev, onSaveDraft, sa
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3">
+    <div className="space-y-3.5 sm:space-y-5 animate-in fade-in duration-300">
+      <div className="border-b border-slate-100 dark:border-slate-800 pb-2 sm:pb-3">
         <div className="flex items-center gap-2 mb-1">
           <Badge className="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border-none font-bold uppercase text-[10px] tracking-wider">
             Step 5 of 7
           </Badge>
           <span className="text-[11px] text-slate-400">• Strict Akwa Ibom State</span>
         </div>
-        <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+        <h2 className="text-base sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
           Location & Logistics
         </h2>
-        <p className="text-slate-500 text-xs mt-0.5">
+        <p className="text-slate-500 text-[11px] sm:text-xs mt-0.5">
           Buyers and aggregators search produce by LGA and community corridor.
         </p>
       </div>

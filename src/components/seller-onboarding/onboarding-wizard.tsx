@@ -319,7 +319,7 @@ export function SellerOnboardingWizard() {
 
       {/* Active Step Form Card */}
       <Card className="rounded-xl sm:rounded-2xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
-        <CardContent className="p-4 sm:p-6 md:p-8">
+        <CardContent className="p-3 sm:p-6 md:p-8">
         {currentStep === 1 && (
             <StepAccount
               data={formData}
