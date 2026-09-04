@@ -74,7 +74,7 @@ export function AppHeader() {
           <Logo withText={true} className="text-xl" />
 
           {/* Right Side: Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {isDashboard && (
               <div className="relative hidden flex-1 sm:flex-initial md:block max-w-xs lg:max-w-md">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -86,11 +86,14 @@ export function AppHeader() {
               </div>
             )}
 
-            <QuickNav>
-              <Button variant="ghost" size="icon" className="rounded-full hover:text-primary">
-                <LayoutGrid className="h-5 w-5" />
-              </Button>
-            </QuickNav>
+            {/* QuickNav is already in mobile bottom nav as 'More', show only on desktop */}
+            <div className="hidden md:block">
+              <QuickNav>
+                <Button variant="ghost" size="icon" className="rounded-full hover:text-primary size-9">
+                  <LayoutGrid className="h-5 w-5" />
+                </Button>
+              </QuickNav>
+            </div>
 
             {isDashboard && (
               <Button asChild className="hidden sm:flex bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -101,17 +104,18 @@ export function AppHeader() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full relative"
+              className="rounded-full relative size-8 sm:size-9"
               onClick={() => setCartOpen(true)}
             >
-              <ShoppingCart className="h-5 w-5" />
+              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
               {totalItems > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0 text-[10px] bg-primary text-primary-foreground border-2 border-background">{totalItems}</Badge>
+                <Badge className="absolute -top-1 -right-1 h-4 min-w-4 px-1 justify-center p-0 text-[9px] bg-primary text-primary-foreground border-2 border-background">{totalItems}</Badge>
               )}
               <span className="sr-only">Open cart</span>
             </Button>
 
-            <Button variant="ghost" size="icon" className="rounded-full relative">
+            {/* Notifications icon is already in mobile bottom nav as 'Alerts', show only on desktop */}
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex rounded-full relative size-9">
               <Bell className="h-5 w-5" />
               {notificationCount > 0 && (
                 <Badge variant="destructive" className="absolute top-1 right-1 h-4 w-4 justify-center p-0 text-xs">{notificationCount}</Badge>
@@ -121,10 +125,10 @@ export function AppHeader() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Avatar className="h-8 w-8">
+                <Button variant="ghost" size="icon" className="rounded-full size-8 sm:size-9 p-0">
+                  <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
                     <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
-                    <AvatarFallback>{user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
+                    <AvatarFallback className="text-xs">{user?.displayName?.charAt(0) ?? 'U'}</AvatarFallback>
                   </Avatar>
                   <span className="sr-only">Toggle user menu</span>
                 </Button>

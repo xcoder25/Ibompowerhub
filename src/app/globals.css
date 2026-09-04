@@ -104,8 +104,19 @@
 }
 
 @layer base {
-  * {
+  *,
+  *::before,
+  *::after {
     @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    overscroll-behavior-x: none;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -113,15 +124,10 @@
     overflow-x: hidden;
     position: relative;
     width: 100%;
+    max-width: 100vw;
   }
 
-  html {
-    overflow-x: hidden;
-    width: 100%;
-    overscroll-behavior-x: none;
-  }
-
-  /* Mobile-first: safe area insets for notched devices */
+  /* Safe areas for notched mobile devices */
   .safe-area-pb {
     padding-bottom: env(safe-area-inset-bottom, 0);
   }

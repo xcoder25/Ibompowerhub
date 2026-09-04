@@ -306,14 +306,14 @@ export function VoiceBankingWidget() {
     };
 
     return (
-        <Card className="relative overflow-hidden border-0 shadow-2xl bg-[#080E1C] rounded-2xl sm:rounded-[2rem]">
+        <Card className="relative overflow-hidden border-0 shadow-2xl bg-[#080E1C] rounded-2xl sm:rounded-[2rem] w-full min-w-0 max-w-full">
             {/* Background ambience */}
-            <div className="absolute inset-0 z-0 pointer-events-none">
+            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-gradient-to-br from-emerald-600/12 via-teal-600/8 to-sky-600/12 blur-[140px] rounded-full" />
                 <div className="absolute bottom-0 right-0 w-48 h-48 bg-green-700/10 rounded-full blur-[80px]" />
             </div>
 
-            <CardContent className="relative z-10 p-4 sm:p-6 md:p-8">
+            <CardContent className="relative z-10 p-4 sm:p-6 md:p-8 w-full min-w-0">
 
                 {/* ── Header ────────────────────────────────────────────── */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-5">
@@ -378,25 +378,25 @@ export function VoiceBankingWidget() {
                 </div>
 
                 {/* ── Main two-column layout ────────────────────────────── */}
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-4 w-full min-w-0">
 
                     {/* ── Left: Prompt chips ─────────────────────────────── */}
-                    <div className="flex-1 space-y-2">
+                    <div className="flex-1 space-y-2 w-full min-w-0">
                         <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2">Try These Commands</p>
-                        <div className="grid grid-cols-2 gap-1.5">
+                        <div className="grid grid-cols-2 gap-1.5 w-full min-w-0">
                             {PROMPT_CHIPS.map((chip) => (
                                 <button
                                     key={chip.label}
                                     onClick={() => handleRealtimeIntent(chip.query)}
                                     disabled={state === 'LISTENING' || state === 'PROCESSING'}
                                     className={cn(
-                                        'flex items-center gap-1.5 text-left px-2.5 py-2 rounded-xl border transition-all group',
+                                        'flex items-center gap-1.5 text-left px-2 sm:px-2.5 py-2 rounded-xl border transition-all group min-w-0 w-full overflow-hidden',
                                         'bg-white/5 border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/10',
-                                        'text-slate-300 hover:text-white text-[11px] font-medium disabled:opacity-40 disabled:cursor-not-allowed'
+                                        'text-slate-300 hover:text-white text-[10px] sm:text-[11px] font-medium disabled:opacity-40 disabled:cursor-not-allowed'
                                     )}
                                 >
-                                    <ChevronRight className="h-3 w-3 text-emerald-500/70 flex-shrink-0 group-hover:text-emerald-400" />
-                                    <span className="truncate">{chip.label}</span>
+                                    <ChevronRight className="h-3 w-3 text-emerald-500/70 shrink-0 group-hover:text-emerald-400" />
+                                    <span className="truncate w-full">{chip.label}</span>
                                 </button>
                             ))}
                         </div>

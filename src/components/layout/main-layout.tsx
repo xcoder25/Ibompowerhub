@@ -129,14 +129,14 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <SidebarProvider>
+        <SidebarProvider className="w-full max-w-full overflow-x-hidden">
             <WalletMonitor />
-            <div className={cn("flex min-h-screen min-h-[100dvh]", isDashboard ? "bg-background" : "bg-background")}>
+            <div className={cn("flex min-h-screen min-h-[100dvh] w-full max-w-full overflow-x-hidden", isDashboard ? "bg-background" : "bg-background")}>
                 {!isMobile && <AppSidebar />}
-                <div className="flex flex-col flex-1">
+                <div className="flex flex-col flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
                     {!(isMapPage || isFlightPage || isWalletPage || (isMarketPage && isMobile)) && <AppHeader />}
-                    <SidebarInset className="flex flex-col">
-                        <main className={cn("flex-1 flex flex-col relative h-full w-full", "pb-[80px] md:pb-0")}>
+                    <SidebarInset className="flex flex-col w-full max-w-full min-w-0 overflow-x-hidden">
+                        <main className={cn("flex-1 flex flex-col relative h-full w-full max-w-full min-w-0 overflow-x-hidden", "pb-[80px] md:pb-0")}>
                             {children}
                         </main>
                     </SidebarInset>
