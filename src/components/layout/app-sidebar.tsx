@@ -267,9 +267,11 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Settings">
-              <Settings />
-              <span>Settings</span>
+            <SidebarMenuButton tooltip="Settings" asChild>
+              <Link href="/settings">
+                <Settings />
+                <span>Settings</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

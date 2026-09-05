@@ -1,14 +1,10 @@
-
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Compass, CircleUser, Bell, Plus, LayoutGrid } from 'lucide-react';
+import { Home, Compass, Bell, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '../ui/button';
 import React from 'react';
-import { ReportIssueDialog } from '../report-issue-dialog';
-import { DialogTrigger } from '../ui/dialog';
 import { QuickNav } from '../quick-nav';
 
 const mobileNavItems = [
@@ -28,10 +24,19 @@ export function AppMobileNav() {
           return (
             <React.Fragment key={item.href}>
               {index === 2 && (
-                <Link href="/report" passHref>
-                  <Button size="icon" className="rounded-full size-12 -mt-8 shadow-lg aks-gradient-motion text-white border-0 hover:opacity-95">
-                    <Plus className="size-6" />
-                  </Button>
+                <Link href="/dara" passHref>
+                  {/* Dara logo floating center button */}
+                  <div className="relative -mt-8 flex items-center justify-center">
+                    {/* Outer glow ring */}
+                    <span className="absolute inset-0 rounded-full bg-violet-400/30 blur-md scale-110 animate-pulse" />
+                    <div className="relative size-14 rounded-full shadow-xl shadow-violet-500/30 overflow-hidden border-2 border-white/20 hover:scale-105 active:scale-95 transition-transform duration-200">
+                      <img
+                        src="/dara.png"
+                        alt="Dara AI"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
                 </Link>
               )}
               <Link

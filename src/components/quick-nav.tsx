@@ -38,6 +38,8 @@ import {
     Sparkles,
     Store,
     Plane,
+    User,
+    Settings,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -89,6 +91,15 @@ const navCategories = [
             { href: '/health', icon: HeartPulse, label: 'Health', color: 'bg-rose-500/10 text-rose-500' },
             { href: '/education', icon: BookOpen, label: 'Education', color: 'bg-lime-500/10 text-lime-500' },
             { href: '/voting', icon: Vote, label: 'Voting', color: 'bg-purple-500/10 text-purple-500' },
+        ]
+    },
+    {
+        title: "Account & Preferences",
+        items: [
+            { href: '/profile', icon: User, label: 'Profile', color: 'bg-emerald-500/10 text-emerald-500' },
+            { href: '/settings', icon: Settings, label: 'Settings', color: 'bg-slate-500/10 text-slate-500' },
+            { href: '/seller/dashboard', icon: Store, label: 'Seller Hub', color: 'bg-amber-500/10 text-amber-500' },
+            { href: '/wallet', icon: Wallet, label: 'IbomPay', color: 'bg-indigo-500/10 text-indigo-500' },
         ]
     }
 ];
