@@ -33,6 +33,8 @@ import { doc, collection, query, orderBy, limit, onSnapshot } from 'firebase/fir
 import { getDaraResponse, DaraMessage } from '@/ai/flows/dara-assistant-flow';
 import { processVoiceBankingIntent, VoiceBankingIntent } from '@/ai/flows/voice-banking-flow';
 import { useIbibioAI } from '@/hooks/use-ibibio-ai';
+import { useWakeWord } from '@/hooks/use-wake-word';
+import { HeyDaraWakeButton } from '@/components/hey-dara-wake-button';
 import { getOfflinePowerTokens, getOfflineFlightTickets } from '@/lib/offline-vault';
 import { cn } from '@/lib/utils';
 
@@ -118,7 +120,63 @@ export default function DaraPage() {
 
   const shouldProcessVoiceRef = useRef(false);
 
-  // Profile ref
+  // ── Wake overlay state ──────────────────────────────────────────────────
+  const [showWakeOverlay, setShowWakeOverlay] = useState(false);
+  const wakeOverlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── "Dara" wake word hook (Google Assistant style) ────────────────────────
+  const {
+    state: wakeState,
+    isSupported: wakeSupported,
+    lastPhrase: wakePhrase,
+    enableWakeWord,
+    disableWakeWord,
+    setActive: setWakeActive,
+    setStandby: setWakeStandby,
+  } = useWakeWord({
+    onWake: (payload) => {
+      // Instant activation — zero time wasted
+      setWakeActive();
+      setShowWakeOverlay(true);
+
+      // If user said "Dara [command]" in one natural breath, execute the command directly!
+      if (payload.command && payload.command.trim().length > 1) {
+        if (wakeOverlayTimerRef.current) clearTimeout(wakeOverlayTimerRef.current);
+        wakeOverlayTimerRef.current = setTimeout(() => {
+          setShowWakeOverlay(false);
+          sendMessage(payload.command);
+          setWakeStandby();
+        }, 400);
+      } else {
+        // User said standalone "Dara" — open microphone INSTANTLY!
+        resetTranscript();
+        startListening();
+
+        if (wakeOverlayTimerRef.current) clearTimeout(wakeOverlayTimerRef.current);
+        wakeOverlayTimerRef.current = setTimeout(() => {
+          setShowWakeOverlay(false);
+          setWakeStandby();
+        }, 7000); // fallback auto-hide
+      }
+    },
+  });
+
+  // Auto-dismiss wake overlay when speech input finishes
+  useEffect(() => {
+    if (!isListening && showWakeOverlay) {
+      const t = setTimeout(() => setShowWakeOverlay(false), 300);
+      return () => clearTimeout(t);
+    }
+  }, [isListening, showWakeOverlay]);
+
+  // Cleanup overlay timer on unmount
+  useEffect(() => {
+    return () => {
+      if (wakeOverlayTimerRef.current) clearTimeout(wakeOverlayTimerRef.current);
+    };
+  }, []);
+
+
   const userDocRef = useMemoFirebase(
     () => (user && firestore ? doc(firestore, 'users', user.uid) : null),
     [firestore, user]
@@ -476,6 +534,17 @@ export default function DaraPage() {
 
         {/* Dialect selector & actions */}
         <div className="flex items-center gap-1.5">
+          {/* Hey Dara Wake Word Button */}
+          <HeyDaraWakeButton
+            state={wakeState}
+            isSupported={wakeSupported}
+            onEnable={enableWakeWord}
+            onDisable={disableWakeWord}
+            lastPhrase={wakePhrase}
+            waveformBars={waveform.bars}
+            compact
+          />
+
           {/* Dialect pills */}
           <div className="flex items-center bg-slate-100 rounded-full p-0.5 border border-slate-200">
             {DIALECT_OPTIONS.map(d => (
@@ -521,6 +590,43 @@ export default function DaraPage() {
           </button>
         </div>
       </header>
+
+      {/* Google Assistant-Style "Dara" Ambient Voice Glow & Bar */}
+      {showWakeOverlay && (
+        <div className="fixed inset-x-0 bottom-0 z-50 p-4 pb-6 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent pointer-events-auto animate-in slide-in-from-bottom duration-200">
+          {/* Ambient Multi-Color Light Bar at Bottom Edge */}
+          <div className="absolute inset-x-0 bottom-0 h-1.5 bg-gradient-to-r from-violet-500 via-indigo-400 via-fuchsia-500 to-sky-400 animate-pulse shadow-[0_-4px_25px_rgba(168,85,247,0.7)]" />
+
+          <div className="max-w-md mx-auto rounded-3xl bg-slate-900/95 backdrop-blur-xl border border-violet-500/30 p-3.5 sm:p-4 shadow-2xl text-white">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="relative size-10 sm:size-11 rounded-2xl overflow-hidden border-2 border-violet-400/80 shadow-lg shadow-violet-500/40 shrink-0">
+                  <img src="/dara.png" alt="Dara" className="w-full h-full object-cover" />
+                  <span className="absolute inset-0 rounded-2xl border border-white/20" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-violet-300">Dara Assistant</span>
+                    <span className="size-1.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
+                    <span className="text-[9px] text-slate-400 hidden sm:inline">Listening…</span>
+                  </div>
+                  <p className="text-sm font-bold text-white truncate mt-0.5">
+                    {transcript || interimTranscript || (wakePhrase ? `"${wakePhrase}"` : "Listening to you…")}
+                  </p>
+                </div>
+              </div>
+
+              {/* 4 Google-Assistant style dynamic pulsing color dots */}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 shrink-0 border border-white/10">
+                <span className="size-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="size-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="size-2 rounded-full bg-fuchsia-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="size-2 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: '450ms' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
