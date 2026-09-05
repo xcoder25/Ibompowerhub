@@ -1,25 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useWeather, getWeatherDescription } from '@/hooks/use-weather';
 import {
   Bell,
   Building2,
   HeartPulse,
   GraduationCap,
-  Briefcase,
-  ShoppingBag,
   Shield,
   Search,
-  Bot,
   MessageSquare,
   Cloud,
   CloudRain,
   CloudLightning,
   CloudFog,
-  TrendingUp,
-  Calendar,
   Clock,
   User,
   MapPin,
@@ -27,7 +23,6 @@ import {
   ChevronRight,
   Zap,
   Award,
-  Users,
   Sun,
   Droplets,
   Wind,
@@ -42,7 +37,6 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   Wifi,
-  RefreshCw,
   Brain,
   Vote,
   Waves,
@@ -50,10 +44,8 @@ import {
   Mic,
 } from 'lucide-react';
 import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { useUser } from '@/firebase';
 import { FloodSensorWidget } from '@/components/floodsense/flood-sensor-widget';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
@@ -62,7 +54,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
@@ -131,13 +122,6 @@ const services = [
   { id: 'forums', title: 'Community Forum', icon: MessageSquare, href: '/forums', color: 'from-slate-500/20 to-slate-600/10', iconColor: 'text-slate-600', borderColor: 'border-slate-200/60' },
 ];
 
-const stats = [
-  { label: 'Power Grid Frequency', value: '49.8 Hz (Normal)', icon: Zap, color: 'text-amber-600', bg: 'bg-amber-500/15', progress: 98 },
-  { label: 'State Security Level', value: 'Peaceful & Secure', icon: ShieldCheck, color: 'text-indigo-600', bg: 'bg-indigo-500/15', progress: 100 },
-  { label: 'Citizen Satisfaction', value: '94%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-500/15', progress: 94 },
-  { label: 'State Digital Hub', value: 'Online', icon: Brain, color: 'text-blue-600', bg: 'bg-blue-500/15', progress: 100 },
-];
-
 type LiveTransaction = {
   id: string;
   type: 'credit' | 'debit';
@@ -147,6 +131,104 @@ type LiveTransaction = {
   timestamp: any;
   reference?: string;
 };
+
+// Static content hoisted to module scope so it isn't recreated on every render
+const HERO_SLIDES = [
+  {
+    badge: 'Akwa Ibom State',
+    title: 'Your Digital Gateway to Akwa Ibom',
+    description: 'Access government services, connect with local businesses, report issues, and stay informed — for a greater Akwa Ibom.',
+    image: '/governor.png',
+    imageAlt: 'His Excellency, the Executive Governor of Akwa Ibom State',
+    imageFit: 'object-cover object-top',
+  },
+  {
+    badge: 'Welcome',
+    title: 'Welcome to Akwa Ibom State',
+    description: 'Building a prosperous, inclusive, and sustainable future for all citizens of Akwa Ibom.',
+    image: '/governor.png',
+    imageAlt: 'His Excellency, the Executive Governor of Akwa Ibom State',
+    imageFit: 'object-cover object-top',
+  },
+  {
+    badge: 'Ibom Air',
+    title: 'Fly Ibom Air — Pride of Akwa Ibom',
+    description: 'Nigeria\'s first state-owned airline connecting you to domestic and international destinations with world-class service.',
+    image: '/ibom_air.png',
+    imageAlt: 'Ibom Air — Pride of Akwa Ibom State',
+    imageFit: 'object-contain object-center',
+  },
+  {
+    badge: 'Our Vision',
+    title: 'A State of Innovation & Growth',
+    description: 'Empowering communities through digital transformation, quality healthcare, education, and sustainable development.',
+    image: '/ibom_air.png',
+    imageAlt: 'Ibom Air — Connecting Akwa Ibom to the World',
+    imageFit: 'object-contain object-center',
+  },
+];
+
+const QUICK_FEATURE_LINKS = [
+  { icon: Map, label: 'Live Map', desc: 'Real-time alerts across AKS', href: '/map' },
+  { icon: Store, label: 'Marketplace', desc: 'Shop from local sellers', href: '/market' },
+  { icon: AlertCircle, label: 'Report Issues', desc: 'Flooding, power, waste & more', href: '/report' },
+  { icon: Shield, label: 'Government', desc: 'Official AKS state services', href: '/government' },
+];
+
+// Shared transaction row renderer — used by both the compact mobile view and
+// the fuller desktop view to avoid duplicating the classification + markup logic.
+function TransactionRow({ tx, compact }: { tx: LiveTransaction; compact: boolean }) {
+  const isCredit = tx.type === 'credit';
+  const isAirSend =
+    tx.description?.toLowerCase().includes('airsend') ||
+    tx.reference?.includes('HIAI') ||
+    tx.reference?.includes('AIR');
+
+  const iconWrapClass = compact ? 'p-2 rounded-xl border shrink-0' : 'p-2 rounded-xl border shrink-0';
+  const iconSize = compact ? 'h-4 w-4' : 'h-5 w-5';
+
+  const toneClass = isAirSend
+    ? 'bg-indigo-500/10 border-indigo-200/50 dark:border-indigo-500/30'
+    : isCredit
+      ? 'bg-emerald-500/15 border-emerald-200/50 dark:border-emerald-500/30'
+      : 'bg-rose-500/10 border-rose-200/50 dark:border-rose-500/30';
+
+  const Icon = isAirSend ? Brain : isCredit ? ArrowDownLeft : ArrowUpRight;
+  const iconColorClass = isAirSend
+    ? 'text-indigo-600 dark:text-indigo-400'
+    : isCredit
+      ? 'text-emerald-600 dark:text-emerald-400'
+      : 'text-rose-500 dark:text-rose-400';
+
+  return (
+    <div className={compact ? 'flex items-center gap-3 w-full min-w-0' : 'flex items-center gap-4'}>
+      <div className={`${iconWrapClass} ${toneClass}`}>
+        <Icon className={`${iconSize} ${iconColorClass}`} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className={`font-semibold text-slate-900 dark:text-white truncate ${compact ? 'text-xs' : 'text-sm'}`}>
+          {tx.description || (isCredit ? 'Credit' : 'Debit')}
+        </p>
+        <div className="flex items-center gap-1.5 mt-0.5">
+          {isAirSend && (
+            <span className="text-[8px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 dark:bg-indigo-500/20 border border-indigo-200/50 dark:border-indigo-500/30 px-1.5 py-0.5 rounded-full">
+              HiAI AirSend
+            </span>
+          )}
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{tx.status}</p>
+        </div>
+      </div>
+      <div className="text-right shrink-0">
+        <p className={`font-bold text-sm ${isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+          {isCredit ? '+' : '-'}₦{Number(tx.amount).toLocaleString()}
+        </p>
+        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+          {tx.timestamp?.toDate ? tx.timestamp.toDate().toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'Recent'}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -180,47 +262,18 @@ export default function DashboardPage() {
     };
   }, [user, firestore]);
 
-  const heroSlides = [
-    {
-      badge: 'Akwa Ibom State',
-      title: 'Your Digital Gateway to Akwa Ibom',
-      description: 'Access government services, connect with local businesses, report issues, and stay informed — for a greater Akwa Ibom.',
-      image: '/governor.png',
-      imageAlt: 'His Excellency, the Executive Governor of Akwa Ibom State',
-      imageFit: 'object-cover object-top',
-    },
-    {
-      badge: 'Welcome',
-      title: 'Welcome to Akwa Ibom State',
-      description: 'Building a prosperous, inclusive, and sustainable future for all citizens of Akwa Ibom.',
-      image: '/governor.png',
-      imageAlt: 'His Excellency, the Executive Governor of Akwa Ibom State',
-      imageFit: 'object-cover object-top',
-    },
-    {
-      badge: 'Ibom Air',
-      title: 'Fly Ibom Air — Pride of Akwa Ibom',
-      description: 'Nigeria\'s first state-owned airline connecting you to domestic and international destinations with world-class service.',
-      image: '/ibom_air.png',
-      imageAlt: 'Ibom Air — Pride of Akwa Ibom State',
-      imageFit: 'object-contain object-center',
-    },
-    {
-      badge: 'Our Vision',
-      title: 'A State of Innovation & Growth',
-      description: 'Empowering communities through digital transformation, quality healthcare, education, and sustainable development.',
-      image: '/ibom_air.png',
-      imageAlt: 'Ibom Air — Connecting Akwa Ibom to the World',
-      imageFit: 'object-contain object-center',
-    },
-  ];
-
   useEffect(() => {
     const timer = setInterval(() => {
-      setHeroSlide((prev) => (prev + 1) % heroSlides.length);
+      setHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [heroSlides.length]);
+  }, []);
+
+  const filteredServices = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return services;
+    return services.filter((service) => service.title.toLowerCase().includes(q));
+  }, [searchQuery]);
 
   const alertsQuery = useMemoFirebase(
     () =>
@@ -263,10 +316,10 @@ export default function DashboardPage() {
 
   if (!firestore) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-green-50">
+      <div className="min-h-screen flex items-center justify-center bg-green-50 dark:bg-slate-950">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-green-600 border-t-transparent mx-auto mb-4" />
-          <p className="text-slate-500 font-medium">Loading Arise AKS...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-green-600 dark:border-emerald-400 border-t-transparent mx-auto mb-4" />
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Loading Arise AKS...</p>
         </div>
       </div>
     );
@@ -353,6 +406,7 @@ export default function DashboardPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
                 type="search"
+                aria-label="Search services, alerts, LGAs"
                 placeholder="Search services, alerts, LGAs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -368,8 +422,6 @@ export default function DashboardPage() {
         </header>
 
 
-
-        {/* Hero Section with Governor & Scrolling Text */}
         <Card className="border-0 overflow-hidden mb-5 md:mb-8 shadow-xl rounded-2xl w-full min-w-0">
           <CardContent className="p-0 w-full min-w-0">
             <div
@@ -387,7 +439,7 @@ export default function DashboardPage() {
                   <div className="min-w-0 w-full">
                     {/* Animated text container */}
                     <div className="relative h-[110px] sm:h-[135px] md:h-[150px] overflow-hidden mb-3 sm:mb-6 w-full min-w-0">
-                      {heroSlides.map((slide, idx) => (
+                      {HERO_SLIDES.map((slide, idx) => (
                         <div
                           key={idx}
                           className="absolute inset-0 flex flex-col justify-center space-y-1 sm:space-y-3 transition-all duration-700 ease-in-out min-w-0 w-full"
@@ -411,7 +463,7 @@ export default function DashboardPage() {
 
                     {/* Slide indicators */}
                     <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-6">
-                      {heroSlides.map((_, idx) => (
+                      {HERO_SLIDES.map((_, idx) => (
                         <button
                           key={idx}
                           onClick={() => setHeroSlide(idx)}
@@ -437,12 +489,16 @@ export default function DashboardPage() {
                 {/* Right: Slide Image (Responsive: compact preview on mobile, full side banner on desktop) */}
                 <div className="hidden md:block flex-shrink-0 relative w-full md:w-72 lg:w-80">
                   <div className="h-36 sm:h-48 md:h-full md:min-h-[320px] relative overflow-hidden">
-                    {heroSlides.map((slide, idx) => (
-                      <img
+                    {HERO_SLIDES.map((slide, idx) => (
+                      <Image
                         key={idx}
                         src={slide.image}
                         alt={slide.imageAlt}
-                        className={`absolute bottom-0 right-0 h-full w-full ${slide.imageFit} transition-opacity duration-700 ease-in-out`}
+                        fill
+                        sizes="(min-width: 1024px) 320px, (min-width: 768px) 288px, 0px"
+                        priority={idx === 0}
+                        loading={idx === 0 ? undefined : 'lazy'}
+                        className={`${slide.imageFit} transition-opacity duration-700 ease-in-out`}
                         style={{ opacity: heroSlide === idx ? 1 : 0 }}
                       />
                     ))}
@@ -455,12 +511,7 @@ export default function DashboardPage() {
               {/* Feature Quick Links Row */}
               <div className="relative z-10 px-2.5 sm:px-6 md:px-10 pb-3 sm:pb-6 w-full min-w-0">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 w-full min-w-0">
-                  {[
-                    { icon: Map, label: 'Live Map', desc: 'Real-time alerts across AKS', href: '/map' },
-                    { icon: Store, label: 'Marketplace', desc: 'Shop from local sellers', href: '/market' },
-                    { icon: AlertCircle, label: 'Report Issues', desc: 'Flooding, power, waste & more', href: '/report' },
-                    { icon: Shield, label: 'Government', desc: 'Official AKS state services', href: '/government' },
-                  ].map((feature, idx) => (
+                  {QUICK_FEATURE_LINKS.map((feature, idx) => (
                     <Link key={feature.label} href={feature.href} className="group min-w-0 w-full">
                       <div
                         className="p-2 sm:p-3 md:p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all cursor-pointer h-full flex flex-col justify-between min-w-0 w-full overflow-hidden"
@@ -573,8 +624,8 @@ export default function DashboardPage() {
         <Link href="/dara" className="block w-full mb-5 md:mb-8 group">
           <div className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-violet-600/10 via-indigo-600/5 to-transparent border border-violet-500/25 hover:border-violet-500/50 shadow-xs hover:shadow-sm transition-all w-full min-w-0">
             <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-              <div className="size-11 rounded-xl overflow-hidden shrink-0 border border-violet-400/30 group-hover:scale-105 transition-transform shadow-xs">
-                <img src="/dara.png" alt="Dara AI" className="w-full h-full object-cover" />
+              <div className="size-11 rounded-xl overflow-hidden shrink-0 border border-violet-400/30 group-hover:scale-105 transition-transform shadow-xs relative">
+                <Image src="/dara.png" alt="Dara AI" fill sizes="44px" className="object-cover" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -607,22 +658,28 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                {services.map((service) => (
-                  <Link key={service.id} href={service.href}>
-                    <Card className="glass-card glass-card-hover card-3d h-full overflow-hidden border-0 group cursor-pointer dark:bg-slate-800/40">
-                      <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
-                        <div className={`p-3 rounded-xl bg-gradient-to-br ${service.color} border ${service.borderColor} group-hover:scale-110 transition-transform duration-300`}>
-                          <service.icon className={`h-5 w-5 ${service.iconColor}`} />
-                        </div>
-                        <CardTitle className="font-headline text-xs font-semibold text-slate-900 dark:text-slate-100 truncate w-full">
-                          {service.title}
-                        </CardTitle>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
+              {filteredServices.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No services match &ldquo;{searchQuery}&rdquo;</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {filteredServices.map((service) => (
+                    <Link key={service.id} href={service.href}>
+                      <Card className="glass-card glass-card-hover card-3d h-full overflow-hidden border-0 group cursor-pointer dark:bg-slate-800/40">
+                        <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
+                          <div className={`p-3 rounded-xl bg-gradient-to-br ${service.color} border ${service.borderColor} group-hover:scale-110 transition-transform duration-300`}>
+                            <service.icon className={`h-5 w-5 ${service.iconColor}`} />
+                          </div>
+                          <CardTitle className="font-headline text-xs font-semibold text-slate-900 dark:text-slate-100 truncate w-full">
+                            {service.title}
+                          </CardTitle>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -690,92 +747,20 @@ export default function DashboardPage() {
               <>
                 {/* Mobile: Strictly only ONE recent transaction */}
                 <div className="md:hidden divide-y divide-slate-200/60 dark:divide-white/10 w-full min-w-0">
-                  {liveTransactions.slice(0, 1).map((tx) => {
-                    const isCredit = tx.type === 'credit';
-                    const isAirSend = tx.description?.toLowerCase().includes('airsend') || tx.reference?.includes('HIAI') || tx.reference?.includes('AIR');
-                    return (
-                      <div key={tx.id} className="p-3.5 px-4 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors w-full min-w-0">
-                        <div className="flex items-center gap-3 w-full min-w-0">
-                          <div className={`p-2 rounded-xl border shrink-0 ${
-                            isAirSend
-                              ? 'bg-indigo-500/10 border-indigo-200/50 dark:border-indigo-500/30'
-                              : isCredit
-                                ? 'bg-emerald-500/15 border-emerald-200/50 dark:border-emerald-500/30'
-                                : 'bg-rose-500/10 border-rose-200/50 dark:border-rose-500/30'
-                          }`}>
-                            {isAirSend
-                              ? <Brain className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                              : isCredit
-                                ? <ArrowDownLeft className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                                : <ArrowUpRight className="h-4 w-4 text-rose-500 dark:text-rose-400" />
-                            }
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-slate-900 dark:text-white text-xs truncate">{tx.description || (isCredit ? 'Credit' : 'Debit')}</p>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              {isAirSend && (
-                                <span className="text-[8px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 dark:bg-indigo-500/20 border border-indigo-200/50 dark:border-indigo-500/30 px-1 py-0.2 rounded-full">HiAI AirSend</span>
-                              )}
-                              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{tx.status}</p>
-                            </div>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <p className={`font-bold text-xs sm:text-sm ${
-                              isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'
-                            }`}>{isCredit ? '+' : '-'}₦{Number(tx.amount).toLocaleString()}</p>
-                            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                              {tx.timestamp?.toDate ? tx.timestamp.toDate().toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'Recent'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {liveTransactions.slice(0, 1).map((tx) => (
+                    <div key={tx.id} className="p-3.5 px-4 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors w-full min-w-0">
+                      <TransactionRow tx={tx} compact />
+                    </div>
+                  ))}
                 </div>
 
                 {/* Desktop: Up to 5 transactions */}
                 <div className="hidden md:block divide-y divide-slate-200/60 dark:divide-white/10">
-                  {liveTransactions.slice(0, 5).map((tx) => {
-                    const isCredit = tx.type === 'credit';
-                    const isAirSend = tx.description?.toLowerCase().includes('airsend') || tx.reference?.includes('HIAI') || tx.reference?.includes('AIR');
-                    return (
-                      <div key={tx.id} className="p-4 px-6 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
-                        <div className="flex items-center gap-4">
-                          <div className={`p-2 rounded-xl border shrink-0 ${
-                            isAirSend
-                              ? 'bg-indigo-500/10 border-indigo-200/50 dark:border-indigo-500/30'
-                              : isCredit
-                                ? 'bg-emerald-500/15 border-emerald-200/50 dark:border-emerald-500/30'
-                                : 'bg-rose-500/10 border-rose-200/50 dark:border-rose-500/30'
-                          }`}>
-                            {isAirSend
-                              ? <Brain className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                              : isCredit
-                                ? <ArrowDownLeft className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                : <ArrowUpRight className="h-5 w-5 text-rose-500 dark:text-rose-400" />
-                            }
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-slate-900 dark:text-white text-sm truncate">{tx.description || (isCredit ? 'Credit' : 'Debit')}</p>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              {isAirSend && (
-                                <span className="text-[8px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 dark:bg-indigo-500/20 border border-indigo-200/50 dark:border-indigo-500/30 px-1.5 py-0.5 rounded-full">HiAI AirSend</span>
-                              )}
-                              <p className="text-xs text-slate-500 dark:text-slate-400">{tx.status}</p>
-                            </div>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <p className={`font-bold text-sm ${
-                              isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'
-                            }`}>{isCredit ? '+' : '-'}₦{Number(tx.amount).toLocaleString()}</p>
-                            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                              {tx.timestamp?.toDate ? tx.timestamp.toDate().toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'Recent'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {liveTransactions.slice(0, 5).map((tx) => (
+                    <div key={tx.id} className="p-4 px-6 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
+                      <TransactionRow tx={tx} compact={false} />
+                    </div>
+                  ))}
                 </div>
 
                 {/* Footer link to view full history */}
