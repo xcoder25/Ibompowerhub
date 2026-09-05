@@ -511,7 +511,8 @@ export default function ProfilePage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {filteredActivities.map((act) => {
+                {/* Only display 2 activities at a time on profile page */}
+                {filteredActivities.slice(0, 2).map((act) => {
                   let iconBg = 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
                   let Icon = Clock;
                   if (act.type === 'power') {
@@ -549,6 +550,19 @@ export default function ProfilePage() {
                     </div>
                   );
                 })}
+
+                {/* View More button opening full activity page */}
+                <div className="pt-3 border-t border-border/40 mt-3 flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    Showing <span className="font-bold text-foreground">{Math.min(2, filteredActivities.length)}</span> of <span className="font-bold text-foreground">{filteredActivities.length}</span> activities
+                  </p>
+                  <Link href="/profile/activity">
+                    <Button variant="ghost" size="sm" className="rounded-xl font-bold text-xs gap-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40">
+                      View More
+                      <ArrowRight className="size-3.5" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
             )}
           </CardContent>
