@@ -359,6 +359,85 @@ export function NearbyAirSend({ open, onOpenChange, currentBalance }: NearbyAirS
     return () => clearInterval(interval);
   }, [role]);
 
+  // ── Firestore Live Presence & Transfer Synchronization ─────────────────────
+  useEffect(() => {
+    if (!firestore || !user) return;
+
+    // A. Recipient mode: Publish presence & listen for incoming transfers
+    if (role === 'recipient') {
+      const presenceDoc = doc(firestore, 'airsend_presence', user.uid);
+      setDoc(presenceDoc, {
+        uid: user.uid,
+        name: user.displayName || user.email || 'Nearby Citizen',
+        device: 'Android • Proximity Mesh Active',
+        distance: '0.5m',
+        updatedAt: serverTimestamp()
+      }).catch(() => {});
+
+      const transfersQuery = query(
+        collection(firestore, 'airsend_transfers'),
+        where('recipientUid', '==', user.uid),
+        where('status', '==', 'pending')
+      );
+
+      const unsubTransfers = onSnapshot(transfersQuery, async (snap) => {
+        for (const d of snap.docs) {
+          const data = d.data();
+          await updateDoc(d.ref, { status: 'completed' });
+          if (walletDocRef) {
+            await updateDoc(walletDocRef, { balance: currentBalance + data.amount });
+            await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
+              type: 'credit',
+              amount: data.amount,
+              description: `AirSend Beam from ${data.senderName || 'Nearby Peer'}`,
+              timestamp: serverTimestamp(),
+              reference: `AIR-REC-${Date.now()}`,
+              status: 'success'
+            });
+          }
+          AirSendAudio.playCashChime();
+          setIncomingTransfer(data);
+          setRecipientState('success');
+          OrionVoice.speak(`Received ${data.amount} Naira from ${data.senderName || 'nearby sender'}.`);
+        }
+      });
+
+      return () => {
+        deleteDoc(presenceDoc).catch(() => {});
+        unsubTransfers();
+      };
+    }
+
+    // B. Sender mode: Discover live nearby peers
+    if (role === 'sender') {
+      const presCol = collection(firestore, 'airsend_presence');
+      const unsub = onSnapshot(presCol, (snap) => {
+        const peers: any[] = [];
+        snap.forEach((d) => {
+          const data = d.data();
+          if (data.uid !== user.uid) {
+            peers.push({
+              uid: data.uid,
+              name: data.name,
+              device: data.device || 'Android Device',
+              distance: data.distance || '0.9m',
+              isLive: true
+            });
+          }
+        });
+
+        // Always merge with verified Akwa Ibom demo nodes for fallback testing
+        const demoNodes = [
+          { uid: 'demo-peer-01', name: 'Edidiong Asuquo', distance: '0.8m', device: 'Galaxy S24 • UWB Locked' },
+          { uid: 'demo-peer-02', name: 'Iniubong Ekanem', distance: '1.4m', device: 'iPhone 15 Pro • BLE Mesh' },
+          { uid: 'demo-peer-03', name: 'Urua Itam Vendor #14', distance: '2.1m', device: 'POS Smart Terminal' },
+        ];
+        setAvailableReceivers([...peers, ...demoNodes]);
+      });
+      return () => unsub();
+    }
+  }, [role, user, firestore, walletDocRef, currentBalance]);
+
   // ── Reset ─────────────────────────────────────────────────────────────────
   const resetFlows = useCallback(() => {
     setRole(null);
@@ -565,6 +644,25 @@ export function NearbyAirSend({ open, onOpenChange, currentBalance }: NearbyAirS
         });
       }
 
+      // Notify live recipient via Firestore transfer collection
+      for (const peer of targetPeers) {
+        if (peer.uid && !peer.uid.startsWith('demo-')) {
+          try {
+            await addDoc(collection(firestore, 'airsend_transfers'), {
+              senderUid: user.uid,
+              senderName: user.displayName || 'Nearby Sender',
+              recipientUid: peer.uid,
+              amount: perPeerAmount,
+              theme: selectedGiftTheme.name,
+              status: 'pending',
+              createdAt: serverTimestamp()
+            });
+          } catch (tErr) {
+            console.warn('[AIRSEND] Transfer sync fallback:', tErr);
+          }
+        }
+      }
+
       confetti({
         particleCount: 100,
         spread: 80,
@@ -729,13 +827,13 @@ export function NearbyAirSend({ open, onOpenChange, currentBalance }: NearbyAirS
                 </div>
               </div>
 
-              {/* Simulated Nearby Nodes */}
+              {/* Proximity Mesh Nodes */}
               <div className="space-y-2">
-                {[
-                  { uid: 'peer-01', name: 'Edidiong Asuquo', distance: '0.8m', device: 'Galaxy S24 • UWB Locked' },
-                  { uid: 'peer-02', name: 'Iniubong Ekanem', distance: '1.4m', device: 'iPhone 15 Pro • BLE Mesh' },
-                  { uid: 'peer-03', name: 'Urua Itam Vendor #14', distance: '2.1m', device: 'POS Smart Terminal' },
-                ].map(peer => {
+                {(availableReceivers.length > 0 ? availableReceivers : [
+                  { uid: 'demo-peer-01', name: 'Edidiong Asuquo', distance: '0.8m', device: 'Galaxy S24 • UWB Locked' },
+                  { uid: 'demo-peer-02', name: 'Iniubong Ekanem', distance: '1.4m', device: 'iPhone 15 Pro • BLE Mesh' },
+                  { uid: 'demo-peer-03', name: 'Urua Itam Vendor #14', distance: '2.1m', device: 'POS Smart Terminal' },
+                ]).map(peer => {
                   const isSelected = selectedReceivers.some(r => r.uid === peer.uid);
 
                   return (
@@ -756,11 +854,23 @@ export function NearbyAirSend({ open, onOpenChange, currentBalance }: NearbyAirS
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-black">
-                          {peer.name.charAt(0)}
+                        <div className="relative">
+                          <div className="size-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-black">
+                            {peer.name.charAt(0)}
+                          </div>
+                          {peer.isLive && (
+                            <span className="absolute -top-1 -right-1 size-3 rounded-full bg-emerald-500 border-2 border-slate-950 animate-pulse" />
+                          )}
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-white">{peer.name}</div>
+                          <div className="text-sm font-bold text-white flex items-center gap-2">
+                            {peer.name}
+                            {peer.isLive && (
+                              <Badge className="bg-emerald-500/20 text-emerald-400 text-[9px] px-1.5 py-0 border-none">
+                                LIVE
+                              </Badge>
+                            )}
+                          </div>
                           <div className="text-xs text-slate-400">{peer.device} ({peer.distance})</div>
                         </div>
                       </div>

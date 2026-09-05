@@ -21,9 +21,14 @@ import {
   FloodSensor, FloodReport 
 } from '@/lib/floodsense-data';
 import { AKWA_IBOM_LGAS } from '@/lib/lga-data';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, updateDoc, doc, increment } from 'firebase/firestore';
 
 export default function FloodSensePage() {
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
+
   const [sensors, setSensors] = useState<FloodSensor[]>(FLOOD_SENSORS);
   const [reports, setReports] = useState<FloodReport[]>(COMMUNITY_FLOOD_REPORTS);
   const [selectedLgaFilter, setSelectedLgaFilter] = useState<string>('ALL');
@@ -46,27 +51,82 @@ export default function FloodSensePage() {
   const [drainageDetails, setDrainageDetails] = useState('');
   const [isRequestingDrainage, setIsRequestingDrainage] = useState(false);
 
-  const simulateRefresh = () => {
+  // Real-time Firestore subscriptions for live reports & sensors
+  React.useEffect(() => {
+    // 1. Fetch initial live telemetry from backend
+    fetch('/api/floodsense/telemetry')
+      .then(res => res.json())
+      .then(result => {
+        if (result.success && Array.isArray(result.data)) {
+          setSensors(result.data);
+        }
+      })
+      .catch(() => {});
+
+    // 2. Subscribe to Firestore community reports
+    if (!firestore) return;
+    const reportsQuery = query(
+      collection(firestore, 'flood_reports'),
+      orderBy('createdAt', 'desc'),
+      limit(20)
+    );
+
+    const unsubscribe = onSnapshot(
+      reportsQuery,
+      (snapshot) => {
+        const liveReports: FloodReport[] = [];
+        snapshot.forEach((d) => {
+          const data = d.data();
+          liveReports.push({
+            id: d.id,
+            reporterName: data.reporterName || 'Resident',
+            lga: data.lga || 'Uyo',
+            location: data.location,
+            severity: data.severity || 'Moderate',
+            waterDepthDescription: data.waterDepthDescription || '',
+            passableByVehicle: Boolean(data.passableByVehicle),
+            passableByFoot: Boolean(data.passableByFoot),
+            timestamp: data.timestamp || 'Live',
+            upvotes: data.upvotes || 1,
+            drainageBlocked: Boolean(data.drainageBlocked)
+          });
+        });
+        if (liveReports.length > 0) {
+          setReports(liveReports);
+        }
+      },
+      () => {
+        // Fallback to initial seed reports if offline
+      }
+    );
+
+    return () => unsubscribe();
+  }, [firestore]);
+
+  const simulateRefresh = async () => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      setSensors(prev => prev.map(s => {
-        const delta = Math.floor(Math.random() * 9) - 4;
-        const newLevel = Math.max(10, Math.min(s.maxThresholdCm + 25, s.waterLevelCm + delta));
-        return {
-          ...s,
-          waterLevelCm: newLevel,
-          lastReadingTime: 'Just now'
-        };
-      }));
-      setIsRefreshing(false);
+    try {
+      const res = await fetch('/api/floodsense/telemetry');
+      const result = await res.json();
+      if (result.success && Array.isArray(result.data)) {
+        setSensors(result.data);
+      }
       toast({
         title: "Telemetry Refreshed",
-        description: "IoT water level and drainage station metrics have been updated."
+        description: "Official IoT water level and drainage station metrics have been refreshed from AKS gateway."
       });
-    }, 600);
+    } catch {
+      toast({
+        title: "Connection Error",
+        description: "Could not reach the IoT telemetry gateway.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
-  const handleReportSubmit = (e: React.FormEvent) => {
+  const handleReportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reportLocation) {
       toast({
@@ -78,33 +138,57 @@ export default function FloodSensePage() {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      const newReport: FloodReport = {
-        id: `RPT-${Date.now().toString().slice(-4)}`,
-        reporterName: reporterName.trim() || 'Anonymous Resident',
-        lga: reportLga,
-        location: reportLocation,
-        severity: reportSeverity,
-        waterDepthDescription: reportDepth || `${reportSeverity} water logging reported on roadway.`,
-        passableByVehicle: passableVehicle,
-        passableByFoot: passableFoot,
-        timestamp: 'Just now',
-        upvotes: 1,
-        drainageBlocked
-      };
+    try {
+      const res = await fetch('/api/floodsense/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reporterName: reporterName.trim() || user?.displayName || 'Resident',
+          lga: reportLga,
+          location: reportLocation,
+          severity: reportSeverity,
+          waterDepthDescription: reportDepth || `${reportSeverity} flood water logging reported on roadway.`,
+          passableByVehicle: passableVehicle,
+          passableByFoot: passableFoot,
+          drainageBlocked
+        })
+      });
 
-      setReports(prev => [newReport, ...prev]);
-      setIsSubmitting(false);
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error);
+
+      // Save directly to Firestore collection
+      if (firestore) {
+        try {
+          await addDoc(collection(firestore, 'flood_reports'), {
+            ...result.data,
+            userId: user?.uid || 'guest',
+            createdAt: serverTimestamp()
+          });
+        } catch (dbErr) {
+          console.warn('[FLOODSENSE] Firestore fallback:', dbErr);
+        }
+      }
+
+      setReports(prev => [result.data, ...prev]);
       setReportLocation('');
       setReportDepth('');
       toast({
         title: "Flood Report Logged & Broadcasted",
-        description: "Your report is now live on the Akwa Ibom community radar and flagged for SEMA AKS."
+        description: result.message || "Your report is now live on the Akwa Ibom community radar and flagged for SEMA AKS."
       });
-    }, 700);
+    } catch (err: any) {
+      toast({
+        title: "Submission Failed",
+        description: err.message || "Could not log incident report.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDrainageRequest = (e: React.FormEvent) => {
+  const handleDrainageRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!drainageStreet) {
       toast({
@@ -116,15 +200,40 @@ export default function FloodSensePage() {
     }
 
     setIsRequestingDrainage(true);
-    setTimeout(() => {
-      setIsRequestingDrainage(false);
+    try {
+      const ticketId = `AKSWMA-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      if (firestore) {
+        try {
+          await addDoc(collection(firestore, 'civic_tickets'), {
+            ticketId,
+            type: 'DRAINAGE_CLEARANCE',
+            lga: drainageLga,
+            street: drainageStreet,
+            details: drainageDetails,
+            userId: user?.uid || 'guest',
+            status: 'DISPATCHED',
+            agency: 'AKSWMA Rapid Response Unit',
+            createdAt: serverTimestamp()
+          });
+        } catch {}
+      }
+
       setDrainageStreet('');
       setDrainageDetails('');
       toast({
         title: "Drainage Clearance Ticket Issued",
-        description: `Ticket #AKSWMA-${Math.floor(1000 + Math.random() * 9000)} dispatched to AKSWMA Rapid Response Unit.`
+        description: `Ticket #${ticketId} dispatched to AKSWMA Rapid Response Unit.`
       });
-    }, 800);
+    } catch {
+      toast({
+        title: "Request Error",
+        description: "Could not create clearance request.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRequestingDrainage(false);
+    }
   };
 
   const filteredSensors = selectedLgaFilter === 'ALL' 

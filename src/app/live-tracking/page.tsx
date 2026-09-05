@@ -57,22 +57,48 @@ export default function LiveTrackingDemoPage() {
             <Card className="border-none shadow-sm bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl p-5 sm:p-6 rounded-2xl border border-white/20">
               <CardHeader className="px-0 pt-0">
                 <Badge className="w-fit bg-emerald-500/10 text-emerald-500 border-none px-3 py-1 font-black uppercase text-[10px] tracking-widest mb-4">
-                  Diagnostics
+                  Akwa Ibom Transit Net
                 </Badge>
-                <CardTitle className="text-2xl font-black tracking-tight mb-2">Simulation Config</CardTitle>
+                <CardTitle className="text-2xl font-black tracking-tight mb-2">Transit Corridors</CardTitle>
                 <CardDescription className="text-slate-500 font-medium text-sm">
-                  Initialize a test link ID to observe latency-free GPS telemetrics.
+                  Select an operational transit route or broadcast live device GPS to the state mobility grid.
                 </CardDescription>
               </CardHeader>
               <CardContent className="px-0 pb-0 space-y-6">
+                <div className="space-y-2">
+                  <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Quick Corridor Select</Label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      { id: 'AKS-CORR-01', name: 'Itam Peace Park ⇄ Ibom Plaza' },
+                      { id: 'AKS-CORR-02', name: 'Uyo ⇄ Victor Attah Airport (QUO)' },
+                      { id: 'AKS-CORR-03', name: 'Uyo ⇄ Eket Urban Bypass' },
+                    ].map(corr => (
+                      <button
+                        key={corr.id}
+                        onClick={() => { setOrderId(corr.id); setCustomOrderId(''); }}
+                        className={`p-2.5 rounded-xl border text-left text-xs font-bold transition-all flex items-center justify-between ${
+                          activeOrderId === corr.id
+                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-white/50 dark:bg-slate-800/50 border-white/10 text-slate-600 dark:text-slate-300 hover:border-emerald-500/30'
+                        }`}
+                      >
+                        <span>{corr.name}</span>
+                        <Badge className="text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-none font-mono">
+                          {corr.id}
+                        </Badge>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="space-y-3">
-                  <Label htmlFor="orderId" className="text-xs font-black uppercase tracking-widest text-slate-400">Target Session ID</Label>
+                  <Label htmlFor="orderId" className="text-xs font-black uppercase tracking-widest text-slate-400">Custom Trip / Dispatch ID</Label>
                   <div className="flex gap-2">
                     <Input
                       id="orderId"
                       value={customOrderId}
                       onChange={(e) => setCustomOrderId(e.target.value)}
-                      placeholder="Enter Link ID"
+                      placeholder="e.g. AKS-TRIP-9821"
                       className="h-12 bg-white/50 dark:bg-slate-800/50 border-none rounded-xl shadow-inner text-base font-bold"
                     />
                     <Button
@@ -86,7 +112,7 @@ export default function LiveTrackingDemoPage() {
                 </div>
                 <div className="flex items-center gap-2 p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/10">
                   <CheckCircle2 className="size-5 text-emerald-500" />
-                  <span className="text-sm font-bold text-slate-900 dark:text-white">Active Link:</span>
+                  <span className="text-sm font-bold text-slate-900 dark:text-white">Active Grid Link:</span>
                   <span className="text-sm font-black text-emerald-500 truncate">{activeOrderId}</span>
                 </div>
               </CardContent>

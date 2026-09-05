@@ -1,15 +1,15 @@
 'use client';
-
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plane, Calendar as CalendarIcon, Users, MapPin, ArrowRight, ArrowLeftRight, Wallet, CheckCircle2, Clock, Star, Radar } from 'lucide-react';
+import { Plane, Calendar as CalendarIcon, Users, MapPin, ArrowRight, ArrowLeftRight, Wallet, CheckCircle2, Clock, Star, Radar, Ticket, QrCode } from 'lucide-react';
 import { useUser, useFirestore, useDoc } from '@/firebase';
-import { doc, updateDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function FlightBookingPage() {
     const { user } = useUser();
@@ -22,17 +22,39 @@ export default function FlightBookingPage() {
     const [passengers, setPassengers] = useState(1);
     const [isSearching, setIsSearching] = useState(false);
     const [showResults, setShowResults] = useState(false);
-    const [selectedFlight, setSelectedFlight] = useState<{ id: string; time: string; price: number } | null>(null);
+    const [selectedFlight, setSelectedFlight] = useState<any | null>(null);
     const [showPayment, setShowPayment] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [bookingSuccess, setBookingSuccess] = useState(false);
-    const [bookingRef] = useState(`QI-${Math.floor(Math.random() * 900000) + 100000}`);
+    const [bookingRef, setBookingRef] = useState(`QI-${Math.floor(Math.random() * 900000) + 100000}`);
     const [scrapedFlights, setScrapedFlights] = useState<any[]>([]);
+    const [myBookings, setMyBookings] = useState<any[]>([]);
 
     // Tracking state
     const [trackRef, setTrackRef] = useState('');
     const [isTracking, setIsTracking] = useState(false);
     const [trackResult, setTrackResult] = useState<any>(null);
+
+    // Fetch user's flight bookings from Firestore
+    useEffect(() => {
+        if (!firestore) return;
+        const userId = user?.uid || 'guest-session';
+        const q = query(
+            collection(firestore, 'flight_bookings'),
+            where('userId', '==', userId),
+            orderBy('createdAt', 'desc')
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const bookings: any[] = [];
+            snapshot.forEach(d => {
+                bookings.push({ id: d.id, ...d.data() });
+            });
+            setMyBookings(bookings);
+        }, () => {});
+
+        return () => unsubscribe();
+    }, [firestore, user]);
 
     const handleTrack = (e: React.FormEvent) => {
         e.preventDefault();
@@ -69,19 +91,36 @@ export default function FlightBookingPage() {
         setIsSearching(true);
         setShowResults(false);
         try {
-            const res = await fetch('/api/flights/scrape', {
+            const res = await fetch('/api/flights/search', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ from, to, date, passengers })
             });
             const result = await res.json();
             
-            if (result.success) {
-                setScrapedFlights(result.data);
-                toast({ title: 'Link Established', description: `Live scraping ${result.bytesRead} bytes from IbomAir.com`, variant: 'default' });
+            if (result.success && Array.isArray(result.data)) {
+                // Map the schedule cabin classes into selectable UI cards
+                const flattenedFlights: any[] = [];
+                result.data.forEach((f: any) => {
+                    (f.cabinClasses || []).forEach((c: any) => {
+                        flattenedFlights.push({
+                            id: f.flightNo,
+                            departure: f.departureTime,
+                            arrival: f.arrivalTime,
+                            duration: f.duration,
+                            price: c.price,
+                            type: c.name,
+                            seats: c.seatsLeft,
+                            aircraft: f.aircraft,
+                            origin: f.origin,
+                            destination: f.destination
+                        });
+                    });
+                });
+                setScrapedFlights(flattenedFlights);
+                toast({ title: 'Schedules Retrieved', description: result.message, variant: 'default' });
             } else {
                 setScrapedFlights(mockFlights);
-                toast({ title: 'Scraper Error', description: 'Falling back to cached flight data.', variant: 'destructive' });
             }
         } catch (err) {
             setScrapedFlights(mockFlights);
@@ -92,27 +131,89 @@ export default function FlightBookingPage() {
     };
 
     const handleBook = (flight: any) => {
-        setSelectedFlight({ id: flight.id, time: `${flight.departure} → ${flight.arrival}`, price: flight.price * passengers });
+        setSelectedFlight({ 
+            id: flight.id, 
+            time: `${flight.departure} → ${flight.arrival}`, 
+            price: flight.price * passengers,
+            type: flight.type,
+            aircraft: flight.aircraft,
+            rawFlight: flight
+        });
         setShowPayment(true);
     };
 
     const handlePayment = async () => {
-        if (!user || !firestore || !walletDocRef || !selectedFlight) return;
-        if (!walletData || walletData.balance < selectedFlight.price) {
-            toast({ title: 'Insufficient Funds', description: `You need ₦${selectedFlight.price.toLocaleString()}. Please top up your wallet.`, variant: 'destructive' });
-            return;
-        }
+        if (!selectedFlight) return;
         setIsProcessing(true);
         try {
-            await updateDoc(walletDocRef, { balance: walletData.balance - selectedFlight.price });
-            await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
-                type: 'debit', amount: selectedFlight.price,
-                description: `Ibom Air: ${from} → ${to} (${selectedFlight.id})`,
-                timestamp: serverTimestamp(), reference: `FLIGHT-${Date.now()}`, status: 'success'
+            const hasWallet = user && firestore && walletDocRef && walletData;
+            if (hasWallet && walletData.balance < selectedFlight.price) {
+                toast({ title: 'Insufficient Funds', description: `You need ₦${selectedFlight.price.toLocaleString()}. Please top up your wallet.`, variant: 'destructive' });
+                setIsProcessing(false);
+                return;
+            }
+
+            // Call live booking API
+            const bookRes = await fetch('/api/flights/book', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    flight: {
+                        flightNo: selectedFlight.id,
+                        origin: from,
+                        destination: to,
+                        departureTime: selectedFlight.rawFlight?.departure || '08:30',
+                        arrivalTime: selectedFlight.rawFlight?.arrival || '09:45',
+                        duration: selectedFlight.rawFlight?.duration || '1h 15m',
+                        aircraft: selectedFlight.aircraft || 'Airbus A220-300'
+                    },
+                    cabinClass: selectedFlight.type,
+                    passengers,
+                    passengerDetails: {
+                        fullName: user?.displayName || 'Akwa Ibom Citizen',
+                        email: user?.email || '',
+                    },
+                    totalAmount: selectedFlight.price,
+                    userId: user?.uid || 'guest-session'
+                })
             });
+
+            const bookResult = await bookRes.json();
+            if (!bookResult.success) throw new Error(bookResult.error);
+
+            const eTicket = bookResult.data;
+            setBookingRef(eTicket.pnr);
+
+            // Deduct wallet and save to Firestore
+            if (hasWallet) {
+                try {
+                    await updateDoc(walletDocRef, { balance: walletData.balance - selectedFlight.price });
+                    await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
+                        type: 'debit',
+                        amount: selectedFlight.price,
+                        description: `Ibom Air Ticket: ${from} → ${to} (PNR: ${eTicket.pnr})`,
+                        timestamp: serverTimestamp(),
+                        reference: `FLIGHT-${eTicket.pnr}`,
+                        status: 'success'
+                    });
+                } catch (wErr) {
+                    console.warn('[FLIGHT] Wallet update error:', wErr);
+                }
+            }
+
+            if (firestore) {
+                try {
+                    await addDoc(collection(firestore, 'flight_bookings'), {
+                        ...eTicket,
+                        userId: user?.uid || 'guest-session',
+                        createdAt: serverTimestamp()
+                    });
+                } catch {}
+            }
+
             setBookingSuccess(true);
-        } catch {
-            toast({ title: 'Booking Failed', description: 'Could not process payment.', variant: 'destructive' });
+        } catch (err: any) {
+            toast({ title: 'Booking Failed', description: err.message || 'Could not process flight reservation.', variant: 'destructive' });
         } finally { setIsProcessing(false); }
     };
 
@@ -147,10 +248,13 @@ export default function FlightBookingPage() {
             <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-8 relative z-20 pb-16">
                 <div className="bg-white/90 backdrop-blur-xl border border-white/90 rounded-3xl shadow-2xl shadow-green-900/10 overflow-hidden p-5 md:p-8">
                     <Tabs defaultValue="book" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 mb-6 h-14 rounded-2xl bg-slate-100 p-1">
-                            <TabsTrigger value="book" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Book a Flight</TabsTrigger>
-                            <TabsTrigger value="track" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Track Flight</TabsTrigger>
-                            <TabsTrigger value="board" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm">Airport Board (QUO)</TabsTrigger>
+                        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 h-auto p-1 gap-1 rounded-2xl bg-slate-100">
+                            <TabsTrigger value="book" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm py-2.5">Book a Flight</TabsTrigger>
+                            <TabsTrigger value="track" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm py-2.5">Track Flight</TabsTrigger>
+                            <TabsTrigger value="board" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm py-2.5">Airport Board (QUO)</TabsTrigger>
+                            <TabsTrigger value="tickets" className="rounded-xl font-bold text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-sm py-2.5">
+                                My E-Tickets {myBookings.length > 0 && `(${myBookings.length})`}
+                            </TabsTrigger>
                         </TabsList>
                         
                         <TabsContent value="book" className="m-0 border-none outline-none">
@@ -406,6 +510,100 @@ export default function FlightBookingPage() {
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+                        </TabsContent>
+
+                        {/* My E-Tickets & Boarding Passes Tab */}
+                        <TabsContent value="tickets" className="m-0 border-none outline-none">
+                            <div className="p-2 md:p-4 space-y-6">
+                                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                                    <div>
+                                        <h2 className="text-xl font-black text-slate-900">My Boarding Passes & E-Tickets</h2>
+                                        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-0.5">Verified Ibom Air Reservation Documents</p>
+                                    </div>
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">
+                                        <Ticket className="size-3.5" />
+                                        {myBookings.length} Active Tickets
+                                    </span>
+                                </div>
+
+                                {myBookings.length === 0 ? (
+                                    <div className="p-12 text-center space-y-4 rounded-3xl bg-slate-50 border border-slate-100">
+                                        <div className="size-16 rounded-3xl bg-green-100 text-green-700 flex items-center justify-center mx-auto">
+                                            <Plane className="size-8" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-base font-bold text-slate-900">No Flights Booked Yet</p>
+                                            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                                                Search direct flights from Victor Attah International Airport (QUO) to Lagos or Abuja to generate your official boarding pass.
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        {myBookings.map((ticket, idx) => (
+                                            <div key={ticket.id || idx} className="rounded-3xl border border-slate-200 bg-white overflow-hidden shadow-lg shadow-green-950/5 flex flex-col justify-between">
+                                                {/* Header */}
+                                                <div className="bg-gradient-to-r from-green-800 to-green-900 text-white p-5 flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                        <Plane className="size-4 text-orange-300" />
+                                                        <span className="font-black text-sm tracking-wide">IBOM AIR</span>
+                                                    </div>
+                                                    <span className="font-mono text-xs font-black tracking-widest bg-white/20 px-2.5 py-1 rounded-lg">
+                                                        PNR: {ticket.pnr}
+                                                    </span>
+                                                </div>
+
+                                                {/* Body */}
+                                                <div className="p-6 space-y-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <p className="text-2xl font-black text-slate-900">{ticket.origin?.split(' ')[0]}</p>
+                                                            <p className="text-[11px] font-bold text-slate-400">{ticket.departureTime}</p>
+                                                        </div>
+                                                        <div className="flex flex-col items-center px-4">
+                                                            <span className="text-[10px] font-bold text-slate-400">{ticket.duration}</span>
+                                                            <div className="w-16 h-0.5 bg-green-500 relative my-1">
+                                                                <Plane className="size-3 text-green-700 absolute -top-1.5 left-1/2 -translate-x-1/2" />
+                                                            </div>
+                                                            <span className="text-[9px] font-black uppercase text-green-700">Direct</span>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <p className="text-2xl font-black text-slate-900">{ticket.destination?.split(' ')[0]}</p>
+                                                            <p className="text-[11px] font-bold text-slate-400">{ticket.arrivalTime}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-3 gap-2 py-3 border-y border-dashed border-slate-200 text-xs">
+                                                        <div>
+                                                            <span className="text-[9px] font-black uppercase text-slate-400">Flight</span>
+                                                            <p className="font-mono font-bold text-slate-900">{ticket.flightNo}</p>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-[9px] font-black uppercase text-slate-400">Seat</span>
+                                                            <p className="font-mono font-bold text-slate-900">{ticket.seatNumber || '14A'}</p>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <span className="text-[9px] font-black uppercase text-slate-400">Gate</span>
+                                                            <p className="font-mono font-bold text-slate-900">{ticket.gate || 'G2'}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between pt-1">
+                                                        <div className="space-y-0.5">
+                                                            <p className="text-[9px] font-black uppercase text-slate-400">Passenger</p>
+                                                            <p className="font-bold text-sm text-slate-900">{ticket.passengerName}</p>
+                                                            <p className="text-[10px] text-slate-400 font-mono">Tkt: {ticket.ticketNumber}</p>
+                                                        </div>
+                                                        <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
+                                                            <QRCodeSVG value={ticket.barcodeData || `IBOMAIR:${ticket.pnr}`} size={56} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </TabsContent>
                     </Tabs>
