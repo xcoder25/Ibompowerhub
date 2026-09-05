@@ -57,7 +57,7 @@ import { Progress } from '@/components/ui/progress';
 import { useUser } from '@/firebase';
 import { FloodSensorWidget } from '@/components/floodsense/flood-sensor-widget';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, limit, doc, onSnapshot, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, doc, onSnapshot } from 'firebase/firestore';
 import {
   Dialog,
   DialogContent,
@@ -155,26 +155,15 @@ export default function DashboardPage() {
   const { weather, loading: weatherLoading } = useWeather();
   const [heroSlide, setHeroSlide] = useState(0);
 
-  // 🔴 REAL-TIME: Live transaction feed and wallet balance from Firestore
+  // 🔴 REAL-TIME: Live transaction feed from Firestore
   const [liveTransactions, setLiveTransactions] = useState<LiveTransaction[]>([]);
   const [txLoading, setTxLoading] = useState(true);
-  const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user || !firestore) return;
     setTxLoading(true);
 
-    // 1. Listen to user wallet balance
-    const walletRef = doc(firestore, 'wallets', user.uid);
-    const unsubWallet = onSnapshot(walletRef, (snap) => {
-      if (snap.exists()) {
-        setWalletBalance(snap.data()?.balance ?? 0);
-      } else {
-        setWalletBalance(0);
-      }
-    });
-
-    // 2. Listen to the user's wallet sub-collection for real-time transactions
+    // Listen to the user's wallet sub-collection for real-time transactions
     const txRef = collection(firestore, 'wallets', user.uid, 'transactions');
     const txQuery = query(txRef, orderBy('timestamp', 'desc'), limit(8));
     const unsubTx = onSnapshot(txQuery, (snap) => {
@@ -187,7 +176,6 @@ export default function DashboardPage() {
     });
 
     return () => {
-      unsubWallet();
       unsubTx();
     };
   }, [user, firestore]);
@@ -379,79 +367,7 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        {/* Citizen Quick Hub: Live Balance + 1-Tap Power Vend + Dara Voice Prompt */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-5 md:mb-6 w-full min-w-0">
-          {/* Live Wallet Balance Preview */}
-          <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between shadow-xs hover:shadow-sm transition-all">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="size-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                <Landmark className="size-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none">IbomPay Wallet</p>
-                <p className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white mt-1 leading-none truncate">
-                  {walletBalance !== null ? `₦${walletBalance.toLocaleString()}` : '₦0.00'}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <Link href="/wallet/transfer">
-                <Button size="sm" variant="ghost" className="h-8 px-2.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 rounded-lg">
-                  Transfer
-                </Button>
-              </Link>
-              <Link href="/wallet/deposit">
-                <Button size="sm" className="h-8 px-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs">
-                  + Add
-                </Button>
-              </Link>
-            </div>
-          </div>
 
-          {/* Quick Vend Power (Ibom Power Flagship) */}
-          <Link href="/power" className="block w-full">
-            <div className="h-full bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/25 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between shadow-xs hover:shadow-sm hover:border-amber-500/40 transition-all group">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="size-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                  <Zap className="size-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 leading-none">Prepaid Electricity</p>
-                    <Badge className="bg-amber-500/20 text-amber-800 dark:text-amber-300 border-none text-[8px] font-bold px-1.5 py-0 leading-none">Instant STS</Badge>
-                  </div>
-                  <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mt-1 leading-tight truncate">
-                    Vend Power in 1-Tap
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="size-4 text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform shrink-0" />
-            </div>
-          </Link>
-
-          {/* Dara Dialect AI Voice Prompt Pill */}
-          <Link href="/dara" className="sm:col-span-2 lg:col-span-1 block w-full">
-            <div className="h-full bg-gradient-to-br from-violet-600/10 via-indigo-600/5 to-transparent border border-violet-500/25 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between shadow-xs hover:shadow-sm hover:border-violet-500/40 transition-all group">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="size-10 rounded-xl overflow-hidden shrink-0 border border-violet-400/30 group-hover:scale-105 transition-transform shadow-xs">
-                  <img src="/dara.png" alt="Dara AI" className="w-full h-full object-cover" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-violet-700 dark:text-violet-300 leading-none">Dara AI Assistant</p>
-                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  </div>
-                  <p className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mt-1 leading-tight truncate">
-                    Speak in Ibibio, Pidgin, or English
-                  </p>
-                </div>
-              </div>
-              <div className="size-7 rounded-lg bg-violet-100 dark:bg-violet-950/60 text-violet-600 dark:text-violet-300 flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
-                <Mic className="size-3.5" />
-              </div>
-            </div>
-          </Link>
-        </div>
 
         {/* Hero Section with Governor & Scrolling Text */}
         <Card className="border-0 overflow-hidden mb-5 md:mb-8 shadow-xl rounded-2xl w-full min-w-0">
@@ -649,9 +565,36 @@ export default function DashboardPage() {
         </div>
 
         {/* Desktop: Full IoT telemetry widget */}
-        <div className="hidden md:block mb-8 w-full min-w-0">
+        <div className="hidden md:block mb-5 w-full min-w-0">
           <FloodSensorWidget />
         </div>
+
+        {/* Dara AI Assistant — dialect-aware voice prompt, lives under FloodSense */}
+        <Link href="/dara" className="block w-full mb-5 md:mb-8 group">
+          <div className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-violet-600/10 via-indigo-600/5 to-transparent border border-violet-500/25 hover:border-violet-500/50 shadow-xs hover:shadow-sm transition-all w-full min-w-0">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+              <div className="size-11 rounded-xl overflow-hidden shrink-0 border border-violet-400/30 group-hover:scale-105 transition-transform shadow-xs">
+                <img src="/dara.png" alt="Dara AI" className="w-full h-full object-cover" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-violet-700 dark:text-violet-300 leading-none">Dara AI Assistant</p>
+                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                </div>
+                <p className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white mt-1 leading-tight">
+                  Speak in <span className="text-violet-600 dark:text-violet-300">Ibibio</span>, Pidgin, or English
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 hidden sm:block">Dialect-aware · Civic queries · Wallet voice commands</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="hidden sm:flex size-9 rounded-xl bg-violet-100 dark:bg-violet-950/60 text-violet-600 dark:text-violet-300 items-center justify-center border border-violet-200/60 dark:border-violet-500/30 group-hover:scale-105 transition-transform">
+                <Mic className="size-4" />
+              </div>
+              <ChevronRight className="size-4 text-violet-500 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </Link>
 
         {/* Quick Access Services */}
         {/* Desktop: Full 12-tile spread */}
