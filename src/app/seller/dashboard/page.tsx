@@ -4,7 +4,24 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUser, useFirestore } from '@/firebase';
-import { doc, getDoc, collection, setDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  collection,
+  setDoc,
+  serverTimestamp,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  updateDoc,
+  addDoc,
+  getDocs,
+  limit,
+  writeBatch,
+  increment,
+  deleteDoc,
+} from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +55,9 @@ import {
   Settings,
   CheckCircle2,
   AlertCircle,
+  Banknote,
+  ArrowDownToLine,
+  Loader2,
 } from 'lucide-react';
 import {
   SellerProfileRecord,
@@ -48,6 +68,28 @@ import {
   ProductUnit,
   ProductAvailability,
 } from '@/lib/seller-types';
+import { formatNaira } from '@/lib/wallet-utils';
+
+/** Marketplace order linked to this merchant (created at checkout). */
+export type SellerOrder = {
+  id: string;
+  orderRef?: string;
+  buyerId?: string;
+  buyerName?: string;
+  buyerPhone?: string;
+  sellerId: string;
+  sellerName?: string;
+  items?: { productId: string; name: string; price: number; quantity: number }[];
+  subtotal: number;
+  deliveryFee?: number;
+  total: number;
+  paymentMethod?: string;
+  status: string;
+  fulfillmentStatus?: string;
+  settled?: boolean;
+  createdAt?: any;
+  deliveryAddress?: string;
+};
 
 export default function MerchantDashboardPage() {
   const router = useRouter();
@@ -59,6 +101,11 @@ export default function MerchantDashboardPage() {
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+
+  // —— Finance (connected to IbomPay wallet + marketplace orders) ——
+  const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [orders, setOrders] = useState<SellerOrder[]>([]);
+  const [settling, setSettling] = useState(false);
 
   // Product Add/Edit Modal
   const [productModalOpen, setProductModalOpen] = useState(false);
@@ -83,7 +130,7 @@ export default function MerchantDashboardPage() {
       const userId = user?.uid;
 
       if (!firestore || !userId) {
-        // Fallback demo merchant profile
+        // Fallback demo merchant profile + sample finance
         setSeller({
           id: 'demo_merchant',
           merchantId: 'AKM-2026-000042',
@@ -147,6 +194,48 @@ export default function MerchantDashboardPage() {
             images: [],
           },
         ]);
+        setWalletBalance(385500);
+        setOrders([
+          {
+            id: 'demo1',
+            orderRef: 'AKS-9941',
+            sellerId: 'demo_merchant',
+            buyerName: 'Anietie Udoh',
+            items: [{ productId: 'p1', name: 'Yellow Garri (50kg)', price: 4500, quantity: 5 }],
+            subtotal: 22500,
+            total: 23000,
+            status: 'paid',
+            fulfillmentStatus: 'awaiting_dispatch',
+            settled: false,
+            createdAt: new Date(),
+          },
+          {
+            id: 'demo2',
+            orderRef: 'AKS-9938',
+            sellerId: 'demo_merchant',
+            buyerName: 'Ekaette Bassey',
+            items: [{ productId: 'p2', name: 'Red Palm Oil', price: 28000, quantity: 2 }],
+            subtotal: 56000,
+            total: 56500,
+            status: 'paid',
+            fulfillmentStatus: 'delivered',
+            settled: true,
+            createdAt: new Date(Date.now() - 86400000 * 2),
+          },
+          {
+            id: 'demo3',
+            orderRef: 'AKS-9920',
+            sellerId: 'demo_merchant',
+            buyerName: 'Okokon Essien',
+            items: [{ productId: 'p3', name: 'Live Catfish', price: 3500, quantity: 10 }],
+            subtotal: 35000,
+            total: 35500,
+            status: 'paid',
+            fulfillmentStatus: 'delivered',
+            settled: true,
+            createdAt: new Date(Date.now() - 86400000 * 5),
+          },
+        ]);
         setLoading(false);
         return;
       }
@@ -158,7 +247,6 @@ export default function MerchantDashboardPage() {
         if (snap.exists()) {
           setSeller(snap.data() as SellerProfileRecord);
         } else {
-          // Check application
           const appRef = doc(firestore, 'seller_applications', userId);
           const appSnap = await getDoc(appRef);
           if (appSnap.exists() && appSnap.data().status === 'APPROVED') {
@@ -193,13 +281,11 @@ export default function MerchantDashboardPage() {
             });
             setProducts(data.products || []);
           } else {
-            // Not approved yet, route to status
             router.push('/seller/application');
             return;
           }
         }
 
-        // Fetch application for products
         const appRef = doc(firestore, 'seller_applications', userId);
         const appSnap = await getDoc(appRef);
         if (appSnap.exists()) {
@@ -213,7 +299,184 @@ export default function MerchantDashboardPage() {
     }
 
     loadMerchantData();
-  }, [user, firestore, isUserLoading]);
+  }, [user, firestore, isUserLoading, router]);
+
+  // Live IbomPay wallet balance + marketplace orders for this seller
+  useEffect(() => {
+    if (!firestore || !user?.uid) return;
+
+    const unsubWallet = onSnapshot(doc(firestore, 'wallets', user.uid), (snap) => {
+      if (snap.exists()) {
+        setWalletBalance(Number(snap.data()?.balance ?? 0));
+      } else {
+        setWalletBalance(0);
+      }
+    });
+
+    // Orders where this user is the merchant
+    const ordersQ = query(
+      collection(firestore, 'orders'),
+      where('sellerId', '==', user.uid),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
+
+    const unsubOrders = onSnapshot(
+      ordersQ,
+      (snap) => {
+        const list: SellerOrder[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<SellerOrder, 'id'>),
+        }));
+        setOrders(list);
+      },
+      (err) => {
+        // Index may be missing; fall back to unordered query
+        console.warn('Seller orders query fallback:', err.message);
+        getDocs(query(collection(firestore, 'orders'), where('sellerId', '==', user.uid), limit(50)))
+          .then((snap) => {
+            const list: SellerOrder[] = snap.docs.map((d) => ({
+              id: d.id,
+              ...(d.data() as Omit<SellerOrder, 'id'>),
+            }));
+            setOrders(list);
+          })
+          .catch(() => {});
+      }
+    );
+
+    return () => {
+      unsubWallet();
+      unsubOrders();
+    };
+  }, [firestore, user?.uid]);
+
+  // Derived finance metrics from real orders
+  const paidOrders = orders.filter((o) => o.status === 'paid' || o.status === 'completed');
+  const pendingOrdersCount = orders.filter(
+    (o) =>
+      o.fulfillmentStatus === 'awaiting_dispatch' ||
+      o.status === 'pending_payment' ||
+      o.fulfillmentStatus === 'in_transit'
+  ).length;
+  const completedOrdersCount =
+    orders.filter((o) => o.fulfillmentStatus === 'delivered' || o.status === 'completed').length ||
+    seller?.completedOrders ||
+    0;
+  const totalRevenue = paidOrders.reduce((sum, o) => sum + (Number(o.subtotal) || Number(o.total) || 0), 0);
+  // Available payout = paid orders not yet settled into seller wallet
+  const availablePayout = paidOrders
+    .filter((o) => !o.settled)
+    .reduce((sum, o) => sum + (Number(o.subtotal) || Number(o.total) || 0), 0);
+
+  /** Claim unsettled order earnings into the seller's own IbomPay wallet. */
+  const handleClaimPayout = async () => {
+    if (!firestore || !user?.uid) return;
+    if (availablePayout <= 0) {
+      toast({ title: 'Nothing to claim', description: 'No unsettled marketplace earnings yet.' });
+      return;
+    }
+
+    setSettling(true);
+    try {
+      const unsettled = paidOrders.filter((o) => !o.settled);
+      const claimAmount = unsettled.reduce(
+        (sum, o) => sum + (Number(o.subtotal) || Number(o.total) || 0),
+        0
+      );
+
+      // Credit seller's own wallet (allowed by rules: owner write)
+      const walletRef = doc(firestore, 'wallets', user.uid);
+      const walletSnap = await getDoc(walletRef);
+      if (walletSnap.exists()) {
+        await updateDoc(walletRef, { balance: increment(claimAmount) });
+      } else {
+        await setDoc(walletRef, {
+          balance: claimAmount,
+          currency: 'NGN',
+          updatedAt: serverTimestamp(),
+        });
+      }
+
+      await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
+        type: 'credit',
+        amount: claimAmount,
+        description: `Agro Marketplace Payout (${unsettled.length} order${unsettled.length === 1 ? '' : 's'})`,
+        category: 'market',
+        timestamp: new Date(),
+        reference: `AGR_PAYOUT_${Date.now()}`,
+        status: 'success',
+      });
+
+      // Mark orders settled
+      const batch = writeBatch(firestore);
+      for (const o of unsettled) {
+        if (o.id.startsWith('demo')) continue;
+        batch.update(doc(firestore, 'orders', o.id), {
+          settled: true,
+          settledAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      }
+      await batch.commit();
+
+      toast({
+        title: 'Payout claimed',
+        description: `${formatNaira(claimAmount)} credited to your IbomPay wallet.`,
+      });
+    } catch (err) {
+      console.error('Payout claim failed:', err);
+      toast({
+        variant: 'destructive',
+        title: 'Payout failed',
+        description: 'Could not settle earnings. Try again or contact support.',
+      });
+    } finally {
+      setSettling(false);
+    }
+  };
+
+
+  /** Seller updates fulfillment status on their order (wires ops → finance timeline). */
+  const handleUpdateOrderFulfillment = async (
+    orderId: string,
+    fulfillmentStatus: 'awaiting_dispatch' | 'in_transit' | 'delivered'
+  ) => {
+    if (!firestore || !user?.uid) return;
+    if (orderId.startsWith('demo')) {
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? {
+                ...o,
+                fulfillmentStatus,
+                status: fulfillmentStatus === 'delivered' ? 'completed' : o.status,
+              }
+            : o
+        )
+      );
+      toast({ title: 'Order updated', description: `Marked as ${fulfillmentStatus.replace('_', ' ')}.` });
+      return;
+    }
+    try {
+      const patch: Record<string, unknown> = {
+        fulfillmentStatus,
+        updatedAt: serverTimestamp(),
+      };
+      if (fulfillmentStatus === 'delivered') {
+        patch.status = 'completed';
+      }
+      await updateDoc(doc(firestore, 'orders', orderId), patch);
+      toast({ title: 'Order updated', description: `Marked as ${fulfillmentStatus.replace(/_/g, ' ')}.` });
+    } catch (err) {
+      console.error(err);
+      toast({
+        variant: 'destructive',
+        title: 'Update failed',
+        description: 'Could not update order status.',
+      });
+    }
+  };
 
   const handleSaveProduct = async () => {
     const res = singleProductSchema.safeParse(currentProduct);
@@ -226,30 +489,60 @@ export default function MerchantDashboardPage() {
       return;
     }
 
+    const productId =
+      editingIndex !== null && currentProduct.id
+        ? currentProduct.id
+        : 'prod_' + Date.now();
+    const savedProduct = { ...currentProduct, id: productId };
+
     const nextList = [...products];
     if (editingIndex !== null) {
-      nextList[editingIndex] = currentProduct;
+      nextList[editingIndex] = savedProduct;
     } else {
-      nextList.push({ ...currentProduct, id: 'prod_' + Date.now() });
+      nextList.push(savedProduct);
     }
 
     setProducts(nextList);
 
-    // Save to Firestore if available
     if (user && firestore) {
       const appRef = doc(firestore, 'seller_applications', user.uid);
       await setDoc(appRef, { products: nextList }, { merge: true });
+
+      // Wire to market catalog with sellerId so checkout credits this merchant
+      await setDoc(
+        doc(firestore, 'approved_products', productId),
+        {
+          id: productId,
+          name: savedProduct.name,
+          description: savedProduct.description,
+          price: savedProduct.price,
+          quantity: savedProduct.availableQuantity,
+          availableQuantity: savedProduct.availableQuantity,
+          unit: savedProduct.unit,
+          category: savedProduct.category,
+          images: savedProduct.images || [],
+          availability: savedProduct.availability,
+          sellerId: user.uid,
+          sellerName: seller?.storeName || 'Ibom Merchant',
+          userId: user.uid,
+          status: 'approved',
+          approvedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
     }
 
     toast({
       title: 'Listing Updated',
-      description: `${currentProduct.name} saved to your store.`,
+      description: `${savedProduct.name} saved to your store and market.`,
     });
 
     setProductModalOpen(false);
   };
 
   const handleDeleteProduct = async (idx: number) => {
+    const removed = products[idx];
     const nextList = [...products];
     nextList.splice(idx, 1);
     setProducts(nextList);
@@ -257,6 +550,13 @@ export default function MerchantDashboardPage() {
     if (user && firestore) {
       const appRef = doc(firestore, 'seller_applications', user.uid);
       await setDoc(appRef, { products: nextList }, { merge: true });
+      if (removed?.id) {
+        try {
+          await deleteDoc(doc(firestore, 'approved_products', removed.id));
+        } catch {
+          /* ignore */
+        }
+      }
     }
 
     toast({
@@ -383,9 +683,9 @@ export default function MerchantDashboardPage() {
                 <ShoppingCart className="size-3.5 text-indigo-600" />
               </div>
               <p className="text-xl font-black text-slate-900 dark:text-white">
-                {seller.completedOrders || 58}
+                {orders.length > 0 ? completedOrdersCount : seller.completedOrders || 0}
               </p>
-              <span className="text-[10px] text-indigo-600 font-bold">Completed</span>
+              <span className="text-[10px] text-indigo-600 font-bold">Completed / delivered</span>
             </CardContent>
           </Card>
 
@@ -395,7 +695,7 @@ export default function MerchantDashboardPage() {
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Pending Orders</span>
                 <Clock className="size-3.5 text-amber-600" />
               </div>
-              <p className="text-xl font-black text-slate-900 dark:text-white">3</p>
+              <p className="text-xl font-black text-slate-900 dark:text-white">{pendingOrdersCount}</p>
               <span className="text-[10px] text-amber-600 font-bold">Awaiting dispatch</span>
             </CardContent>
           </Card>
@@ -406,28 +706,35 @@ export default function MerchantDashboardPage() {
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Total Revenue</span>
                 <TrendingUp className="size-3.5 text-emerald-600" />
               </div>
-              <p className="text-xl font-black text-slate-900 dark:text-white">₦1,420,000</p>
-              <span className="text-[10px] text-emerald-600 font-bold">+18% this month</span>
+              <p className="text-xl font-black text-slate-900 dark:text-white">
+                {formatNaira(totalRevenue)}
+              </p>
+              <span className="text-[10px] text-emerald-600 font-bold">Paid marketplace sales</span>
             </CardContent>
           </Card>
 
           <Card className="rounded-2xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <CardContent className="p-4 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Balance</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Available Payout</span>
                 <Wallet className="size-3.5 text-teal-600" />
               </div>
-              <p className="text-xl font-black text-slate-900 dark:text-white">₦385,500</p>
-              <span className="text-[10px] text-teal-600 font-bold">Available payout</span>
+              <p className="text-xl font-black text-slate-900 dark:text-white">
+                {formatNaira(availablePayout)}
+              </p>
+              <span className="text-[10px] text-teal-600 font-bold">Unsettled earnings</span>
             </CardContent>
           </Card>
         </div>
 
         {/* Dashboard Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-1 rounded-2xl">
+          <TabsList className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-1 rounded-2xl flex flex-wrap h-auto gap-1">
             <TabsTrigger value="overview" className="rounded-xl text-xs font-bold">
               Overview
+            </TabsTrigger>
+            <TabsTrigger value="finance" className="rounded-xl text-xs font-bold">
+              Finance & Payouts
             </TabsTrigger>
             <TabsTrigger value="products" className="rounded-xl text-xs font-bold">
               Products & Inventory ({products.length})
@@ -443,7 +750,6 @@ export default function MerchantDashboardPage() {
           {/* Overview Tab Content */}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Recent Orders Feed */}
               <Card className="lg:col-span-2 rounded-3xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                 <CardHeader className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-row items-center justify-between">
                   <div>
@@ -451,69 +757,115 @@ export default function MerchantDashboardPage() {
                       Recent Buyer Orders
                     </CardTitle>
                     <CardDescription className="text-xs text-slate-400">
-                      Dispatched across Akwa Ibom State
+                      Live marketplace orders for your store
                     </CardDescription>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-xs font-bold text-emerald-600">
-                    View All Orders
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs font-bold text-emerald-600"
+                    onClick={() => setActiveTab('finance')}
+                  >
+                    Finance &amp; Payouts
                   </Button>
                 </CardHeader>
                 <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
-                  <div className="p-4 flex items-center justify-between text-xs">
-                    <div>
-                      <p className="font-bold text-slate-900 dark:text-white">
-                        Order #AKS-9941 • 5x Yellow Garri (50kg)
-                      </p>
-                      <p className="text-slate-400 text-[11px] mt-0.5">
-                        Buyer: Anietie Udoh • Delivery to Itam, Itu LGA
-                      </p>
+                  {orders.length === 0 ? (
+                    <div className="p-8 text-center text-xs text-slate-400">
+                      No marketplace orders yet. When buyers pay via Ibom Market, they appear here
+                      and credit your available payout.
                     </div>
-                    <div className="text-right">
-                      <p className="font-black text-slate-900 dark:text-white">₦22,500</p>
-                      <Badge className="bg-amber-500/15 text-amber-700 text-[9px] font-bold border-none">
-                        Preparing
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="p-4 flex items-center justify-between text-xs">
-                    <div>
-                      <p className="font-bold text-slate-900 dark:text-white">
-                        Order #AKS-9938 • 2x Carton Red Palm Oil
-                      </p>
-                      <p className="text-slate-400 text-[11px] mt-0.5">
-                        Buyer: Eket Catering Services • Eket LGA
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-black text-slate-900 dark:text-white">₦56,000</p>
-                      <Badge className="bg-emerald-500/15 text-emerald-700 text-[9px] font-bold border-none">
-                        Completed
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="p-4 flex items-center justify-between text-xs">
-                    <div>
-                      <p className="font-bold text-slate-900 dark:text-white">
-                        Order #AKS-9920 • 10x Live Catfish (Table Size)
-                      </p>
-                      <p className="text-slate-400 text-[11px] mt-0.5">
-                        Buyer: Uyo Sports Bar • Ikot Ekpene Road, Uyo
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-black text-slate-900 dark:text-white">₦35,000</p>
-                      <Badge className="bg-emerald-500/15 text-emerald-700 text-[9px] font-bold border-none">
-                        Completed
-                      </Badge>
-                    </div>
-                  </div>
+                  ) : (
+                    orders.slice(0, 8).map((order) => {
+                      const itemSummary =
+                        order.items
+                          ?.map((i) => `${i.quantity}x ${i.name}`)
+                          .join(', ') || 'Order items';
+                      const isPending =
+                        order.fulfillmentStatus === 'awaiting_dispatch' ||
+                        order.status === 'pending_payment';
+                      return (
+                        <div
+                          key={order.id}
+                          className="p-4 flex items-center justify-between text-xs gap-3"
+                        >
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-900 dark:text-white truncate">
+                              {order.orderRef || order.id.slice(0, 10)} • {itemSummary}
+                            </p>
+                            <p className="text-slate-400 text-[11px] mt-0.5 truncate">
+                              Buyer: {order.buyerName || 'Customer'}
+                              {order.deliveryAddress ? ` • ${order.deliveryAddress}` : ''}
+                            </p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="font-black text-slate-900 dark:text-white">
+                              {formatNaira(order.subtotal || order.total)}
+                            </p>
+                            <Badge
+                              className={
+                                isPending
+                                  ? 'bg-amber-500/15 text-amber-700 text-[9px] font-bold border-none'
+                                  : order.settled
+                                    ? 'bg-slate-500/15 text-slate-600 text-[9px] font-bold border-none'
+                                    : 'bg-emerald-500/15 text-emerald-700 text-[9px] font-bold border-none'
+                              }
+                            >
+                              {isPending
+                                ? 'Preparing'
+                                : order.settled
+                                  ? 'Settled'
+                                  : order.status === 'paid'
+                                    ? 'Paid'
+                                    : order.fulfillmentStatus || order.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </CardContent>
               </Card>
 
-              {/* Quick Actions & Logistics */}
               <div className="space-y-6">
+                <Card className="rounded-3xl border-teal-500/20 bg-gradient-to-br from-teal-500/5 to-emerald-500/5 shadow-sm">
+                  <CardHeader className="p-5 pb-2">
+                    <CardTitle className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                      <Wallet className="size-4 text-teal-600" /> IbomPay Snapshot
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-5 pt-0 space-y-3 text-xs">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-slate-500">Wallet balance</span>
+                      <span className="font-black text-lg text-slate-900 dark:text-white">
+                        {formatNaira(walletBalance)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-slate-500">Unsettled payout</span>
+                      <span className="font-bold text-teal-700 dark:text-teal-400">
+                        {formatNaira(availablePayout)}
+                      </span>
+                    </div>
+                    <Button
+                      size="sm"
+                      className="w-full rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs h-9 gap-1.5"
+                      onClick={() => setActiveTab('finance')}
+                    >
+                      Manage Finance <ArrowRight className="size-3.5" />
+                    </Button>
+                    <Link href="/wallet" className="block">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full rounded-xl text-xs font-bold h-9"
+                      >
+                        Open IbomPay Wallet
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+
                 <Card className="rounded-3xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                   <CardHeader className="p-5 pb-3">
                     <CardTitle className="text-base font-black text-slate-900 dark:text-white">
@@ -524,12 +876,14 @@ export default function MerchantDashboardPage() {
                     <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 space-y-1">
                       <span className="text-slate-400 font-medium">Pickup Point</span>
                       <p className="font-bold text-slate-800 dark:text-slate-200">
-                        {seller.delivery.pickupAddress}
+                        {seller.delivery?.pickupAddress || 'Not set'}
                       </p>
                     </div>
                     <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 space-y-1">
                       <span className="text-slate-400 font-medium">Coverage Area</span>
-                      <p className="font-bold text-emerald-600">{seller.delivery.coverage}</p>
+                      <p className="font-bold text-emerald-600">
+                        {seller.delivery?.coverage || 'Akwa Ibom State'}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -537,6 +891,158 @@ export default function MerchantDashboardPage() {
             </div>
           </TabsContent>
 
+          {/* Finance & Payouts — connected to orders + IbomPay wallet */}
+          <TabsContent value="finance" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="rounded-3xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                <CardContent className="p-5 space-y-1">
+                  <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                    IbomPay Wallet
+                  </p>
+                  <p className="text-2xl font-black text-slate-900 dark:text-white">
+                    {formatNaira(walletBalance)}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Already in your citizen wallet (withdraw / transfer anytime)
+                  </p>
+                  <Link href="/wallet">
+                    <Button variant="outline" size="sm" className="mt-2 rounded-xl text-xs font-bold h-8">
+                      Open Wallet
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card className="rounded-3xl border-teal-500/25 bg-teal-500/5 shadow-sm">
+                <CardContent className="p-5 space-y-1">
+                  <p className="text-[10px] font-bold uppercase text-teal-700/80 tracking-wider">
+                    Available to Claim
+                  </p>
+                  <p className="text-2xl font-black text-teal-800 dark:text-teal-300">
+                    {formatNaira(availablePayout)}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Paid orders not yet settled into your wallet
+                  </p>
+                  <Button
+                    size="sm"
+                    disabled={availablePayout <= 0 || settling}
+                    onClick={handleClaimPayout}
+                    className="mt-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold h-8 gap-1.5"
+                  >
+                    {settling ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <ArrowDownToLine className="size-3.5" />
+                    )}
+                    Claim to IbomPay
+                  </Button>
+                </CardContent>
+              </Card>
+              <Card className="rounded-3xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                <CardContent className="p-5 space-y-1">
+                  <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                    Lifetime Revenue
+                  </p>
+                  <p className="text-2xl font-black text-slate-900 dark:text-white">
+                    {formatNaira(totalRevenue)}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Sum of paid marketplace sales (product subtotal)
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="rounded-3xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+              <CardHeader className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <CardTitle className="text-base font-black flex items-center gap-2">
+                  <Banknote className="size-4 text-emerald-600" />
+                  How seller finance is connected
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  End-to-end path from buyer cart to your earnings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-5 text-xs text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+                <ol className="list-decimal list-inside space-y-1.5">
+                  <li>
+                    Buyer adds products (with your sellerId) to cart and checks out.
+                  </li>
+                  <li>
+                    Wallet payments debit the buyer IbomPay wallet and write a debit transaction.
+                  </li>
+                  <li>
+                    Checkout creates one orders document per seller with status paid (or pending for COD).
+                  </li>
+                  <li>
+                    This dashboard listens to orders where sellerId equals you for revenue, pending, and payout.
+                  </li>
+                  <li>
+                    Claim to IbomPay credits your wallet and marks those orders settled (shows as Agro Marketplace Payout in wallet history).
+                  </li>
+                </ol>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-3xl border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+              <CardHeader className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <CardTitle className="text-base font-black">Order ledger</CardTitle>
+                <CardDescription className="text-xs">All orders driving your finance numbers</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
+                {orders.length === 0 ? (
+                  <p className="p-6 text-center text-xs text-slate-400">No orders yet.</p>
+                ) : (
+                  orders.map((order) => (
+                    <div
+                      key={order.id}
+                      className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                    >
+                      <div>
+                        <p className="font-bold text-slate-900 dark:text-white">
+                          {order.orderRef || order.id}
+                        </p>
+                        <p className="text-slate-400 mt-0.5">
+                          {order.buyerName || 'Buyer'} · {order.paymentMethod || '—'} ·{' '}
+                          {order.settled ? 'Settled' : order.status}
+                        </p>
+                      </div>
+                      <div className="text-right space-y-1.5">
+                        <p className="font-black">{formatNaira(order.subtotal || order.total)}</p>
+                        <p className="text-[10px] text-slate-400">
+                          {order.fulfillmentStatus || '—'}
+                        </p>
+                        <div className="flex flex-wrap justify-end gap-1">
+                          {order.fulfillmentStatus !== 'in_transit' &&
+                            order.fulfillmentStatus !== 'delivered' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 text-[10px] font-bold rounded-lg px-2"
+                                onClick={() => handleUpdateOrderFulfillment(order.id, 'in_transit')}
+                              >
+                                Dispatch
+                              </Button>
+                            )}
+                          {order.fulfillmentStatus !== 'delivered' && (
+                            <Button
+                              size="sm"
+                              className="h-7 text-[10px] font-bold rounded-lg px-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                              onClick={() => handleUpdateOrderFulfillment(order.id, 'delivered')}
+                            >
+                              Delivered
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Products Tab Content */}
           {/* Products Tab Content */}
           <TabsContent value="products" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

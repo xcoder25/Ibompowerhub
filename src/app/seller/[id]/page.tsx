@@ -23,8 +23,11 @@ import {
   Share2,
   Clock,
   Sparkles,
+  ShoppingCart,
 } from 'lucide-react';
 import { SellerProfileRecord, ProductItem, SELLER_TYPES } from '@/lib/seller-types';
+import { useCart } from '@/context/cart-context';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SellerPublicStorefront() {
   const params = useParams();
@@ -34,6 +37,8 @@ export default function SellerPublicStorefront() {
   const [seller, setSeller] = useState<SellerProfileRecord | null>(null);
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { addItem } = useCart();
+  const { toast } = useToast();
 
   useEffect(() => {
     async function loadStore() {
@@ -422,7 +427,26 @@ export default function SellerPublicStorefront() {
                     </CardContent>
                   </div>
 
-                  <div className="p-4 pt-0">
+                  <div className="p-4 pt-0 space-y-2">
+                    <Button
+                      className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-10 gap-1.5 shadow-sm"
+                      onClick={() => {
+                        addItem({
+                          id: prod.id || `${prod.name}-${idx}`,
+                          name: prod.name,
+                          price: Number(prod.price) || 0,
+                          sellerName: seller.storeName,
+                          sellerId: sellerId,
+                          imageId: undefined,
+                        });
+                        toast({
+                          title: 'Added to cart',
+                          description: `${prod.name} from ${seller.storeName}`,
+                        });
+                      }}
+                    >
+                      <ShoppingCart className="size-3.5" /> Add to Cart
+                    </Button>
                     {seller.whatsapp ? (
                       <a
                         href={`https://wa.me/234${seller.whatsapp.replace(
@@ -433,17 +457,13 @@ export default function SellerPublicStorefront() {
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full"
+                        className="w-full block"
                       >
-                        <Button className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-10 gap-1.5 shadow-sm">
+                        <Button variant="outline" className="w-full rounded-xl font-bold text-xs h-10 gap-1.5">
                           <MessageSquare className="size-3.5" /> Order via WhatsApp
                         </Button>
                       </a>
-                    ) : (
-                      <Button className="w-full rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs h-10">
-                        Contact Seller
-                      </Button>
-                    )}
+                    ) : null}
                   </div>
                 </Card>
               ))}

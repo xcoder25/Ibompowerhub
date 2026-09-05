@@ -55,12 +55,21 @@ export default function ApproveProductsPage() {
     if (!firestore) return;
 
     try {
-      // Move to approved products
+      // Move to approved products — preserve sellerId for checkout → seller finance
       await setDoc(doc(firestore, 'approved_products', product.id), {
-        ...product,
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        quantity: product.quantity,
+        category: product.category,
+        images: product.images || [],
+        sellerId: product.sellerId,
+        sellerName: product.sellerName,
+        userId: product.sellerId,
         status: 'approved',
         approvedAt: new Date(),
-        approvedBy: user?.uid
+        approvedBy: user?.uid,
       });
 
       // Remove from pending

@@ -19,10 +19,10 @@ import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import Link from 'next/link';
 
 const featuredProducts = [
-  { id: 'fp-1', name: 'Fresh Waterleaf (Bundle)', category: 'Vegetables', price: 800, sellerName: 'Ibom Organic Farms', imageId: 'seller-vegetables', description: 'Freshly harvested waterleaf from our organic beds.' },
-  { id: 'fp-2', name: 'Oron Jumbo Crayfish', category: 'Seafood', price: 4500, sellerName: 'Oron Seafood Direct', imageId: 'seller-seafood', description: 'Sun-dried jumbo crayfish straight from Oron waters.' },
-  { id: 'fp-3', name: 'Itam Yellow Garri', category: 'Tubers & Grains', price: 2000, sellerName: 'Itam Market Tubers', imageId: 'seller-tubers', description: 'Crispy yellow garri perfectly fried in Itam.' },
-  { id: 'fp-4', name: 'Live Broiler Chicken', category: 'Poultry', price: 12000, sellerName: 'Ikot Ekpene Poultry', imageId: 'seller-poultry', description: 'Healthy, well-fed broiler chicken ready for preparation.' }
+  { id: 'fp-1', name: 'Fresh Waterleaf (Bundle)', category: 'Vegetables', price: 800, sellerName: 'Ibom Organic Farms', sellerId: 'demo_seller_organic', imageId: 'seller-vegetables', description: 'Freshly harvested waterleaf from our organic beds.' },
+  { id: 'fp-2', name: 'Oron Jumbo Crayfish', category: 'Seafood', price: 4500, sellerName: 'Oron Seafood Direct', sellerId: 'demo_seller_oron', imageId: 'seller-seafood', description: 'Sun-dried jumbo crayfish straight from Oron waters.' },
+  { id: 'fp-3', name: 'Itam Yellow Garri', category: 'Tubers & Grains', price: 2000, sellerName: 'Itam Market Tubers', sellerId: 'demo_seller_itam', imageId: 'seller-tubers', description: 'Crispy yellow garri perfectly fried in Itam.' },
+  { id: 'fp-4', name: 'Live Broiler Chicken', category: 'Poultry', price: 12000, sellerName: 'Ikot Ekpene Poultry', sellerId: 'demo_seller_poultry', imageId: 'seller-poultry', description: 'Healthy, well-fed broiler chicken ready for preparation.' }
 ];
 
 export default function MarketPage() {
@@ -79,7 +79,9 @@ export default function MarketPage() {
       id: product.id || `${product.name}-${Date.now()}`,
       name: productName || product.name,
       price: product.price || 0,
-      sellerName: product.sellerName || product.name,
+      sellerName: product.sellerName || product.storeName || product.name,
+      // sellerId links the line item to the merchant wallet / seller dashboard finance
+      sellerId: product.sellerId || product.userId || product.merchantUserId || undefined,
       imageId: product.imageId,
     });
 

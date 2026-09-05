@@ -8,6 +8,8 @@ export type CartItem = {
   name: string;
   price: number;
   sellerName: string;
+  /** Firestore user id of the merchant (seller_profiles / seller_applications doc id) */
+  sellerId?: string;
   quantity: number;
   imageId?: string;
 };

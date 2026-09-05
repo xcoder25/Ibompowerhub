@@ -14,13 +14,46 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ShoppingBag, ArrowLeft, CreditCard, Truck, MapPin, Wallet, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, updateDoc, addDoc, collection } from 'firebase/firestore';
+import { doc, updateDoc, addDoc, collection, serverTimestamp, writeBatch, increment } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 type WalletData = {
   balance: number;
   currency: string;
 };
+
+/** Group cart lines by seller so each merchant gets their own order + earnings. */
+function groupItemsBySeller(items: { id: string; name: string; price: number; quantity: number; sellerName: string; sellerId?: string }[]) {
+  const groups = new Map<string, {
+    sellerId: string;
+    sellerName: string;
+    items: { productId: string; name: string; price: number; quantity: number }[];
+    subtotal: number;
+  }>();
+
+  for (const item of items) {
+    const key = item.sellerId || `name:${item.sellerName || 'unknown'}`;
+    const existing = groups.get(key);
+    const line = {
+      productId: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+    };
+    if (existing) {
+      existing.items.push(line);
+      existing.subtotal += item.price * item.quantity;
+    } else {
+      groups.set(key, {
+        sellerId: item.sellerId || key,
+        sellerName: item.sellerName || 'Ibom Merchant',
+        items: [line],
+        subtotal: item.price * item.quantity,
+      });
+    }
+  }
+  return Array.from(groups.values());
+}
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
@@ -59,44 +92,89 @@ export default function CheckoutPage() {
     e.preventDefault();
     if (items.length === 0) return;
 
+    if (!user || !firestore) {
+      toast({
+        variant: 'destructive',
+        title: 'Sign in required',
+        description: 'Please sign in to place a market order.',
+      });
+      return;
+    }
+
     if (paymentMethod === 'wallet') {
       if (!hasEnoughBalance) {
         toast({
           variant: 'destructive',
           title: 'Insufficient Balance',
-          description: 'Your Ibom Wallet balance is too low for this purchase.'
-        });
-        return;
-      }
-
-      try {
-        const newBalance = walletData!.balance - grandTotal;
-        await updateDoc(walletDocRef!, { balance: newBalance });
-
-        await addDoc(collection(firestore!, 'wallets', user!.uid, 'transactions'), {
-          type: 'debit',
-          amount: grandTotal,
-          description: `Ibom Market Order - ${items.length} items`,
-          timestamp: new Date(),
-          reference: `IM-${Date.now()}`
-        });
-      } catch (error) {
-        console.error('Error processing wallet payment:', error);
-        toast({
-          variant: 'destructive',
-          title: 'Payment Error',
-          description: 'Failed to authorize wallet transaction.'
+          description: 'Your Ibom Wallet balance is too low for this purchase.',
         });
         return;
       }
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    const orderRef = `IM-${Date.now()}`;
+    const sellerGroups = groupItemsBySeller(items);
+    // Split delivery fee evenly across seller groups (simple allocation)
+    const deliveryPerGroup = sellerGroups.length > 0 ? deliveryFee / sellerGroups.length : deliveryFee;
+
+    try {
+      // 1) Debit buyer wallet when paying with IbomPay
+      if (paymentMethod === 'wallet' && walletDocRef) {
+        const newBalance = (walletData?.balance ?? 0) - grandTotal;
+        await updateDoc(walletDocRef, { balance: newBalance });
+        await addDoc(collection(firestore, 'wallets', user.uid, 'transactions'), {
+          type: 'debit',
+          amount: grandTotal,
+          description: `Ibom Market Order - ${items.length} item(s)`,
+          category: 'market',
+          timestamp: new Date(),
+          reference: orderRef,
+          status: 'success',
+        });
+      }
+
+      // 2) Create one order document per seller (connects to seller dashboard finance)
+      for (const group of sellerGroups) {
+        const orderTotal = group.subtotal + deliveryPerGroup;
+        const isWalletPaid = paymentMethod === 'wallet';
+
+        await addDoc(collection(firestore, 'orders'), {
+          orderRef: `${orderRef}-${group.sellerId.slice(0, 8)}`,
+          parentRef: orderRef,
+          buyerId: user.uid,
+          buyerName: formData.name || user.displayName || 'Buyer',
+          buyerPhone: formData.phone || user.phoneNumber || '',
+          deliveryAddress: formData.address,
+          deliveryNotes: formData.notes || '',
+          sellerId: group.sellerId,
+          sellerName: group.sellerName,
+          items: group.items,
+          subtotal: group.subtotal,
+          deliveryFee: deliveryPerGroup,
+          total: orderTotal,
+          paymentMethod,
+          // paid → counts toward seller available payout; pending for COD
+          status: isWalletPaid ? 'paid' : 'pending_payment',
+          fulfillmentStatus: 'awaiting_dispatch',
+          settled: false, // seller can claim into IbomPay wallet when ready
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      }
+
       clearCart();
       setIsLoading(false);
       router.push('/market/success');
-    }, 3000);
+    } catch (error) {
+      console.error('Error placing order:', error);
+      setIsLoading(false);
+      toast({
+        variant: 'destructive',
+        title: 'Order failed',
+        description: 'Could not complete your market order. Please try again.',
+      });
+    }
   };
 
   if (items.length === 0 && !isLoading) {

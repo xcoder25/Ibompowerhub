@@ -46,10 +46,33 @@ service cloud.firestore {
       }
     }
 
+    // Marketplace orders — buyer creates; buyer or seller can read/update their own side
+    match /orders/{orderId} {
+      allow create: if isSignedIn()
+        && request.resource.data.buyerId == request.auth.uid;
+      allow read: if isSignedIn()
+        && (resource.data.buyerId == request.auth.uid
+            || resource.data.sellerId == request.auth.uid);
+      allow update: if isSignedIn()
+        && (resource.data.buyerId == request.auth.uid
+            || resource.data.sellerId == request.auth.uid);
+      allow delete: if false;
+    }
+
     // Rules for the 'sellers' collection
     match /sellers/{userId} {
       allow read: if isSignedIn();
       allow create, update: if isOwner(userId);
+    }
+
+    match /seller_profiles/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn() && isOwner(userId);
+    }
+
+    match /seller_applications/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && isOwner(userId);
     }
 
     // Rules for the 'reports' collection
