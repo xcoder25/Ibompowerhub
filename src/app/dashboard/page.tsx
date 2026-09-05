@@ -776,7 +776,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* ── Status Matrix ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 md:mb-8 w-full min-w-0">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 mb-6 md:mb-8 w-full min-w-0">
            {/* Resident State Briefing */}
            <Card className="bg-indigo-950 border-none rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl relative group h-full w-full min-w-0">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent pointer-events-none" />
@@ -799,32 +799,6 @@ export default function DashboardPage() {
                  </div>
               </div>
               <div className="absolute top-[-20%] right-[-10%] size-64 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
-           </Card>
-
-           {/* Secure Access Snapshot */}
-           <Card className="bg-white dark:bg-slate-900 border-none shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden p-0 relative h-full w-full min-w-0">
-              <div className="p-4 sm:p-7 md:p-8 space-y-4 sm:space-y-6 bg-slate-50/50 dark:bg-slate-950/50 h-full flex flex-col justify-between min-w-0 w-full">
-                 <div className="space-y-4 sm:space-y-6">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                       <ShieldCheck className="size-4 sm:size-5 text-indigo-500 shrink-0" />
-                       <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter text-base sm:text-xl truncate">SECURE ACCESS</h4>
-                    </div>
-                    <div className="space-y-3 sm:space-y-4">
-                       <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 flex items-center justify-between">
-                          <div className="flex items-center gap-2.5 sm:gap-3">
-                             <div className="size-7 sm:size-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500"><Shield className="size-3.5 sm:size-4" /></div>
-                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">ID Sync</p>
-                          </div>
-                          <p className="font-black text-xs text-indigo-500 uppercase tracking-widest">Pre-Verified</p>
-                       </div>
-                    </div>
-                 </div>
-                 <div className="mt-auto pt-3 sm:pt-6">
-                    <Link href="/access" className="block w-full">
-                       <Button className="w-full h-10 sm:h-12 rounded-xl bg-slate-950 text-white hover:bg-indigo-600 transition-all font-black uppercase text-[10px] tracking-[0.15em] sm:tracking-[0.2em] shadow-xl shadow-indigo-500/20 truncate">Initialize Gate Sync</Button>
-                    </Link>
-                 </div>
-              </div>
            </Card>
         </div>
 
