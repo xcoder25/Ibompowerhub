@@ -21,6 +21,7 @@ import { useIbibioAI } from '@/hooks/use-ibibio-ai';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { GlobalDaraWakeAssistant } from '../global-dara-wake-assistant';
+import { PwaInstallPrompt } from '../pwa-install-prompt';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const [isClient, setIsClient] = useState(false);
@@ -39,6 +40,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <CartProvider>
                 <AuthHandler>{children}</AuthHandler>
                 <GlobalDaraWakeAssistant />
+                <PwaInstallPrompt />
                 <Toaster />
             </CartProvider>
         </LoadingProvider>
