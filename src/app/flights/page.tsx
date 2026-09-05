@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
+import { saveOfflineFlightTicket, getOfflineFlightTickets } from '@/lib/offline-vault';
 
 export default function FlightBookingPage() {
     const { user } = useUser();
@@ -27,8 +28,14 @@ export default function FlightBookingPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [bookingSuccess, setBookingSuccess] = useState(false);
     const [bookingRef, setBookingRef] = useState(`QI-${Math.floor(Math.random() * 900000) + 100000}`);
+
     const [scrapedFlights, setScrapedFlights] = useState<any[]>([]);
-    const [myBookings, setMyBookings] = useState<any[]>([]);
+    const [myBookings, setMyBookings] = useState<any[]>(() => {
+        if (typeof window !== 'undefined') {
+            return getOfflineFlightTickets();
+        }
+        return [];
+    });
 
     // Tracking state
     const [trackRef, setTrackRef] = useState('');
@@ -37,6 +44,12 @@ export default function FlightBookingPage() {
 
     // Fetch user's flight bookings from Firestore
     useEffect(() => {
+        // Hydrate from offline vault immediately
+        const offlineTickets = getOfflineFlightTickets();
+        if (offlineTickets.length > 0 && myBookings.length === 0) {
+            setMyBookings(offlineTickets);
+        }
+
         if (!firestore) return;
         const userId = user?.uid || 'guest-session';
         const q = query(
@@ -48,10 +61,33 @@ export default function FlightBookingPage() {
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const bookings: any[] = [];
             snapshot.forEach(d => {
-                bookings.push({ id: d.id, ...d.data() });
+                const data = d.data();
+                bookings.push({ id: d.id, ...data });
+                // Cache into offline vault
+                saveOfflineFlightTicket({
+                    id: d.id,
+                    bookingRef: data.pnr || d.id,
+                    flightNumber: data.flightNo || 'QI 0101',
+                    passengerName: data.passengerName || 'Akwa Ibom Resident',
+                    origin: data.origin || 'Uyo (QUO)',
+                    destination: data.destination || 'Lagos (LOS)',
+                    date: data.bookingDate || new Date().toISOString(),
+                    departureTime: data.departureTime || '08:30',
+                    arrivalTime: data.arrivalTime || '09:45',
+                    seat: data.seatNumber || '14A',
+                    gate: data.gate || 'G2',
+                    class: data.cabinClass || 'Economy',
+                    qrPayload: data.barcodeData || `IBOMAIR:${data.pnr}`
+                });
             });
-            setMyBookings(bookings);
-        }, () => {});
+            if (bookings.length > 0) {
+                setMyBookings(bookings);
+            }
+        }, () => {
+            // If offline, ensure offline tickets are visible
+            const fallback = getOfflineFlightTickets();
+            if (fallback.length > 0) setMyBookings(fallback);
+        });
 
         return () => unsubscribe();
     }, [firestore, user]);
@@ -211,6 +247,24 @@ export default function FlightBookingPage() {
                 } catch {}
             }
 
+            // Save to offline vault immediately
+            saveOfflineFlightTicket({
+                id: eTicket.pnr,
+                bookingRef: eTicket.pnr,
+                flightNumber: eTicket.flightNo || selectedFlight.id,
+                passengerName: eTicket.passengerName || 'Akwa Ibom Resident',
+                origin: from,
+                destination: to,
+                date: eTicket.bookingDate || new Date().toISOString(),
+                departureTime: eTicket.departureTime || '08:30',
+                arrivalTime: eTicket.arrivalTime || '09:45',
+                seat: eTicket.seatNumber || '14A',
+                gate: eTicket.gate || 'G2',
+                class: typeof selectedFlight.type === 'string' ? selectedFlight.type : 'Economy',
+                qrPayload: eTicket.barcodeData || `IBOMAIR:${eTicket.pnr}`
+            });
+
+            setMyBookings(prev => [eTicket, ...prev.filter(b => b.pnr !== eTicket.pnr)]);
             setBookingSuccess(true);
         } catch (err: any) {
             toast({ title: 'Booking Failed', description: err.message || 'Could not process flight reservation.', variant: 'destructive' });

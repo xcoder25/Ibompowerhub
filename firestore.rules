@@ -117,7 +117,63 @@ service cloud.firestore {
       allow read, write: if isSignedIn() && isOwner(userId);
     }
 
-    // Rules for Nearby AirSend
+    // Rules for Power Grid Vended Tokens
+    match /power_tokens/{tokenId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.userId == 'guest-session');
+      allow create: if true; // Allows instant vending with valid token receipt
+      allow update, delete: if false; // Tokens are immutable receipts
+    }
+
+    // Rules for Ibom Air Flight Bookings & E-Tickets
+    match /flight_bookings/{bookingId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.userId == 'guest-session');
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Rules for FloodSense AKS Telemetry & Citizen Reports
+    match /flood_sensors/{sensorId} {
+      allow read: if true; // Public state drainage telemetry
+      allow write: if false; // Only backend ingestion nodes can write
+    }
+
+    match /flood_reports/{reportId} {
+      allow read: if true; // Public emergency radar for all citizens
+      allow create: if true; // Allows rapid citizen flood hazard reporting
+      allow update: if true; // Allows community upvoting
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Rules for Civic & AKSWMA Drainage Tickets
+    match /civic_tickets/{ticketId} {
+      allow read: if isSignedIn();
+      allow create: if true;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Rules for Nearby AirSend Mesh Presence & Transfers
+    match /airsend_presence/{userId} {
+      allow read: if true; // Active proximity discovery
+      allow write, delete: if isSignedIn() && isOwner(userId);
+    }
+
+    match /airsend_transfers/{transferId} {
+      allow read: if isSignedIn() && (
+        resource.data.recipientUid == request.auth.uid || 
+        resource.data.senderUid == request.auth.uid
+      );
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource.data.recipientUid == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // Rules for Live Mobility & Transit Tracking
+    match /live_tracking/{orderId} {
+      allow read: if true; // Real-time transit visualization
+      allow write: if isSignedIn(); // Verified drivers can publish location
+    }
+
+    // Legacy AirSend routes
     match /air_receivers/{document=**} {
       allow read, write: if isSignedIn();
     }

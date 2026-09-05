@@ -273,6 +273,14 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Privacy & Legal" asChild>
+              <Link href="/privacy">
+                <ShieldCheck className="size-4" />
+                <span>Privacy & Legal</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton tooltip="Logout" onClick={handleSignOut}>
               <LogOut />
               <span>Logout</span>

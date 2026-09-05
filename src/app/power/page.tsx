@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useToast } from '@/hooks/use-toast';
 import { useUser, useFirestore } from '@/firebase';
 import { collection, addDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { saveOfflinePowerToken, getOfflinePowerTokens } from '@/lib/offline-vault';
 
 // ── Interactive Grid Canvas ──
 function GridCanvas() {
@@ -127,13 +128,60 @@ export default function PowerPage() {
   const [latestReceipt, setLatestReceipt] = useState<VendedTokenReceipt | null>(null);
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [recentTokens, setRecentTokens] = useState<VendedTokenReceipt[]>([]);
+  const [recentTokens, setRecentTokens] = useState<VendedTokenReceipt[]>(() => {
+    if (typeof window !== 'undefined') {
+      const offline = getOfflinePowerTokens();
+      if (offline.length > 0) {
+        return offline.map(o => ({
+          token: o.token,
+          receiptNo: o.id,
+          meterNumber: o.meterNumber,
+          meterType: 'Prepaid (STS)',
+          disco: o.disco,
+          band: 'Band A (20+ hrs)',
+          customerName: o.customerName || 'Grid Subscriber',
+          address: o.address || 'Akwa Ibom State',
+          amountPaid: o.amount,
+          netEnergyCost: Math.round(o.amount * 0.925),
+          vatAmount: Math.round(o.amount * 0.075),
+          tariffPerKwh: 68,
+          unitsKwh: o.units,
+          timestamp: o.createdAt,
+          status: 'SUCCESSFUL',
+          feederStation: 'Ibom Power Plant (Ikot Abasi)'
+        }));
+      }
+    }
+    return [];
+  });
 
   // Real-time Firestore tokens listener
   useEffect(() => {
+    // Check offline tokens
+    const cached = getOfflinePowerTokens();
+    if (cached.length > 0 && recentTokens.length === 0) {
+      setRecentTokens(cached.map(o => ({
+        token: o.token,
+        receiptNo: o.id,
+        meterNumber: o.meterNumber,
+        meterType: 'Prepaid (STS)',
+        disco: o.disco,
+        band: 'Band A (20+ hrs)',
+        customerName: o.customerName || 'Grid Subscriber',
+        address: o.address || 'Akwa Ibom State',
+        amountPaid: o.amount,
+        netEnergyCost: Math.round(o.amount * 0.925),
+        vatAmount: Math.round(o.amount * 0.075),
+        tariffPerKwh: 68,
+        unitsKwh: o.units,
+        timestamp: o.createdAt,
+        status: 'SUCCESSFUL',
+        feederStation: 'Ibom Power Plant (Ikot Abasi)'
+      })));
+    }
+
     if (!firestore) return;
 
-    // Listen to user's power tokens if authenticated, or general local state
     const userId = user?.uid || 'guest-session';
     const tokensRef = collection(firestore, 'power_tokens');
     const q = query(
@@ -148,18 +196,47 @@ export default function PowerPage() {
       (snapshot) => {
         const tokens: VendedTokenReceipt[] = [];
         snapshot.forEach((doc) => {
-          tokens.push(doc.data() as VendedTokenReceipt);
+          const d = doc.data() as VendedTokenReceipt;
+          tokens.push(d);
+          saveOfflinePowerToken({
+            id: d.receiptNo || doc.id,
+            meterNumber: d.meterNumber,
+            disco: d.disco,
+            token: d.token,
+            units: d.unitsKwh,
+            amount: d.amountPaid,
+            customerName: d.customerName,
+            address: d.address,
+            createdAt: d.timestamp
+          });
         });
         if (tokens.length > 0) {
           setRecentTokens(tokens);
         }
       },
-      (error) => {
-        // Fallback to local storage for guests
-        try {
-          const localStored = localStorage.getItem('ibom_recent_power_tokens');
-          if (localStored) setRecentTokens(JSON.parse(localStored));
-        } catch {}
+      () => {
+        // Fallback to offline vault
+        const off = getOfflinePowerTokens();
+        if (off.length > 0) {
+          setRecentTokens(off.map(o => ({
+            token: o.token,
+            receiptNo: o.id,
+            meterNumber: o.meterNumber,
+            meterType: 'Prepaid (STS)',
+            disco: o.disco,
+            band: 'Band A (20+ hrs)',
+            customerName: o.customerName || 'Grid Subscriber',
+            address: o.address || 'Akwa Ibom State',
+            amountPaid: o.amount,
+            netEnergyCost: Math.round(o.amount * 0.925),
+            vatAmount: Math.round(o.amount * 0.075),
+            tariffPerKwh: 68,
+            unitsKwh: o.units,
+            timestamp: o.createdAt,
+            status: 'SUCCESSFUL',
+            feederStation: 'Ibom Power Plant (Ikot Abasi)'
+          })));
+        }
       }
     );
 
@@ -212,6 +289,19 @@ export default function PowerPage() {
           console.warn('[POWER] Firestore save fallback:', dbErr);
         }
       }
+
+      // Save to offline vault immediately
+      saveOfflinePowerToken({
+        id: receiptData.receiptNo,
+        meterNumber: receiptData.meterNumber,
+        disco: receiptData.disco,
+        token: receiptData.token,
+        units: receiptData.unitsKwh,
+        amount: receiptData.amountPaid,
+        customerName: receiptData.customerName,
+        address: receiptData.address,
+        createdAt: receiptData.timestamp
+      });
 
       // Update local storage history
       try {
