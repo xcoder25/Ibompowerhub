@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 /**
  * useWakeWord — "Dara" always-on, low-latency wake word engine
  * Designed to behave like Google Assistant:
+ * - Auto-starts on mount (and auto-resumes on first user gesture if browser requires interaction)
  * - Direct wake on "Dara" (plus natural prefixes and phonetic/dialect variations: Idara, Edara, etc.)
  * - Zero-delay instant chime
  * - Continuous command extraction: saying "Dara what's my balance" immediately forwards the command!
@@ -26,14 +27,14 @@ export interface WakePayload {
 
 /**
  * Robust phonetic & dialect matching for "Dara":
- * Handles: "Dara", "Hey Dara", "Idara", "Edara", "Adara", "Darah", "Dra", "Da ra", "Oya Dara", etc.
+ * Handles: "Dara", "Hey Dara", "Idara", "Edara", "Adara", "Darah", "Dra", "Da ra", "Oya Dara", "Dollar", etc.
  */
 export function extractDaraCommand(transcript: string): { isMatch: boolean; command: string; wakeWord: string } {
   if (!transcript) return { isMatch: false, command: '', wakeWord: '' };
   const clean = transcript.trim();
 
-  // Pattern: matches optional conversational preface + Dara (or Idara/Edara/Darah) + trailing command
-  const regex = /(?:^|.*?\b)(?:hey\s+|hi\s+|hello\s+|oya\s+|ok\s+|okay\s+|yo\s+|ahh\s+|di\s+)?((?:i|e|a)?dar+a+h?|da\s+ra)\b[\s,:!?]*(.*)$/i;
+  // Pattern: matches optional conversational preface + Dara (or Idara/Edara/Darah/Dalla) + trailing command
+  const regex = /(?:^|.*?\b)(?:hey\s+|hi\s+|hello\s+|oya\s+|ok\s+|okay\s+|yo\s+|ahh\s+|di\s+)?((?:i|e|a)?dar+a+h?|da\s+ra|dalah|dalla|dollar)\b[\s,:!?]*(.*)$/i;
   const match = clean.match(regex);
 
   if (match) {
@@ -67,7 +68,7 @@ export function playWakeChime() {
     osc1.type = 'sine';
     osc1.frequency.setValueAtTime(587.33, t);
     gain1.gain.setValueAtTime(0, t);
-    gain1.gain.linearRampToValueAtTime(0.18, t + 0.015);
+    gain1.gain.linearRampToValueAtTime(0.20, t + 0.015);
     gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
     osc1.connect(gain1);
     gain1.connect(ctx.destination);
@@ -80,7 +81,7 @@ export function playWakeChime() {
     osc2.type = 'sine';
     osc2.frequency.setValueAtTime(880.0, t + 0.09);
     gain2.gain.setValueAtTime(0, t + 0.09);
-    gain2.gain.linearRampToValueAtTime(0.22, t + 0.105);
+    gain2.gain.linearRampToValueAtTime(0.24, t + 0.105);
     gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
     osc2.connect(gain2);
     gain2.connect(ctx.destination);
@@ -93,15 +94,16 @@ export function playWakeChime() {
   }
 }
 
-const RESTART_DELAY_MS = 150;
+const RESTART_DELAY_MS = 100;
 const HEARD_COOLDOWN_MS = 1800;
 
 export interface UseWakeWordOptions {
   onWake: (payload: WakePayload) => void;
   enabled?: boolean;
+  autoStart?: boolean;
 }
 
-export function useWakeWord({ onWake, enabled = true }: UseWakeWordOptions) {
+export function useWakeWord({ onWake, enabled = true, autoStart = true }: UseWakeWordOptions) {
   const [state, setState] = useState<WakeWordState>('idle');
   const [lastPhrase, setLastPhrase] = useState<string>('');
   const [isSupported, setIsSupported] = useState<boolean | null>(null);
@@ -113,6 +115,7 @@ export function useWakeWord({ onWake, enabled = true }: UseWakeWordOptions) {
   const enabledRef = useRef(enabled);
   const onWakeRef = useRef(onWake);
   const lastWakeTimeRef = useRef<number>(0);
+  const userInteractedRef = useRef(false);
 
   useEffect(() => { enabledRef.current = enabled; }, [enabled]);
   useEffect(() => { onWakeRef.current = onWake; }, [onWake]);
@@ -141,71 +144,91 @@ export function useWakeWord({ onWake, enabled = true }: UseWakeWordOptions) {
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRec) return;
 
-    isRunningRef.current = true;
-    const rec = new SpeechRec();
-    rec.continuous = true;
-    rec.interimResults = true;
-    rec.lang = 'en-NG'; // Dialect-aware primary
-    rec.maxAlternatives = 3;
-    recognitionRef.current = rec;
+    try {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch {}
+      }
 
-    rec.onresult = (event: any) => {
-      if (!enabledRef.current) return;
+      isRunningRef.current = true;
+      const rec = new SpeechRec();
+      rec.continuous = true;
+      rec.interimResults = true;
+      // Primary dialect locale, fallback safely
+      rec.lang = navigator.language || 'en-NG';
+      rec.maxAlternatives = 3;
+      recognitionRef.current = rec;
 
-      const now = Date.now();
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        for (let j = 0; j < result.length; j++) {
-          const rawTranscript = result[j].transcript;
-          const { isMatch, command, wakeWord } = extractDaraCommand(rawTranscript);
+      rec.onresult = (event: any) => {
+        if (!enabledRef.current) return;
 
-          if (isMatch) {
-            // Check cooldown to prevent duplicate triggers within 1.8s
-            if (now - lastWakeTimeRef.current < HEARD_COOLDOWN_MS) {
+        const now = Date.now();
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const result = event.results[i];
+          for (let j = 0; j < result.length; j++) {
+            const rawTranscript = result[j].transcript;
+            const { isMatch, command, wakeWord } = extractDaraCommand(rawTranscript);
+
+            if (isMatch) {
+              // Check cooldown to prevent duplicate triggers within 1.8s
+              if (now - lastWakeTimeRef.current < HEARD_COOLDOWN_MS) {
+                return;
+              }
+              lastWakeTimeRef.current = now;
+
+              // Instant audio chime like Google Assistant
+              playWakeChime();
+
+              setState('heard');
+              setLastPhrase(rawTranscript.trim());
+
+              // Fire onWake immediately with extracted command if present
+              onWakeRef.current({
+                phrase: rawTranscript.trim(),
+                command,
+                wakeWord,
+              });
               return;
             }
-            lastWakeTimeRef.current = now;
-
-            // Instant audio chime like Google Assistant
-            playWakeChime();
-
-            setState('heard');
-            setLastPhrase(rawTranscript.trim());
-
-            // Fire onWake immediately with extracted command if present
-            onWakeRef.current({
-              phrase: rawTranscript.trim(),
-              command,
-              wakeWord,
-            });
-            return;
           }
         }
-      }
-    };
+      };
 
-    rec.onend = () => {
-      isRunningRef.current = false;
-      if (!enabledRef.current) return;
-      clearRestartTimer();
-      restartTimerRef.current = setTimeout(() => startWakeListener(), RESTART_DELAY_MS);
-    };
+      rec.onend = () => {
+        isRunningRef.current = false;
+        if (!enabledRef.current) return;
+        clearRestartTimer();
+        restartTimerRef.current = setTimeout(() => {
+          if (enabledRef.current) startWakeListener();
+        }, RESTART_DELAY_MS);
+      };
 
-    rec.onerror = (event: any) => {
-      isRunningRef.current = false;
-      if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-        setState('error');
-        setHasPermission(false);
-        return;
-      }
-      if (!enabledRef.current) return;
-      clearRestartTimer();
-      restartTimerRef.current = setTimeout(() => startWakeListener(), RESTART_DELAY_MS * 2);
-    };
+      rec.onerror = (event: any) => {
+        isRunningRef.current = false;
+        // 'no-speech' is completely normal in continuous listening
+        if (event.error === 'no-speech') {
+          clearRestartTimer();
+          restartTimerRef.current = setTimeout(() => {
+            if (enabledRef.current) startWakeListener();
+          }, 80);
+          return;
+        }
 
-    try {
+        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+          setState('error');
+          setHasPermission(false);
+          return;
+        }
+
+        if (!enabledRef.current) return;
+        clearRestartTimer();
+        restartTimerRef.current = setTimeout(() => {
+          if (enabledRef.current) startWakeListener();
+        }, RESTART_DELAY_MS * 2);
+      };
+
       rec.start();
-      setState(prev => prev === 'idle' || prev === 'standby' ? 'standby' : prev);
+      setState('standby');
+      setHasPermission(true);
     } catch {
       isRunningRef.current = false;
     }
@@ -215,8 +238,8 @@ export function useWakeWord({ onWake, enabled = true }: UseWakeWordOptions) {
     clearRestartTimer();
     isRunningRef.current = false;
     try {
-      recognitionRef.current?.stop();
-    } catch { }
+      recognitionRef.current?.abort();
+    } catch {}
     recognitionRef.current = null;
   }, [clearRestartTimer]);
 
@@ -247,9 +270,37 @@ export function useWakeWord({ onWake, enabled = true }: UseWakeWordOptions) {
   const setActive = useCallback(() => { setState('active'); }, []);
   const setStandby = useCallback(() => { setState('standby'); }, []);
 
+  // ── Auto-Start on Mount & User Gesture Unlock ───────────────────────────
   useEffect(() => {
-    return () => { stopWakeListener(); };
-  }, [stopWakeListener]);
+    if (!autoStart || !enabled) return;
+
+    // 1. Attempt immediate auto-start
+    const timer = setTimeout(() => {
+      startWakeListener();
+    }, 400);
+
+    // 2. Add one-time user interaction listener to unlock microphone in strict browsers
+    const handleFirstGesture = () => {
+      if (!userInteractedRef.current) {
+        userInteractedRef.current = true;
+        if (!isRunningRef.current && enabledRef.current) {
+          startWakeListener();
+        }
+      }
+    };
+
+    window.addEventListener('click', handleFirstGesture, { once: true, passive: true });
+    window.addEventListener('touchstart', handleFirstGesture, { once: true, passive: true });
+    window.addEventListener('keydown', handleFirstGesture, { once: true, passive: true });
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('click', handleFirstGesture);
+      window.removeEventListener('touchstart', handleFirstGesture);
+      window.removeEventListener('keydown', handleFirstGesture);
+      stopWakeListener();
+    };
+  }, [autoStart, enabled, startWakeListener, stopWakeListener]);
 
   return {
     state,
@@ -260,8 +311,9 @@ export function useWakeWord({ onWake, enabled = true }: UseWakeWordOptions) {
     disableWakeWord,
     setActive,
     setStandby,
-    isListening: state === 'standby',
+    isListening: state === 'standby' || state === 'heard' || state === 'active',
     isWoken: state === 'heard' || state === 'active',
   };
 }
+
 

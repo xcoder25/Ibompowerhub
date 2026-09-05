@@ -486,6 +486,22 @@ export default function DaraPage() {
     }
   }, [isLoading, messages, buildUserContext, dialect, voiceSpeechEnabled, isListening, speakTonal]);
 
+  // Check for auto-prompt passed from global wake assistant (e.g. ?prompt=...)
+  const initialPromptProcessedRef = useRef(false);
+  useEffect(() => {
+    if (initialPromptProcessedRef.current) return;
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialPrompt = urlParams.get('prompt') || urlParams.get('q');
+    if (initialPrompt && initialPrompt.trim()) {
+      initialPromptProcessedRef.current = true;
+      window.history.replaceState({}, '', window.location.pathname);
+      setTimeout(() => {
+        sendMessage(initialPrompt.trim());
+      }, 350);
+    }
+  }, [sendMessage]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sendMessage(input);

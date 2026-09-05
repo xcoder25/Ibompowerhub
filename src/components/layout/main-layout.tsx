@@ -20,6 +20,7 @@ import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestor
 import { useIbibioAI } from '@/hooks/use-ibibio-ai';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { GlobalDaraWakeAssistant } from '../global-dara-wake-assistant';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const [isClient, setIsClient] = useState(false);
@@ -37,6 +38,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <LoadingProvider>
             <CartProvider>
                 <AuthHandler>{children}</AuthHandler>
+                <GlobalDaraWakeAssistant />
                 <Toaster />
             </CartProvider>
         </LoadingProvider>
