@@ -47,6 +47,7 @@ import {
   Vote,
   Waves,
   Landmark,
+  Mic,
 } from 'lucide-react';
 import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -54,8 +55,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useUser } from '@/firebase';
-import { VoiceBankingWidget } from '@/components/voice-banking';
-import { EmergencySOS } from '@/components/emergency-sos';
 import { FloodSensorWidget } from '@/components/floodsense/flood-sensor-widget';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit, doc, onSnapshot, where } from 'firebase/firestore';
@@ -156,17 +155,29 @@ export default function DashboardPage() {
   const { weather, loading: weatherLoading } = useWeather();
   const [heroSlide, setHeroSlide] = useState(0);
 
-  // 🔴 REAL-TIME: Live transaction feed from Firestore
+  // 🔴 REAL-TIME: Live transaction feed and wallet balance from Firestore
   const [liveTransactions, setLiveTransactions] = useState<LiveTransaction[]>([]);
   const [txLoading, setTxLoading] = useState(true);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user || !firestore) return;
     setTxLoading(true);
-    // Listen to the user's wallet sub-collection for real-time transactions
+
+    // 1. Listen to user wallet balance
+    const walletRef = doc(firestore, 'wallets', user.uid);
+    const unsubWallet = onSnapshot(walletRef, (snap) => {
+      if (snap.exists()) {
+        setWalletBalance(snap.data()?.balance ?? 0);
+      } else {
+        setWalletBalance(0);
+      }
+    });
+
+    // 2. Listen to the user's wallet sub-collection for real-time transactions
     const txRef = collection(firestore, 'wallets', user.uid, 'transactions');
     const txQuery = query(txRef, orderBy('timestamp', 'desc'), limit(8));
-    const unsub = onSnapshot(txQuery, (snap) => {
+    const unsubTx = onSnapshot(txQuery, (snap) => {
       const txs: LiveTransaction[] = snap.docs.map(d => ({
         id: d.id,
         ...d.data() as Omit<LiveTransaction, 'id'>,
@@ -174,7 +185,11 @@ export default function DashboardPage() {
       setLiveTransactions(txs);
       setTxLoading(false);
     });
-    return () => unsub();
+
+    return () => {
+      unsubWallet();
+      unsubTx();
+    };
   }, [user, firestore]);
 
   const heroSlides = [
@@ -364,6 +379,80 @@ export default function DashboardPage() {
           </div>
         </header>
 
+        {/* Citizen Quick Hub: Live Balance + 1-Tap Power Vend + Dara Voice Prompt */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-5 md:mb-6 w-full min-w-0">
+          {/* Live Wallet Balance Preview */}
+          <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between shadow-xs hover:shadow-sm transition-all">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="size-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <Landmark className="size-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none">IbomPay Wallet</p>
+                <p className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white mt-1 leading-none truncate">
+                  {walletBalance !== null ? `₦${walletBalance.toLocaleString()}` : '₦0.00'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Link href="/wallet/transfer">
+                <Button size="sm" variant="ghost" className="h-8 px-2.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 rounded-lg">
+                  Transfer
+                </Button>
+              </Link>
+              <Link href="/wallet/deposit">
+                <Button size="sm" className="h-8 px-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs">
+                  + Add
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Quick Vend Power (Ibom Power Flagship) */}
+          <Link href="/power" className="block w-full">
+            <div className="h-full bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/25 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between shadow-xs hover:shadow-sm hover:border-amber-500/40 transition-all group">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="size-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <Zap className="size-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 leading-none">Prepaid Electricity</p>
+                    <Badge className="bg-amber-500/20 text-amber-800 dark:text-amber-300 border-none text-[8px] font-bold px-1.5 py-0 leading-none">Instant STS</Badge>
+                  </div>
+                  <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mt-1 leading-tight truncate">
+                    Vend Power in 1-Tap
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="size-4 text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform shrink-0" />
+            </div>
+          </Link>
+
+          {/* Dara Dialect AI Voice Prompt Pill */}
+          <Link href="/dara" className="sm:col-span-2 lg:col-span-1 block w-full">
+            <div className="h-full bg-gradient-to-br from-violet-600/10 via-indigo-600/5 to-transparent border border-violet-500/25 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between shadow-xs hover:shadow-sm hover:border-violet-500/40 transition-all group">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="size-10 rounded-xl overflow-hidden shrink-0 border border-violet-400/30 group-hover:scale-105 transition-transform shadow-xs">
+                  <img src="/dara.png" alt="Dara AI" className="w-full h-full object-cover" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-violet-700 dark:text-violet-300 leading-none">Dara AI Assistant</p>
+                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  </div>
+                  <p className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mt-1 leading-tight truncate">
+                    Speak in Ibibio, Pidgin, or English
+                  </p>
+                </div>
+              </div>
+              <div className="size-7 rounded-lg bg-violet-100 dark:bg-violet-950/60 text-violet-600 dark:text-violet-300 flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
+                <Mic className="size-3.5" />
+              </div>
+            </div>
+          </Link>
+        </div>
+
         {/* Hero Section with Governor & Scrolling Text */}
         <Card className="border-0 overflow-hidden mb-5 md:mb-8 shadow-xl rounded-2xl w-full min-w-0">
           <CardContent className="p-0 w-full min-w-0">
@@ -381,7 +470,7 @@ export default function DashboardPage() {
                 <div className="flex-1 p-3.5 sm:p-6 md:p-10 flex flex-col justify-between min-w-0 w-full">
                   <div className="min-w-0 w-full">
                     {/* Animated text container */}
-                    <div className="relative h-[95px] sm:h-[135px] md:h-[160px] overflow-hidden mb-3 sm:mb-6 w-full min-w-0">
+                    <div className="relative h-[110px] sm:h-[135px] md:h-[150px] overflow-hidden mb-3 sm:mb-6 w-full min-w-0">
                       {heroSlides.map((slide, idx) => (
                         <div
                           key={idx}
@@ -758,13 +847,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Emergency SOS */}
-        <div className="mb-6 md:mb-8">
-          <EmergencySOS />
-        </div>
-
         {/* ── Status Matrix ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-6 md:mb-8 w-full min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 md:mb-8 w-full min-w-0">
            {/* Resident State Briefing */}
            <Card className="bg-indigo-950 border-none rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl relative group h-full w-full min-w-0">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent pointer-events-none" />
@@ -789,27 +873,10 @@ export default function DashboardPage() {
               <div className="absolute top-[-20%] right-[-10%] size-64 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
            </Card>
 
-           {/* Power Grid Status Snapshot */}
-           <Card className="lg:col-span-2 bg-white dark:bg-slate-900 border-none shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden p-0 relative h-full w-full min-w-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 h-full w-full min-w-0">
-                 <div className="p-4 sm:p-7 md:p-8 space-y-4 sm:space-y-6 border-b md:border-b-0 md:border-r border-slate-100 dark:border-white/5 min-w-0 w-full">
-                    <div className="flex items-center gap-2.5 sm:gap-3">
-                       <Zap className="size-4 sm:size-5 text-amber-500 animate-pulse shrink-0" />
-                       <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs sm:text-base truncate">ELECTRICITY SUPPLY FEEDERS</h4>
-                    </div>
-                    <div className="space-y-3 sm:space-y-5">
-                       {[{ area: 'Shelter Afrique', status: 'Optimal', load: '12MW' }, { area: 'Uyo Metropolis', status: 'Maintenance', load: '4MW' }].map(node => (
-                          <div key={node.area} className="flex items-center justify-between gap-2">
-                             <span className="text-slate-500 dark:text-slate-400 font-bold text-xs truncate">{node.area}</span>
-                             <div className="flex items-center gap-2.5 shrink-0">
-                                <span className="text-xs font-black text-slate-900 dark:text-white">{node.load}</span>
-                                <div className={cn("size-2 rounded-full", node.status === 'Optimal' ? "bg-emerald-500" : "bg-amber-500")} />
-                             </div>
-                          </div>
-                       ))}
-                    </div>
-                 </div>
-                 <div className="p-4 sm:p-7 md:p-8 space-y-4 sm:space-y-6 bg-slate-50/50 dark:bg-slate-950/50 min-w-0 w-full">
+           {/* Secure Access Snapshot */}
+           <Card className="bg-white dark:bg-slate-900 border-none shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden p-0 relative h-full w-full min-w-0">
+              <div className="p-4 sm:p-7 md:p-8 space-y-4 sm:space-y-6 bg-slate-50/50 dark:bg-slate-950/50 h-full flex flex-col justify-between min-w-0 w-full">
+                 <div className="space-y-4 sm:space-y-6">
                     <div className="flex items-center gap-2 sm:gap-3">
                        <ShieldCheck className="size-4 sm:size-5 text-indigo-500 shrink-0" />
                        <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter text-base sm:text-xl truncate">SECURE ACCESS</h4>
@@ -822,18 +889,15 @@ export default function DashboardPage() {
                           </div>
                           <p className="font-black text-xs text-indigo-500 uppercase tracking-widest">Pre-Verified</p>
                        </div>
-                       <Link href="/access" className="block w-full">
-                          <Button className="w-full h-10 sm:h-12 rounded-xl bg-slate-950 text-white hover:bg-indigo-600 transition-all font-black uppercase text-[10px] tracking-[0.15em] sm:tracking-[0.2em] shadow-xl shadow-indigo-500/20 truncate">Initialize Gate Sync</Button>
-                       </Link>
                     </div>
+                 </div>
+                 <div className="mt-auto pt-3 sm:pt-6">
+                    <Link href="/access" className="block w-full">
+                       <Button className="w-full h-10 sm:h-12 rounded-xl bg-slate-950 text-white hover:bg-indigo-600 transition-all font-black uppercase text-[10px] tracking-[0.15em] sm:tracking-[0.2em] shadow-xl shadow-indigo-500/20 truncate">Initialize Gate Sync</Button>
+                    </Link>
                  </div>
               </div>
            </Card>
-        </div>
-
-        {/* Advanced Voice Banking Edge Widget */}
-        <div className="mb-10">
-          <VoiceBankingWidget />
         </div>
 
       </div>
